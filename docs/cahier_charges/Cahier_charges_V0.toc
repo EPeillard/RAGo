@@ -1,0 +1,13 @@
+\select@language {french}
+\contentsline {section}{\numberline {1}Présentation du sujet}{3}
+\contentsline {subsection}{\numberline {1.1}Préambule}{3}
+\contentsline {subsection}{\numberline {1.2}Contexte}{3}
+\contentsline {section}{\numberline {2}Environnement}{4}
+\contentsline {subsection}{\numberline {2.1}Licence et technologies}{4}
+\contentsline {subsection}{\numberline {2.2}Environnement de développement}{4}
+\contentsline {subsection}{\numberline {2.3}Méthodes de suivi et déroulement du projet}{4}
+\contentsline {subsection}{\numberline {2.4}Livrables}{4}
+\contentsline {section}{\numberline {3}Spécification}{5}
+\contentsline {subsection}{\numberline {3.1}Fonctionnalités de l'application}{5}
+\contentsline {subsection}{\numberline {3.2}Documentation}{5}
+\contentsline {section}{\numberline {4}Réalisation}{6}

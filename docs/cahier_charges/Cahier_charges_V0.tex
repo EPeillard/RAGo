@@ -1,0 +1,137 @@
+\documentclass{article}
+\usepackage[frenchb]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage[french,linesnumbered]{algorithm2e}
+\newtheorem{mydef}{Définition}
+\newtheorem{myth}{Théorème}
+\newcommand{\reels}{\mathbb{R}}
+\newcommand{\naturels}{\mathbb{N}}
+
+\title{%
+    \begin{minipage}\linewidth
+        \centering
+        RA2GO
+				\vspace{1cm}
+        \vskip3pt
+        \large Cahier des charges
+    \end{minipage}
+}
+\author{Nicolas DAVID, Sylvain PALOMINOS}
+\date{\today}
+
+\begin{document}
+\maketitle
+\begin{center}
+	\textit{Encadré par Myriam SERVIERES \& Jean-Marie NORMAND}
+\end{center}
+\vspace{5cm}
+\begin{abstract}
+    \textit{Cahier des charges du projet d'application (PAPPL) visant à l'élaboration d'une application de jeu de GO à distance en réalité augmentée.}
+\end{abstract}
+\pagebreak 
+
+\tableofcontents
+\pagebreak 
+
+\section{Présentation du sujet}
+\vspace{1cm}
+\subsection{Préambule}
+
+Le présent docuent traite des spécifications fonctionnelles et techniques concernant la réalisation du projet "RA2GO". Il est élaboré suite à la réunion du mercredi 8 janvier 2014 entre l'équipe projet et l'équipe pédagogique. Ce document établit l'ensemble du travail qui sera réalisé sous forme d'un accord entre les étudiants du projet et l'équipe pédagogique.
+
+La ssituation du contexte de ce projet ainsi que la description des objectifs vont permettre de dégager les besoins du projet et de spécifier ses lignes directrices. La prise en compte des risques et limites sera aussi considérée dans ce document.
+
+Outre ces points, ce document permet de cadrer les conditions et modalités d'éxécution des missions, de communiquer en amont du projet et de formaliser et ordonner l'expression des besoins et des objectifs. Il doit donc être validé par les étudiants ainsi que par l'équipe pédagogique.
+
+\subsection{Contexte}
+
+Dans le cadre du cours de Projet d'application de l'option disciplinaire Informatique, les étudiants sont amenés à travailler par binôme sur un sujet proposé par différents encadrants.
+
+Ce sujet propose la mise en place d'une application de réalité augmentée permettant de jouer au GO sur un plateau réel avec un adversaire distant dont les images des pions seront projetés sur le plateau. L'application doit permettre de détecter les mouvements du joueur en présence et de jouer à distance en se connectant à des serveurs de jeu de GO.
+\pagebreak 
+
+\section{Environnement}
+\vspace{1cm}
+\subsection{Licence et technologies}
+L'ensemble du projet sera écrit en langage C++ sous environnement UNIX. Le code sera écrit et commenté en langue anglaise à des fins de partage. L'application sera développée à l'aide de la librairie openCV mise à disposition sous licence BSD \textit{(licence libre pour réutiliser tout ou partie du logiciel)}.
+Toutes les fonctionnalités du jeu de GO seront reprise d'un client \textit{(vraissemblablement q4go sous licence GPL)}.
+\begin{center}
+\textit{cf document d'analyse des clientsGO à détailler}
+\end{center}
+
+Le programme final sera sous licence CeCILL. (http://www.cecill.info/)
+
+\subsection{Environnement de développement}
+
+L'ensemble du code et des documents seront stockés sur un dépôt Github. Chaque membre de l'équipe aura accès à ce dépôt en tant que collaborateur.
+
+
+\begin{center}
+\textit{https://github.com/Mendroyxx/RA2GO}
+\end{center}
+
+\subsection{Méthodes de suivi et déroulement du projet}
+
+\begin{itemize}
+	\item rapport hebdomadaire à l'équipe pédagogique envoyé le vendredi de chaque semaine
+	\item suivi du temps passé sur chaque tâche (tableur googledoc)
+	\item suivi du cours du projet (tableur google doc)
+	\item réunions à planifier suivant l'avancement du projet
+\end{itemize}
+\subsection{Livrables}
+\begin{itemize}
+	\item Prototype final de l'application avec démonstration
+	\item Rapport d'avancement hebdomadaire
+	\item Rapport final
+	\item Code source du programme
+	\item Manuels utilisateur et développeur
+\end{itemize}
+\pagebreak 
+
+\section{Spécification}
+\vspace{1cm}
+\subsection{Fonctionnalités de l'application}
+
+Le but est la réalisation d'une application "RA2GO" contenant : 
+\begin{itemize}
+	\item les différentes fonctionnalités d'un client de GO à savoir : 
+	
+	\begin{enumerate}
+		\item se connecter à un seveur de Go.
+		\item jouer avec un adversaire distant.
+		\item regarder une partie de Go.
+		\item jouer seul face au logiciel.
+		\item enregistrer la partie pour permettre son visionnage.
+		\item interface d'aide et d'analyse de la partie.
+	\end{enumerate}
+	
+	\item couplées à des fonctionnalités de réalité augmentée :
+	
+	
+	\begin{enumerate}
+		\item détecter les mouvements des pièces sur le plateau d'un joueur physiquement présent.
+		\item vidéo-projeter les pièces du joueur distant ou de la partie visionnée
+		\item assurer un calibrage caméra-projecteur en cas de déplacement de la caméra, du projecteur ou du plateau.
+		\item proposer au joueur une interface pour choisir un type de partie.
+	\end{enumerate}
+\end{itemize}
+
+\subsection{Documentation}
+
+L'ensemble du code sera commenté et documenté. De plus un document détaillant les fonctionnalités et l'architecture du programme sera rédigé en parallèle au développement auquel s'ajouteront des diagrammes type UML afin d'expliquer le travail de conception.
+
+
+\pagebreak 
+
+\section{Réalisation}
+\vspace{1cm}
+La réalisation de l'application de réalité augmentée suppose l'accès au matériel nécessaire par l'équipe projet.
+Ainsi, un vidéo-projecteur, une caméra USB et un jeu complet de Go avec les poins de couleurs noir et blanc et un plateau seront fournis par l'équipe pédagogique pour toute la durée du projet. 
+\pagebreak 
+
+\end{document}
