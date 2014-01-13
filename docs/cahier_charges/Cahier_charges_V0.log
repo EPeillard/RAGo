@@ -1,7 +1,7 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2014.1.12)  13 JAN 2014 15:59
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2014.1.12)  13 JAN 2014 17:24
 entering extended mode
 **Cahier_charges_V0.tex
-(E:\cours\RA2GO\docs\cahier_charges\Cahier_charges_V0.tex
+(E:\cours\RA2Go\docs\cahier_charges\Cahier_charges_V0.tex
 LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, arabic, armenian, assamese, basque, bengali
 , bokmal, bulgarian, catalan, coptic, croatian, czech, danish, dutch, esperanto, estonian, farsi, finnish, french, galic
@@ -233,7 +233,7 @@ subscribe by emailing sympa@lirmm.fr with 'subscribe <list> <firstname name>'
 )
 \c@mydef=\count107
 \c@myth=\count108
- (E:\cours\RA2GO\docs\cahier_charges\Cahier_charges_V0.aux)
+ (E:\cours\RA2Go\docs\cahier_charges\Cahier_charges_V0.aux)
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 27.
 LaTeX Font Info:    ... okay on input line 27.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 27.
@@ -285,7 +285,7 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <9> not available
 {C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 38.
-(E:\cours\RA2GO\docs\cahier_charges\Cahier_charges_V0.toc
+(E:\cours\RA2Go\docs\cahier_charges\Cahier_charges_V0.toc
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 2.
 )
@@ -293,22 +293,22 @@ LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <10> not available
  [2]
 LaTeX Font Info:    Font shape `T1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `T1/ptm/b/n' tried instead on input line 43.
- [3] [4] [5] [6]
-(E:\cours\RA2GO\docs\cahier_charges\Cahier_charges_V0.aux) ) 
+ [3] [4] [5] [6] [7]
+(E:\cours\RA2Go\docs\cahier_charges\Cahier_charges_V0.aux) ) 
 Here is how much of TeX's memory you used:
  4228 strings out of 493921
  55597 string characters out of 3144870
- 135614 words of memory out of 3000000
+ 136614 words of memory out of 3000000
  7470 multiletter control sequences out of 15000+200000
  40655 words of font info for 67 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 27i,6n,24p,388b,238s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 27i,6n,24p,388b,267s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files (x86)/MiKTeX 2.9/fonts/enc/dvips/fontname/
 8r.enc}<C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmb8a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type
 1/urw/times/utmr8a.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Cahier_charges_V0.pdf (6 pages, 55950 bytes).
+Output written on Cahier_charges_V0.pdf (7 pages, 58140 bytes).
 PDF statistics:
- 34 PDF objects out of 1000 (max. 8388607)
+ 39 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

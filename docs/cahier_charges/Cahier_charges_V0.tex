@@ -44,7 +44,7 @@
 
 Le présent docuent traite des spécifications fonctionnelles et techniques concernant la réalisation du projet "RA2GO". Il est élaboré suite à la réunion du mercredi 8 janvier 2014 entre l'équipe projet et l'équipe pédagogique. Ce document établit l'ensemble du travail qui sera réalisé sous forme d'un accord entre les étudiants du projet et l'équipe pédagogique.
 
-La ssituation du contexte de ce projet ainsi que la description des objectifs vont permettre de dégager les besoins du projet et de spécifier ses lignes directrices. La prise en compte des risques et limites sera aussi considérée dans ce document.
+La ssituation du contexte de ce projet ainsi que la description des objectifs vont permettre de dégager les besoins du projet et de spécifier ses lignes directrices. 
 
 Outre ces points, ce document permet de cadrer les conditions et modalités d'éxécution des missions, de communiquer en amont du projet et de formaliser et ordonner l'expression des besoins et des objectifs. Il doit donc être validé par les étudiants ainsi que par l'équipe pédagogique.
 
@@ -104,10 +104,25 @@ Le but est la réalisation d'une application "RA2GO" contenant :
 	\begin{enumerate}
 		\item se connecter à un seveur de Go.
 		\item jouer avec un adversaire distant.
+		
+			Le joueur physique utilisant l'application doit pouvoir défier un joueur distant par l'intermédiaire du serveur. C'est ce joueur dont les pièces seront projetées sur le plateau. 
+		
 		\item regarder une partie de Go.
+	
+			Le joueur physique utilisant l'application doit pouvoir demander à l'application la diffusion d'une partie de GO stockée sur les serveurs liés ou en local sur le plateau de go.  
+		
 		\item jouer seul face au logiciel.
+		
+			Le joueur physique utilisant l'application doit pouvoir défier une intelligence artificielle gérée par l'application.
+		
 		\item enregistrer la partie pour permettre son visionnage.
+				
+			Au début de la partie, l'application doit proposer au joueur d'enregistrer l'enchainement des mouvements qui la constituent pour permettre de la stocker en locale (voire de l'envoyer au sevreur) pour pouvoir la visionner ultérieurement (cf fonctionnalité 3)
+		
 		\item interface d'aide et d'analyse de la partie.
+
+			L'application doit afficher sur le plateau les interractions possibles entre les pièces par analyse des coups effectués/en cours 
+	
 	\end{enumerate}
 	
 	\item couplées à des fonctionnalités de réalité augmentée :
@@ -115,9 +130,21 @@ Le but est la réalisation d'une application "RA2GO" contenant :
 	
 	\begin{enumerate}
 		\item détecter les mouvements des pièces sur le plateau d'un joueur physiquement présent.
+			
+			Une fois la caméra en place, l'application doit permettre au joueur physique de réaliser une partie de go en plaçant simplement ses pièces sur le plateau et en reconnaissant automatiquement ses mouvements (début/fin du tour) afin d'envoyer les consignes de jeu au serveur.
+		
 		\item vidéo-projeter les pièces du joueur distant ou de la partie visionnée
+						
+			Une fois le projecteur en place, l'application doit permettre au joueur physique d'observer les coups joués par son adversaire distant( ou au cours d'une partie visionnée) et ce dans des conditions de luminosité (normale (modulo la luminosité du projecteur)
+		
 		\item assurer un calibrage caméra-projecteur en cas de déplacement de la caméra, du projecteur ou du plateau.
+								
+			L'ensemble caméra/projecteur/plateau se doit d'effectuer une calibration "automatique" et régulière une fois ceux-ci mis en place. La synchronisation se réptera à intervalles de temps réguliers afin de s'adapter en cas de mouvement de l'un des constituants de ce système.
+		
 		\item proposer au joueur une interface pour choisir un type de partie.
+								
+			Une fois l'application lancée sur l'ordinateur, le plateau de jeu doit constituer l'interface principale de l'utilisateur et lui permettre de choisir quel mode de jeu, celui-ci souhaite lancer. (voire interrompre la partie et quitter l'application)
+		
 	\end{enumerate}
 \end{itemize}
 
@@ -132,6 +159,8 @@ L'ensemble du code sera commenté et documenté. De plus un document détaillant le
 \vspace{1cm}
 La réalisation de l'application de réalité augmentée suppose l'accès au matériel nécessaire par l'équipe projet.
 Ainsi, un vidéo-projecteur, une caméra USB et un jeu complet de Go avec les poins de couleurs noir et blanc et un plateau seront fournis par l'équipe pédagogique pour toute la durée du projet. 
+
+
 \pagebreak 
 
 \end{document}

@@ -9,5 +9,5 @@
 \contentsline {subsection}{\numberline {2.4}Livrables}{4}
 \contentsline {section}{\numberline {3}Spécification}{5}
 \contentsline {subsection}{\numberline {3.1}Fonctionnalités de l'application}{5}
-\contentsline {subsection}{\numberline {3.2}Documentation}{5}
-\contentsline {section}{\numberline {4}Réalisation}{6}
+\contentsline {subsection}{\numberline {3.2}Documentation}{6}
+\contentsline {section}{\numberline {4}Réalisation}{7}
