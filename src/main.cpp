@@ -1,207 +1,259 @@
-#include <iostream> // for standard I/O
-#include <string>   // for strings
-#include <iomanip>  // for controlling float print precision
-#include <sstream>  // string to number conversion
+/**
+  * Function for the calibration between the goban, the camera and the projector
+  *
+  *
+  * @author Nicolas David and Sylvain Palominos
+  *
+  **/
 
-#include <opencv2/core/core.hpp>        // Basic OpenCV structures (cv::Mat, Scalar)
-#include <opencv2/imgproc/imgproc.hpp>  // Gaussian Blur
-#include <opencv2/highgui/highgui.hpp>  // OpenCV window I/O
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 
-using namespace std;
 using namespace cv;
+using namespace std;
 
-double getPSNR ( const Mat& I1, const Mat& I2);
-Scalar getMSSIM( const Mat& I1, const Mat& I2);
+/// Global variables
+//OpenCV matrix
+Mat src, src_gray, matGoban;
 
-static void help()
+//constant values for the image analisis
+int thresh = 120;
+int max_thresh = 255;
+
+//vector of point to save corners coodinates
+vector<Point*> list_corner_goban;
+vector<Point*> list_corner_display;
+vector<Point*> list_corner_physical;
+
+//Windows names
+char* source_window = "Source image";
+char* corners_window = "Corners detected";
+char* goban = "Goban";
+
+bool analisis = false;
+
+
+CvCapture* capture;
+
+/// Function header
+void cornerHarris_demo( int, void* );
+
+void displayGoban();
+
+void emptyBuffer();
+
+
+/** @function main */
+int main( int argc, char** argv )
 {
-    cout
-        << "------------------------------------------------------------------------------" << endl
-        << "This program shows how to read a video file with OpenCV. In addition, it "
-        << "tests the similarity of two input videos first with PSNR, and for the frames "
-        << "below a PSNR trigger value, also with MSSIM."                                   << endl
-        << "Usage:"                                                                         << endl
-        << "./video-source referenceVideo useCaseTestVideo PSNR_Trigger_Value Wait_Between_Frames " << endl
-        << "--------------------------------------------------------------------------"     << endl
-        << endl;
-}
+    ///Initialisation of the goban display Mat
+    matGoban = Mat::zeros( 745, 1024, CV_8UC3 );
+    matGoban = cv::Scalar(255, 255, 255);
 
-int main(int argc, char *argv[])
-{
-    help();
+    ///Capture of a picture
+    capture = cvCreateCameraCapture(0);
+    IplImage* image;
+    image = cvQueryFrame(capture);
 
-    if (argc != 5)
+    ///Load source image and convert it to gray
+    Mat mat(image);
+    src = mat;
+    cvtColor( src, src_gray, CV_BGR2GRAY );
+
+    ///Create a window and a trackbar
+    namedWindow( source_window, CV_WINDOW_AUTOSIZE );
+    createTrackbar( "Threshold: ", source_window, &thresh, max_thresh, cornerHarris_demo );
+    imshow( source_window, src );
+
+    cornerHarris_demo( 0, 0 );
+
+
+    waitKey(0);
+
+    ///Once the detection of corner is done, the goban is display
+    cout << "display" << endl;
+    analisis=true;
+    displayGoban();
+
+    list_corner_physical = list_corner_goban;
+
+
+    waitKey(0);
+
+    ///Reloading a picture to detect points displayed
+    cout << "New image" << endl;
+
+    emptyBuffer();
+
+    IplImage* frame = cvQueryFrame( capture );
+    Mat mat2(frame);
+    src = mat2;
+    cvtColor( src, src_gray, CV_BGR2GRAY );
+
+    imshow( source_window, src );
+    cornerHarris_demo( 0, 0 );
+
+
+    waitKey(0);
+
+    ///Save of the points displayed in a vector
+    cout << "Analisis" << endl;
+    for(int i=0; i<list_corner_goban.size(); i++)
     {
-        cout << "Not enough parameters" << endl;
-        return -1;
-    }
-
-    stringstream conv;
-
-    const string sourceReference = argv[1], sourceCompareWith = argv[2];
-    int psnrTriggerValue, delay;
-    conv << argv[3] << endl << argv[4];       // put in the strings
-    conv >> psnrTriggerValue >> delay;        // take out the numbers
-
-    char c;
-    int frameNum = -1;          // Frame counter
-
-    VideoCapture captRefrnc(sourceReference), captUndTst(sourceCompareWith);
-
-    if (!captRefrnc.isOpened())
-    {
-        cout  << "Could not open reference " << sourceReference << endl;
-        return -1;
-    }
-
-    if (!captUndTst.isOpened())
-    {
-        cout  << "Could not open case test " << sourceCompareWith << endl;
-        return -1;
-    }
-
-    Size refS = Size((int) captRefrnc.get(CV_CAP_PROP_FRAME_WIDTH),
-                     (int) captRefrnc.get(CV_CAP_PROP_FRAME_HEIGHT)),
-         uTSi = Size((int) captUndTst.get(CV_CAP_PROP_FRAME_WIDTH),
-                     (int) captUndTst.get(CV_CAP_PROP_FRAME_HEIGHT));
-
-    if (refS != uTSi)
-    {
-        cout << "Inputs have different size!!! Closing." << endl;
-        return -1;
-    }
-
-    const char* WIN_UT = "Under Test";
-    const char* WIN_RF = "Reference";
-
-    // Windows
-    namedWindow(WIN_RF, CV_WINDOW_AUTOSIZE);
-    namedWindow(WIN_UT, CV_WINDOW_AUTOSIZE);
-    cvMoveWindow(WIN_RF, 400       , 0);         //750,  2 (bernat =0)
-    cvMoveWindow(WIN_UT, refS.width, 0);         //1500, 2
-
-    cout << "Reference frame resolution: Width=" << refS.width << "  Height=" << refS.height
-         << " of nr#: " << captRefrnc.get(CV_CAP_PROP_FRAME_COUNT) << endl;
-
-    cout << "PSNR trigger value " << setiosflags(ios::fixed) << setprecision(3)
-         << psnrTriggerValue << endl;
-
-    Mat frameReference, frameUnderTest;
-    double psnrV;
-    Scalar mssimV;
-
-    for(;;) //Show the image captured in the window and repeat
-    {
-        captRefrnc >> frameReference;
-        captUndTst >> frameUnderTest;
-
-        if (frameReference.empty() || frameUnderTest.empty())
+        bool flag=true;
+        for(int j=0; j<list_corner_physical.size(); j++)
         {
-            cout << " < < <  Game over!  > > > ";
-            break;
+            if(list_corner_goban[i]->x<list_corner_physical[j]->x+5 && list_corner_goban[i]->x>list_corner_physical[j]->x-5 &&
+              list_corner_goban[i]->y<list_corner_physical[j]->y+5 && list_corner_goban[i]->y>list_corner_physical[j]->y-5)
+                flag = false;
         }
-
-        ++frameNum;
-        cout << "Frame: " << frameNum << "# ";
-
-        ///////////////////////////////// PSNR ////////////////////////////////////////////////////
-        psnrV = getPSNR(frameReference,frameUnderTest);
-        cout << setiosflags(ios::fixed) << setprecision(3) << psnrV << "dB";
-
-        //////////////////////////////////// MSSIM /////////////////////////////////////////////////
-        if (psnrV < psnrTriggerValue && psnrV)
-        {
-            mssimV = getMSSIM(frameReference, frameUnderTest);
-
-            cout << " MSSIM: "
-                << " R " << setiosflags(ios::fixed) << setprecision(2) << mssimV.val[2] * 100 << "%"
-                << " G " << setiosflags(ios::fixed) << setprecision(2) << mssimV.val[1] * 100 << "%"
-                << " B " << setiosflags(ios::fixed) << setprecision(2) << mssimV.val[0] * 100 << "%";
-        }
-
-        cout << endl;
-
-        ////////////////////////////////// Show Image /////////////////////////////////////////////
-        imshow(WIN_RF, frameReference);
-        imshow(WIN_UT, frameUnderTest);
-
-        c = (char)cvWaitKey(delay);
-        if (c == 27) break;
+        if(flag)
+            list_corner_display.push_back(list_corner_goban[i]);
     }
 
-    return 0;
+    waitKey(0);
+
+    cout<<"\nlist_corner_display :"<<endl;
+    for(int i=0; i<list_corner_display.size(); i++)
+        cout<<list_corner_display[i]->x<<" , "<<list_corner_display[i]->y<<endl;
+
+    cout<<"\nlist_corner_goban :"<<endl;
+    for(int i=0; i<list_corner_goban.size(); i++)
+        cout<<list_corner_goban[i]->x<<" , "<<list_corner_goban[i]->y<<endl;
+
+    cout<<"\nlist_corner_physical :"<<endl;
+    for(int i=0; i<list_corner_physical.size(); i++)
+        cout<<list_corner_physical[i]->x<<" , "<<list_corner_physical[i]->y<<endl;
+
+
+    waitKey(0);
+
+    ///Changing the coordinate of the display points to adapt them to physicals corners
+
+    cout<<"Moving the points"<<endl;
+    /**
+    for(int i=0; i<list_corner_phycal
+    **/
+
+
+    waitKey(0);
+
+    ///restart!
+
+
+  return(0);
 }
 
-double getPSNR(const Mat& I1, const Mat& I2)
+/** the function empty the capture buffer
+  *
+  * @function emptyBuffer()
+  **/
+void emptyBuffer()
 {
-    Mat s1;
-    absdiff(I1, I2, s1);       // |I1 - I2|
-    s1.convertTo(s1, CV_32F);  // cannot make a square on 8 bits
-    s1 = s1.mul(s1);           // |I1 - I2|^2
+    IplImage *frame = cvQueryFrame(capture);
+    IplImage *frame2 = NULL;
+    int i=0;
+    //the loop read the 5 save pictures in the buffer
+    while(i<5){
+        if(frame2)
+            frame = cvCloneImage(frame2);
+        frame2 = cvQueryFrame(capture);
+        if(!frame2) break;
+        waitKey(10);
+        i++;
+    }
+    cout<<"buffer empty"<<endl;
+}
 
-    Scalar s = sum(s1);        // sum elements per channel
+/** @function cornerHarris_demo */
+void cornerHarris_demo( int, void* )
+{
 
-    double sse = s.val[0] + s.val[1] + s.val[2]; // sum channels
+  Mat dst, dst_norm, dst_norm_scaled;
+  dst = Mat::zeros( src.size(), CV_32FC1 );
 
-    if( sse <= 1e-10) // for small values return zero
-        return 0;
-    else
+  /// Detector parameters
+  int blockSize = 2;
+  int apertureSize = 3;
+  double k = 0.04;
+  list_corner_display.empty();
+  list_corner_goban.empty();
+
+  /// Detecting corners
+  cornerHarris( src_gray, dst, blockSize, apertureSize, k, BORDER_DEFAULT );
+
+  /// Normalizing
+  normalize( dst, dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat() );
+  convertScaleAbs( dst_norm, dst_norm_scaled );
+
+  /// Drawing a circle around corners and saving the corners in a vector
+    cout<<"Points détectés :\n"<<endl;
+  for( int j = 0; j < dst_norm.rows ; j++ )
+     { for( int i = 0; i < dst_norm.cols; i++ )
+          {
+            if( (int) dst_norm.at<float>(j,i) > thresh )
+              {
+               circle( dst_norm_scaled, Point( i, j ), 5,  Scalar(0), 2, 8, 0 );
+               cout<<i<<" , "<<j<<endl;
+
+                bool flag=true;
+
+               if(list_corner_goban.size()!=0)
+               {
+                   cout<<"if"<<endl;
+                   for(int l=0; l<list_corner_goban.size(); l++)
+                   {
+                        cout<<"testing point"<<endl;
+                       if(i<list_corner_goban[l]->x+5 && i>list_corner_goban[l]->x-5 &&
+                          j<list_corner_goban[l]->y+5 && j>list_corner_goban[l]->y-5)
+                        {
+                            flag=false;
+                        }
+                   }
+                   if(flag)
+                    {
+                        Point* p = new Point(i, j);
+                        list_corner_goban.push_back(p);
+                        cout<<"adding point"<<endl;
+                        cout<<list_corner_goban.size()<<endl;
+                   }
+               }
+               else
+                {
+                    Point* p = new Point(i, j);
+                    list_corner_goban.push_back(p);
+                    cout<<"first point"<<endl;
+                    cout<<list_corner_goban.size()<<endl;
+               }
+              }
+          }
+     }
+
+    cout<<"Points tableau :\n"<<endl;
+    for(int l=0; l<list_corner_goban.size(); l++)
     {
-        double mse  = sse / (double)(I1.channels() * I1.total());
-        double psnr = 10.0 * log10((255 * 255) / mse);
-        return psnr;
+        cout<<list_corner_goban[l]->x << " , " <<list_corner_goban[l]->y<<endl;
     }
+
+  /// Showing the result
+  namedWindow( corners_window, CV_WINDOW_AUTOSIZE );
+  imshow( corners_window, dst_norm_scaled );
 }
 
-Scalar getMSSIM( const Mat& i1, const Mat& i2)
+/** the function display the corner analised from the picture from the camera
+  *
+  * @function displayGoban()
+  **/
+void displayGoban()
 {
-    const double C1 = 6.5025, C2 = 58.5225;
-    /***************************** INITS **********************************/
-    int d = CV_32F;
-
-    Mat I1, I2;
-    i1.convertTo(I1, d);            // cannot calculate on one byte large values
-    i2.convertTo(I2, d);
-
-    Mat I2_2   = I2.mul(I2);        // I2^2
-    Mat I1_2   = I1.mul(I1);        // I1^2
-    Mat I1_I2  = I1.mul(I2);        // I1 * I2
-
-    /*************************** END INITS **********************************/
-
-    Mat mu1, mu2;                   // PRELIMINARY COMPUTING
-    GaussianBlur(I1, mu1, Size(11, 11), 1.5);
-    GaussianBlur(I2, mu2, Size(11, 11), 1.5);
-
-    Mat mu1_2   =   mu1.mul(mu1);
-    Mat mu2_2   =   mu2.mul(mu2);
-    Mat mu1_mu2 =   mu1.mul(mu2);
-
-    Mat sigma1_2, sigma2_2, sigma12;
-
-    GaussianBlur(I1_2, sigma1_2, Size(11, 11), 1.5);
-    sigma1_2 -= mu1_2;
-
-    GaussianBlur(I2_2, sigma2_2, Size(11, 11), 1.5);
-    sigma2_2 -= mu2_2;
-
-    GaussianBlur(I1_I2, sigma12, Size(11, 11), 1.5);
-    sigma12 -= mu1_mu2;
-
-    ///////////////////////////////// FORMULA ////////////////////////////////
-    Mat t1, t2, t3;
-
-    t1 = 2 * mu1_mu2 + C1;
-    t2 = 2 * sigma12 + C2;
-    t3 = t1.mul(t2);                 // t3 = ((2*mu1_mu2 + C1).*(2*sigma12 + C2))
-
-    t1 = mu1_2 + mu2_2 + C1;
-    t2 = sigma1_2 + sigma2_2 + C2;
-    t1 = t1.mul(t2);                 // t1 =((mu1_2 + mu2_2 + C1).*(sigma1_2 + sigma2_2 + C2))
-
-    Mat ssim_map;
-    divide(t3, t1, ssim_map);        // ssim_map =  t3./t1;
-
-    Scalar mssim = mean(ssim_map);   // mssim = average of ssim map
-    return mssim;
+    matGoban = cv::Scalar(0, 0, 0);
+    for(int i= 0 ; i<list_corner_goban.size(); i++)
+    {
+        circle( matGoban, Point(list_corner_goban[i]->x, list_corner_goban[i]->y), 5,  Scalar(255, 255, 255), 2 );
+    }
+    namedWindow( "Goban", CV_WINDOW_NORMAL );
+    imshow( "Goban", matGoban );
 }
