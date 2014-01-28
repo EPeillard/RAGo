@@ -11,6 +11,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 using namespace cv;
 using namespace std;
@@ -20,13 +21,14 @@ using namespace std;
 Mat src, src_gray, matGoban;
 
 //constant values for the image analisis
-int thresh = 120;
+int thresh = 200;
 int max_thresh = 255;
 
 //vector of point to save corners coodinates
 vector<Point*> list_corner_goban;
 vector<Point*> list_corner_display;
 vector<Point*> list_corner_physical;
+vector<Point*> list_corner_projection;
 
 //Windows names
 char* source_window = "Source image";
@@ -68,80 +70,227 @@ int main( int argc, char** argv )
     createTrackbar( "Threshold: ", source_window, &thresh, max_thresh, cornerHarris_demo );
     imshow( source_window, src );
 
-    cornerHarris_demo( 0, 0 );
-
-
-    waitKey(0);
+    while(list_corner_goban.size()<4 && thresh>60)
+    {
+        list_corner_goban.empty();
+        cornerHarris_demo( 0, 0 );
+        thresh--;
+    }
+    thresh=200;
 
     ///Once the detection of corner is done, the goban is display
     cout << "display" << endl;
     analisis=true;
-    displayGoban();
 
+    //saving the temporaries points into the pysical corner
     list_corner_physical = list_corner_goban;
 
+    ///Ordering the points to have the top left corner in 0, the top right corner in 1 ...
 
-    waitKey(0);
+    cout << "ordering" << endl;
 
-    ///Reloading a picture to detect points displayed
-    cout << "New image" << endl;
+    vector<Point*> list_corner_absolute_camera;
 
-    emptyBuffer();
+    list_corner_absolute_camera.push_back(new Point(0, 0));
+    list_corner_absolute_camera.push_back(new Point(1279, 0));
+    list_corner_absolute_camera.push_back(new Point(1279, 719));
+    list_corner_absolute_camera.push_back(new Point(0, 719));
 
-    IplImage* frame = cvQueryFrame( capture );
-    Mat mat2(frame);
-    src = mat2;
-    cvtColor( src, src_gray, CV_BGR2GRAY );
+    vector<Point*> temp = list_corner_physical;
+    vector<Point*> temp_physical;
 
-    imshow( source_window, src );
-    cornerHarris_demo( 0, 0 );
-
-
-    waitKey(0);
-
-    ///Save of the points displayed in a vector
-    cout << "Analisis" << endl;
-    for(int i=0; i<list_corner_goban.size(); i++)
-    {
-        bool flag=true;
-        for(int j=0; j<list_corner_physical.size(); j++)
+    for(int i=0; i< list_corner_physical.size(); i++)
         {
-            if(list_corner_goban[i]->x<list_corner_physical[j]->x+5 && list_corner_goban[i]->x>list_corner_physical[j]->x-5 &&
-              list_corner_goban[i]->y<list_corner_physical[j]->y+5 && list_corner_goban[i]->y>list_corner_physical[j]->y-5)
-                flag = false;
+            cout << list_corner_physical[i]->x << " , " << list_corner_physical[i]->y << endl;
         }
-        if(flag)
-            list_corner_display.push_back(list_corner_goban[i]);
+        cout << endl;
+
+    for(int i=0; i< list_corner_absolute_camera.size(); i++)
+        {
+            cout << list_corner_absolute_camera[i]->x << " , " << list_corner_absolute_camera[i]->y << endl;
+        }
+        cout << endl << endl;
+
+    while(temp.size()>0)
+    {
+        for(int j=0; j<list_corner_absolute_camera.size(); j++)
+        {
+            cout << list_corner_absolute_camera[j]->x << " , " << list_corner_absolute_camera[j]->y << endl;
+            double d = 99999999999;
+            int i, index=0;
+            for(i=0; i<temp.size(); i++)
+            {
+                Point p(temp[i] - list_corner_absolute_camera[j]);
+                double norme = sqrt(pow((temp[i]->x - list_corner_absolute_camera[j]->x), 2)+pow((temp[i]->y - list_corner_absolute_camera[j]->y), 2));
+                if(d>norme){d=norme;index=i;}
+                cout << "i:"<<i<<"     d:"<<norme<<endl;
+                //waitKey(0);
+            }
+            temp_physical.push_back(temp[index]);
+            cout << temp[index]->x << " , " << temp[index]->y << "     "<< index << endl<< endl;
+            temp.erase(temp.begin()+index);
+        }
     }
 
-    waitKey(0);
+    while(list_corner_physical.size()>0){list_corner_physical.pop_back();}
+    list_corner_physical = temp_physical;
 
-    cout<<"\nlist_corner_display :"<<endl;
-    for(int i=0; i<list_corner_display.size(); i++)
-        cout<<list_corner_display[i]->x<<" , "<<list_corner_display[i]->y<<endl;
+        for(int i=0; i< list_corner_physical.size(); i++)
+        {
+            cout << list_corner_physical[i]->x << " , " << list_corner_physical[i]->y << endl;
+        }
 
-    cout<<"\nlist_corner_goban :"<<endl;
-    for(int i=0; i<list_corner_goban.size(); i++)
-        cout<<list_corner_goban[i]->x<<" , "<<list_corner_goban[i]->y<<endl;
-
-    cout<<"\nlist_corner_physical :"<<endl;
+    //deep copy
     for(int i=0; i<list_corner_physical.size(); i++)
-        cout<<list_corner_physical[i]->x<<" , "<<list_corner_physical[i]->y<<endl;
+    {
+        list_corner_projection.push_back(new Point(list_corner_physical[i]->x, list_corner_physical[i]->y));
+    }
 
-
+    displayGoban();
     waitKey(0);
 
-    ///Changing the coordinate of the display points to adapt them to physicals corners
+//start loop
+int a=0;
 
-    cout<<"Moving the points"<<endl;
-    /**
-    for(int i=0; i<list_corner_phycal
-    **/
+    do{
+        thresh=200;
+        list_corner_display.empty();
+        list_corner_goban.empty();
+        while(list_corner_display.size()>0){list_corner_display.pop_back();}
+        ///Reloading a picture to detect points displayed
+        displayGoban();
+        cout << "New image" << endl;
 
+        emptyBuffer();
 
-    waitKey(0);
+        IplImage* frame = cvQueryFrame( capture );
+        Mat mat2(frame);
+        src = mat2;
+        cvtColor( src, src_gray, CV_BGR2GRAY );
+
+        imshow( source_window, src );
+        //cornerHarris_demo( 0, 0 );
+
+        ///Save of the points displayed in a vector
+        cout << "Analysis" << endl;
+        while(list_corner_display.size()<4 && thresh>60)
+        {
+            list_corner_goban.empty();
+            while(list_corner_display.size()>0){list_corner_display.pop_back();}
+            while(list_corner_goban.size()>0){list_corner_goban.pop_back();}
+
+            cornerHarris_demo( 0, 0 );
+
+            thresh--;
+            for(int i=0; i<list_corner_goban.size(); i++)
+            {
+                bool flag=true;
+                for(int j=0; j<list_corner_physical.size(); j++)
+                {
+                    if(list_corner_goban[i]->x<list_corner_physical[j]->x+5 && list_corner_goban[i]->x>list_corner_physical[j]->x-5 &&
+                      list_corner_goban[i]->y<list_corner_physical[j]->y+5 && list_corner_goban[i]->y>list_corner_physical[j]->y-5)
+                        flag = false;
+                }
+                if(flag)
+                    list_corner_display.push_back(list_corner_goban[i]);
+            }
+        }
+
+        ///Ordering the points to have the top left corner in 0, the top right corner in 1 ...
+
+        cout << "ordering" << endl;
+
+        vector<Point*> temp = list_corner_display;
+        vector<Point*> temp_display;
+        /*for(int i=0; i< list_corner_physical.size(); i++)
+        {
+            cout << list_corner_absolute_camera[i]->x << " , " << list_corner_absolute_camera[i]->y << endl;
+        }
+        cout << endl << endl;*/
+
+        while(temp.size()>0)
+        {
+            for(int j=0; j<list_corner_absolute_camera.size(); j++)
+            {
+                //cout << list_corner_absolute_camera[j]->x << " , " << list_corner_absolute_camera[j]->y << endl;
+                double d = 99999999999;
+                int i, index=0;
+                for(i=0; i<temp.size(); i++)
+                {
+                    Point p(temp[i] - list_corner_absolute_camera[j]);
+                    double norme = sqrt(pow((temp[i]->x - list_corner_absolute_camera[j]->x), 2)+pow((temp[i]->y - list_corner_absolute_camera[j]->y), 2));
+                    if(d>norme){d=norme;index=i;}
+                    //cout << "i:"<<i<<"     d:"<<norme<<endl;
+                    //waitKey(0);
+                }
+                temp_display.push_back(temp[index]);
+                //cout << temp[index]->x << " , " << temp[index]->y << "     "<< index << endl<< endl;
+                temp.erase(temp.begin()+index);
+            }
+        }
+waitKey(0);
+        while(list_corner_display.size()>0){list_corner_display.pop_back();}
+        list_corner_display = temp_physical;
+
+        list_corner_display = temp_display;
+
+        for(int i=0; i< list_corner_display.size(); i++)
+        {
+            cout << list_corner_display[i]->x << " , " << list_corner_display[i]->y << endl;
+        }
+
+        cout << endl;/*
+
+        for(int i=0; i< list_corner_physical.size(); i++)
+        {
+            cout << list_corner_physical[i]->x << " , " << list_corner_physical[i]->y << endl;
+        }*/
+
+        ///Changing the coordinate of the display points to adapt them to physicals corners
+
+        cout<<"Moving the points"<<endl;
+        if(list_corner_display.size()==4)
+        {
+            for(int i=0; i<4; i++)
+            {
+                    if(list_corner_physical[i]->x-5>=list_corner_display[i]->x)
+                        *list_corner_projection[i] += Point(10, 0);
+                    if(list_corner_physical[i]->x+5<=list_corner_display[i]->x)
+                        *list_corner_projection[i] += Point(-10, 0);
+            }
+            for(int i=0; i<4; i++)
+            {
+                    if(list_corner_physical[i]->y-5>=list_corner_display[i]->y)
+                        *list_corner_projection[i] += Point(0, 10);
+                    if(list_corner_physical[i]->y+5<=list_corner_display[i]->y)
+                        *list_corner_projection[i] += Point(0, -10);
+            }
+            displayGoban();
+
+        }
+
+        /*cout<<"\nlist_corner_display :"<<endl;
+        for(int i=0; i<list_corner_display.size(); i++)
+            cout<<list_corner_display[i]->x<<" , "<<list_corner_display[i]->y<<endl;
+
+        cout<<"\nlist_corner_goban :"<<endl;
+        for(int i=0; i<list_corner_goban.size(); i++)
+            cout<<list_corner_goban[i]->x<<" , "<<list_corner_goban[i]->y<<endl;
+
+        cout<<"\nlist_corner_physical :"<<endl;
+        for(int i=0; i<list_corner_physical.size(); i++)
+            cout<<list_corner_physical[i]->x<<" , "<<list_corner_physical[i]->y<<endl;*/
+
 
     ///restart!
+    waitKey(0);
+    a++;
+    }while(/*list_corner_display.size()==4 && */a<10);
+
+    cout << "\n end ofcalibration" << endl;
+
+    waitKey(0);
+
 
 
   return(0);
@@ -165,7 +314,7 @@ void emptyBuffer()
         waitKey(10);
         i++;
     }
-    cout<<"buffer empty"<<endl;
+    //cout<<"buffer empty"<<endl;
 }
 
 /** @function cornerHarris_demo */
@@ -190,25 +339,25 @@ void cornerHarris_demo( int, void* )
   convertScaleAbs( dst_norm, dst_norm_scaled );
 
   /// Drawing a circle around corners and saving the corners in a vector
-    cout<<"Points détectés :\n"<<endl;
+    //cout<<"Points détectés :\n"<<endl;
   for( int j = 0; j < dst_norm.rows ; j++ )
      { for( int i = 0; i < dst_norm.cols; i++ )
           {
             if( (int) dst_norm.at<float>(j,i) > thresh )
               {
                circle( dst_norm_scaled, Point( i, j ), 5,  Scalar(0), 2, 8, 0 );
-               cout<<i<<" , "<<j<<endl;
+               //cout<<i<<" , "<<j<<endl;
 
                 bool flag=true;
 
                if(list_corner_goban.size()!=0)
                {
-                   cout<<"if"<<endl;
+                   //cout<<"if"<<endl;
                    for(int l=0; l<list_corner_goban.size(); l++)
                    {
-                        cout<<"testing point"<<endl;
-                       if(i<list_corner_goban[l]->x+5 && i>list_corner_goban[l]->x-5 &&
-                          j<list_corner_goban[l]->y+5 && j>list_corner_goban[l]->y-5)
+                        //cout<<"testing point"<<endl;
+                       if(i<list_corner_goban[l]->x+10 && i>list_corner_goban[l]->x-10 &&
+                          j<list_corner_goban[l]->y+10 && j>list_corner_goban[l]->y-10)
                         {
                             flag=false;
                         }
@@ -217,26 +366,26 @@ void cornerHarris_demo( int, void* )
                     {
                         Point* p = new Point(i, j);
                         list_corner_goban.push_back(p);
-                        cout<<"adding point"<<endl;
-                        cout<<list_corner_goban.size()<<endl;
+                        //cout<<"adding point"<<endl;
+                        //cout<<list_corner_goban.size()<<endl;
                    }
                }
                else
                 {
                     Point* p = new Point(i, j);
                     list_corner_goban.push_back(p);
-                    cout<<"first point"<<endl;
-                    cout<<list_corner_goban.size()<<endl;
+                    //cout<<"first point"<<endl;
+                    //cout<<list_corner_goban.size()<<endl;
                }
               }
           }
      }
 
-    cout<<"Points tableau :\n"<<endl;
-    for(int l=0; l<list_corner_goban.size(); l++)
+    //cout<<"Points tableau :\n"<<endl;
+    /*for(int l=0; l<list_corner_goban.size(); l++)
     {
         cout<<list_corner_goban[l]->x << " , " <<list_corner_goban[l]->y<<endl;
-    }
+    }*/
 
   /// Showing the result
   namedWindow( corners_window, CV_WINDOW_AUTOSIZE );
@@ -250,10 +399,12 @@ void cornerHarris_demo( int, void* )
 void displayGoban()
 {
     matGoban = cv::Scalar(0, 0, 0);
-    for(int i= 0 ; i<list_corner_goban.size(); i++)
+    for(int i= 0 ; i<list_corner_projection.size(); i++)
     {
-        circle( matGoban, Point(list_corner_goban[i]->x, list_corner_goban[i]->y), 5,  Scalar(255, 255, 255), 2 );
+        circle( matGoban, Point(list_corner_projection[i]->x, list_corner_projection[i]->y), 7,  Scalar(255, 255, 255), 4 );
     }
-    namedWindow( "Goban", CV_WINDOW_NORMAL );
+    cvNamedWindow( "Goban", CV_WINDOW_FULLSCREEN );
+    cvMoveWindow("Goban", 0, 0);
+    cvSetWindowProperty("Goban", CV_WINDOW_FULLSCREEN, CV_WINDOW_FULLSCREEN);
     imshow( "Goban", matGoban );
 }
