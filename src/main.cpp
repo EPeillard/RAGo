@@ -29,13 +29,17 @@ vector<Point*> list_corner_goban;
 vector<Point*> list_corner_display;
 vector<Point*> list_corner_physical;
 vector<Point*> list_corner_projection;
+vector<Point*> list_corner_absolute_camera;
 
 //Windows names
 char* source_window = "Source image";
 char* corners_window = "Corners detected";
 char* goban = "Goban";
 
-bool analisis = false;
+
+int nbrPt=0;
+Point *point;
+Point *p_display=NULL;
 
 
 CvCapture* capture;
@@ -47,116 +51,26 @@ void displayGoban();
 
 void emptyBuffer();
 
+void initStart();
+
+void reorderPoints(vector<Point*>&);
+
+void detectCalibPts();
+void detectCalibPt();
 
 /** @function main */
 int main( int argc, char** argv )
 {
-    ///Initialisation of the goban display Mat
-    matGoban = Mat::zeros( 745, 1024, CV_8UC3 );
-    matGoban = cv::Scalar(255, 255, 255);
 
-    ///Capture of a picture
-    capture = cvCreateCameraCapture(0);
-    IplImage* image;
-    image = cvQueryFrame(capture);
-
-    ///Load source image and convert it to gray
-    Mat mat(image);
-    src = mat;
-    cvtColor( src, src_gray, CV_BGR2GRAY );
-
-    ///Create a window and a trackbar
-    namedWindow( source_window, CV_WINDOW_AUTOSIZE );
-    createTrackbar( "Threshold: ", source_window, &thresh, max_thresh, cornerHarris_demo );
-    imshow( source_window, src );
-
-    while(list_corner_goban.size()<4 && thresh>60)
-    {
-        list_corner_goban.empty();
-        cornerHarris_demo( 0, 0 );
-        thresh--;
-    }
-    thresh=200;
-
-    ///Once the detection of corner is done, the goban is display
-    cout << "display" << endl;
-    analisis=true;
-
-    //saving the temporaries points into the pysical corner
-    list_corner_physical = list_corner_goban;
-
-    ///Ordering the points to have the top left corner in 0, the top right corner in 1 ...
-
-    cout << "ordering" << endl;
-
-    vector<Point*> list_corner_absolute_camera;
-
-    list_corner_absolute_camera.push_back(new Point(0, 0));
-    list_corner_absolute_camera.push_back(new Point(1279, 0));
-    list_corner_absolute_camera.push_back(new Point(1279, 719));
-    list_corner_absolute_camera.push_back(new Point(0, 719));
-
-    vector<Point*> temp = list_corner_physical;
-    vector<Point*> temp_physical;
-
-    for(int i=0; i< list_corner_physical.size(); i++)
-        {
-            cout << list_corner_physical[i]->x << " , " << list_corner_physical[i]->y << endl;
-        }
-        cout << endl;
-
-    for(int i=0; i< list_corner_absolute_camera.size(); i++)
-        {
-            cout << list_corner_absolute_camera[i]->x << " , " << list_corner_absolute_camera[i]->y << endl;
-        }
-        cout << endl << endl;
-
-    while(temp.size()>0)
-    {
-        for(int j=0; j<list_corner_absolute_camera.size(); j++)
-        {
-            cout << list_corner_absolute_camera[j]->x << " , " << list_corner_absolute_camera[j]->y << endl;
-            double d = 99999999999;
-            int i, index=0;
-            for(i=0; i<temp.size(); i++)
-            {
-                Point p(temp[i] - list_corner_absolute_camera[j]);
-                double norme = sqrt(pow((temp[i]->x - list_corner_absolute_camera[j]->x), 2)+pow((temp[i]->y - list_corner_absolute_camera[j]->y), 2));
-                if(d>norme){d=norme;index=i;}
-                cout << "i:"<<i<<"     d:"<<norme<<endl;
-                //waitKey(0);
-            }
-            temp_physical.push_back(temp[index]);
-            cout << temp[index]->x << " , " << temp[index]->y << "     "<< index << endl<< endl;
-            temp.erase(temp.begin()+index);
-        }
-    }
-
-    while(list_corner_physical.size()>0){list_corner_physical.pop_back();}
-    list_corner_physical = temp_physical;
-
-        for(int i=0; i< list_corner_physical.size(); i++)
-        {
-            cout << list_corner_physical[i]->x << " , " << list_corner_physical[i]->y << endl;
-        }
-
-    //deep copy
-    for(int i=0; i<list_corner_physical.size(); i++)
-    {
-        list_corner_projection.push_back(new Point(list_corner_physical[i]->x, list_corner_physical[i]->y));
-    }
-
-    displayGoban();
-    waitKey(0);
+    initStart();
 
 //start loop
-int a=0;
+    int a=0;
 
     do{
-        thresh=200;
-        list_corner_display.empty();
-        list_corner_goban.empty();
         while(list_corner_display.size()>0){list_corner_display.pop_back();}
+        while(list_corner_goban.size()>0){list_corner_goban.pop_back();}
+
         ///Reloading a picture to detect points displayed
         displayGoban();
         cout << "New image" << endl;
@@ -169,11 +83,11 @@ int a=0;
         cvtColor( src, src_gray, CV_BGR2GRAY );
 
         imshow( source_window, src );
-        //cornerHarris_demo( 0, 0 );
 
         ///Save of the points displayed in a vector
         cout << "Analysis" << endl;
-        while(list_corner_display.size()<4 && thresh>60)
+        detectCalibPt();
+        /*while(list_corner_display.size()<4 && thresh>60)
         {
             list_corner_goban.empty();
             while(list_corner_display.size()>0){list_corner_display.pop_back();}
@@ -194,25 +108,20 @@ int a=0;
                 if(flag)
                     list_corner_display.push_back(list_corner_goban[i]);
             }
-        }
+        }*/
 
-        ///Ordering the points to have the top left corner in 0, the top right corner in 1 ...
+        ////Ordering the points to have the top left corner in 0, the top right corner in 1 ...
 
-        cout << "ordering" << endl;
-
+        /*cout << "ordering" << endl;
+        reorderPoints(list_corner_display);*/
+/*
         vector<Point*> temp = list_corner_display;
         vector<Point*> temp_display;
-        /*for(int i=0; i< list_corner_physical.size(); i++)
-        {
-            cout << list_corner_absolute_camera[i]->x << " , " << list_corner_absolute_camera[i]->y << endl;
-        }
-        cout << endl << endl;*/
 
         while(temp.size()>0)
         {
             for(int j=0; j<list_corner_absolute_camera.size(); j++)
             {
-                //cout << list_corner_absolute_camera[j]->x << " , " << list_corner_absolute_camera[j]->y << endl;
                 double d = 99999999999;
                 int i, index=0;
                 for(i=0; i<temp.size(); i++)
@@ -220,11 +129,8 @@ int a=0;
                     Point p(temp[i] - list_corner_absolute_camera[j]);
                     double norme = sqrt(pow((temp[i]->x - list_corner_absolute_camera[j]->x), 2)+pow((temp[i]->y - list_corner_absolute_camera[j]->y), 2));
                     if(d>norme){d=norme;index=i;}
-                    //cout << "i:"<<i<<"     d:"<<norme<<endl;
-                    //waitKey(0);
                 }
                 temp_display.push_back(temp[index]);
-                //cout << temp[index]->x << " , " << temp[index]->y << "     "<< index << endl<< endl;
                 temp.erase(temp.begin()+index);
             }
         }
@@ -232,26 +138,14 @@ waitKey(0);
         while(list_corner_display.size()>0){list_corner_display.pop_back();}
         list_corner_display = temp_physical;
 
-        list_corner_display = temp_display;
-
-        for(int i=0; i< list_corner_display.size(); i++)
-        {
-            cout << list_corner_display[i]->x << " , " << list_corner_display[i]->y << endl;
-        }
-
-        cout << endl;/*
-
-        for(int i=0; i< list_corner_physical.size(); i++)
-        {
-            cout << list_corner_physical[i]->x << " , " << list_corner_physical[i]->y << endl;
-        }*/
+        list_corner_display = temp_display;*/
 
         ///Changing the coordinate of the display points to adapt them to physicals corners
 
         cout<<"Moving the points"<<endl;
-        if(list_corner_display.size()==4)
+        if(p_display!=NULL)
         {
-            for(int i=0; i<4; i++)
+            /*for(int i=0; i<4; i++)
             {
                     if(list_corner_physical[i]->x-5>=list_corner_display[i]->x)
                         *list_corner_projection[i] += Point(10, 0);
@@ -264,28 +158,25 @@ waitKey(0);
                         *list_corner_projection[i] += Point(0, 10);
                     if(list_corner_physical[i]->y+5<=list_corner_display[i]->y)
                         *list_corner_projection[i] += Point(0, -10);
-            }
-            displayGoban();
+            }*/
+            //cout<<"list_corner_physical : "<<list_corner_physical[nbrPt]->x << " , " << list_corner_physical[nbrPt]->y << endl;
+            //cout<<"p_display : "<<p_display->x << " , " << p_display->y << endl;
+            if(list_corner_physical[nbrPt]->x-2>=p_display->x)
+                *point += Point(4, 0);
+            if(list_corner_physical[nbrPt]->x+2<=p_display->x)
+                *point += Point(-4, 0);
 
+            if(list_corner_physical[nbrPt]->y-2>=p_display->y)
+                *point += Point(0, 4);
+            if(list_corner_physical[nbrPt]->y+2<=p_display->y)
+                *point += Point(0, -4);
+
+            displayGoban();
         }
 
-        /*cout<<"\nlist_corner_display :"<<endl;
-        for(int i=0; i<list_corner_display.size(); i++)
-            cout<<list_corner_display[i]->x<<" , "<<list_corner_display[i]->y<<endl;
-
-        cout<<"\nlist_corner_goban :"<<endl;
-        for(int i=0; i<list_corner_goban.size(); i++)
-            cout<<list_corner_goban[i]->x<<" , "<<list_corner_goban[i]->y<<endl;
-
-        cout<<"\nlist_corner_physical :"<<endl;
-        for(int i=0; i<list_corner_physical.size(); i++)
-            cout<<list_corner_physical[i]->x<<" , "<<list_corner_physical[i]->y<<endl;*/
-
-
-    ///restart!
-    waitKey(0);
     a++;
-    }while(/*list_corner_display.size()==4 && */a<10);
+    //waitKey(0);
+    }while(nbrPt==0 && a<25);
 
     cout << "\n end ofcalibration" << endl;
 
@@ -356,8 +247,8 @@ void cornerHarris_demo( int, void* )
                    for(int l=0; l<list_corner_goban.size(); l++)
                    {
                         //cout<<"testing point"<<endl;
-                       if(i<list_corner_goban[l]->x+10 && i>list_corner_goban[l]->x-10 &&
-                          j<list_corner_goban[l]->y+10 && j>list_corner_goban[l]->y-10)
+                       if(i<list_corner_goban[l]->x+5 && i>list_corner_goban[l]->x-5 &&
+                          j<list_corner_goban[l]->y+5 && j>list_corner_goban[l]->y-5)
                         {
                             flag=false;
                         }
@@ -399,12 +290,184 @@ void cornerHarris_demo( int, void* )
 void displayGoban()
 {
     matGoban = cv::Scalar(0, 0, 0);
-    for(int i= 0 ; i<list_corner_projection.size(); i++)
+    /*for(int i= 0 ; i<list_corner_projection.size(); i++)
     {
-        circle( matGoban, Point(list_corner_projection[i]->x, list_corner_projection[i]->y), 7,  Scalar(255, 255, 255), 4 );
-    }
-    cvNamedWindow( "Goban", CV_WINDOW_FULLSCREEN );
-    cvMoveWindow("Goban", 0, 0);
-    cvSetWindowProperty("Goban", CV_WINDOW_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+        circle( matGoban, Point(list_corner_projection[i]->x, list_corner_projection[i]->y), 7,  Scalar(255, 255, 255), 2 );
+    }*/
+    circle( matGoban, *point, 7,  Scalar(255, 255, 255), 2 );
+    cvNamedWindow( "Goban", CV_WINDOW_NORMAL );
     imshow( "Goban", matGoban );
+}
+
+
+void initStart()
+{
+    list_corner_absolute_camera.push_back(new Point(0, 0));
+    list_corner_absolute_camera.push_back(new Point(1279, 0));
+    list_corner_absolute_camera.push_back(new Point(1279, 719));
+    list_corner_absolute_camera.push_back(new Point(0, 719));
+
+    ///Initialisation of the goban display Mat
+    matGoban = Mat::zeros( 768, 1024, CV_8UC3 );
+    matGoban = cv::Scalar(255, 255, 255);
+
+    ///Capture of a picture
+    capture = cvCreateCameraCapture(0);
+    IplImage* image;
+    image = cvQueryFrame(capture);
+
+    ///Load source image and convert it to gray
+    Mat mat(image);
+    src = mat;
+    cvtColor( src, src_gray, CV_BGR2GRAY );
+
+    ///Create a window and a trackbar
+    namedWindow( source_window, CV_WINDOW_AUTOSIZE );
+    createTrackbar( "Threshold: ", source_window, &thresh, max_thresh, cornerHarris_demo );
+    imshow( source_window, src );
+
+    while(list_corner_goban.size()<4 && thresh>60)
+    {
+        list_corner_goban.empty();
+        cornerHarris_demo( 0, 0 );
+        thresh--;
+    }
+    thresh=200;
+
+    ///Once the detection of corner is done, the goban is display
+    list_corner_physical = list_corner_goban;
+
+    ///Ordering the points to have the top left corner in 0, the top right corner in 1 ...
+
+    /*vector<Point*> temp = list_corner_physical;
+    vector<Point*> temp_physical;
+
+    while(temp.size()>0)
+    {
+        for(int j=0; j<list_corner_absolute_camera.size(); j++)
+        {
+            double d = 99999999999;
+            int i, index=0;
+            for(i=0; i<temp.size(); i++)
+            {
+                Point p(temp[i] - list_corner_absolute_camera[j]);
+                double norme = sqrt(pow((temp[i]->x - list_corner_absolute_camera[j]->x), 2)+pow((temp[i]->y - list_corner_absolute_camera[j]->y), 2));
+                if(d>norme){d=norme;index=i;}
+            }
+            temp_physical.push_back(temp[index]);
+            temp.erase(temp.begin()+index);
+        }
+    }
+
+    while(list_corner_physical.size()>0){list_corner_physical.pop_back();}
+    list_corner_physical = temp_physical;*/
+    reorderPoints(list_corner_physical);
+
+    //deep copy
+    /*for(int i=0; i<list_corner_physical.size(); i++)
+    {
+        list_corner_projection.push_back(new Point(list_corner_physical[i]->x, list_corner_physical[i]->y));
+    }*/
+    point = new Point(*list_corner_physical[nbrPt]);
+
+    displayGoban();
+    waitKey(0);
+}
+
+void reorderPoints(vector<Point*>& list_point)
+{
+
+    vector<Point*> temp = list_point;
+    vector<Point*> ret;
+
+    while(temp.size()>0)
+    {
+        for(int j=0; j<list_corner_absolute_camera.size(); j++)
+        {
+            double d = 99999999999;
+            int i, index=0;
+            for(i=0; i<temp.size(); i++)
+            {
+                Point p(temp[i] - list_corner_absolute_camera[j]);
+                double norme = sqrt(pow((temp[i]->x - list_corner_absolute_camera[j]->x), 2)+pow((temp[i]->y - list_corner_absolute_camera[j]->y), 2));
+                if(d>norme){d=norme;index=i;}
+            }
+            ret.push_back(temp[index]);
+            temp.erase(temp.begin()+index);
+        }
+    }
+    while(list_point.size()>0){list_point.pop_back();}
+    list_point = ret;
+}
+
+void detectCalibPts()
+{
+    thresh=255;
+    while(list_corner_display.size()<4 && thresh>60)
+    {
+        list_corner_goban.empty();
+        while(list_corner_display.size()>0){list_corner_display.pop_back();}
+        while(list_corner_goban.size()>0){list_corner_goban.pop_back();}
+
+        cornerHarris_demo( 0, 0 );
+
+        thresh--;
+        for(int i=0; i<list_corner_goban.size(); i++)
+        {
+            bool flag=true;
+            for(int j=0; j<list_corner_physical.size(); j++)
+            {
+                if(list_corner_goban[i]->x<list_corner_physical[j]->x+5 && list_corner_goban[i]->x>list_corner_physical[j]->x-5 &&
+                  list_corner_goban[i]->y<list_corner_physical[j]->y+5 && list_corner_goban[i]->y>list_corner_physical[j]->y-5)
+                    flag = false;
+            }
+            if(flag)
+                list_corner_display.push_back(list_corner_goban[i]);
+        }
+    }
+}
+
+void detectCalibPt()
+{
+    Point* p_old=NULL;
+    cout << p_display << endl;
+    if(p_display!=NULL)
+        p_old = p_display;
+    p_display = NULL;
+    while(p_display==NULL && thresh>60)
+    {
+        list_corner_goban.empty();
+        while(list_corner_display.size()>0){list_corner_display.pop_back();}
+        while(list_corner_goban.size()>0){list_corner_goban.pop_back();}
+
+        cornerHarris_demo( 0, 0 );
+
+        thresh--;
+        for(int i=0; i<list_corner_goban.size(); i++)
+        {
+            bool flag=true;
+            for(int j=0; j<list_corner_physical.size(); j++)
+            {
+                if(list_corner_goban[i]->x<list_corner_physical[j]->x+5 && list_corner_goban[i]->x>list_corner_physical[j]->x-5 &&
+                  list_corner_goban[i]->y<list_corner_physical[j]->y+5 && list_corner_goban[i]->y>list_corner_physical[j]->y-5)
+                    flag = false;
+            }
+            if(flag)
+            {
+                p_display = list_corner_goban[i];
+            }
+        }
+    }
+
+    if(p_old!=NULL)
+    {
+        cout << "p_old : " << p_old->x << " , " << p_old->y <<endl;
+        cout << "p_display : " << p_display->x << " , " << p_display->y <<endl;
+        if(p_display->x<p_old->x-10 ||p_display->x>p_old->x+10 || p_display->y<p_old->y-10 ||p_display->y>p_old->y+10)
+        {
+            nbrPt++;
+            p_display=NULL;
+            cout << "incr nbr" << endl;
+        }
+    }
 }
