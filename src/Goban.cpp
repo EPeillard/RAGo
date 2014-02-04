@@ -22,12 +22,25 @@ Goban::Goban()
     //Windows creation
     namedWindow(GOBAN, CV_WINDOW_NORMAL);
     namedWindow(CORNER, CV_WINDOW_AUTOSIZE);
+
+    margin_corner = 5;
+    pasX = 50;
+    pasY = 50;
 }
 
 Goban::~Goban()
 {
     delete point_display;
     delete point_read;
+}
+
+void Goban::draw()
+{
+    matGoban = cv::Scalar(0, 0, 0);
+    imshow(GOBAN, matGoban);
+    clock = new Clock(list_corner_detected[1]->x, list_corner_detected[1]->y, list_corner_detected[2]->y);
+    clock->draw(GOBAN, &matGoban);
+    waitKey(0);
 }
 
 
@@ -72,14 +85,14 @@ void Goban::detection()
         if(point_read!=NULL)
         {
             if(list_corner_markers[nbrPt]->x-2>=point_read->x)
-                *point_display += Point(10, 0);
+                *point_display += Point(pasX, 0);
             if(list_corner_markers[nbrPt]->x+2<=point_read->x)
-                *point_display += Point(-10, 0);
+                *point_display += Point(-pasX, 0);
 
             if(list_corner_markers[nbrPt]->y-2>=point_read->y)
-                *point_display += Point(0, 10);
+                *point_display += Point(0, pasY);
             if(list_corner_markers[nbrPt]->y+2<=point_read->y)
-                *point_display += Point(0, -10);
+                *point_display += Point(0, -pasY);
 
             this->refresh();
         }
@@ -103,11 +116,10 @@ void Goban::init()
     waitKey(0);
 
     ///Capture of a picture
-    capture = cvCreateCameraCapture(1);
+    capture = cvCreateCameraCapture(0);
     IplImage* image;
     image = cvQueryFrame(capture);
-    cout<<"Press any key to continue"<<endl;
-    waitKey(0);
+    waitKey(100);
 
     ///Load source image and convert it to gray
     Mat mat(image);
@@ -117,7 +129,7 @@ void Goban::init()
     while(list_temp.size()<4 && thresh>70)
     {
         list_temp = cornerHarris_demo(thresh, 0);
-        thresh--;
+        thresh-=10;
     }
     thresh=200;
 
@@ -131,7 +143,7 @@ void Goban::init()
     this->refresh();
 
 
-    waitKey(0);
+    waitKey(100);
 }
 
 /** @function cornerHarris_demo */
@@ -269,10 +281,10 @@ void Goban::detectCalibPt()
         {
             bool flag=true;
             for(int j=0; j<list_corner_markers.size(); j++)
-                if(list_temp[i]->x<list_corner_markers[j]->x+MARGIN_DETECT_CORNER &&
-                   list_temp[i]->x>list_corner_markers[j]->x-MARGIN_DETECT_CORNER &&
-                   list_temp[i]->y<list_corner_markers[j]->y+MARGIN_DETECT_CORNER &&
-                   list_temp[i]->y>list_corner_markers[j]->y-MARGIN_DETECT_CORNER)
+                if(list_temp[i]->x<list_corner_markers[j]->x+margin_corner &&
+                   list_temp[i]->x>list_corner_markers[j]->x-margin_corner &&
+                   list_temp[i]->y<list_corner_markers[j]->y+margin_corner &&
+                   list_temp[i]->y>list_corner_markers[j]->y-margin_corner)
                    {
                     flag = false;
                     break;
@@ -280,22 +292,24 @@ void Goban::detectCalibPt()
             if(flag)
             {
                 point_read = list_temp[i];
+                break;
             }
         }
     }
 
     ///Comparison with the old values of the point to ensure that is the same which has moved
+    bool newP=false;
     if(point_read!=NULL && p_old!=NULL)
-        if(point_read->x<p_old->x-10 ||point_read->x>p_old->x+10 || point_read->y<p_old->y-10 ||point_read->y>p_old->y+10 )
         {
-            cout << "different"<<endl;
-            nbrPt++;
-            point_read=NULL;
-            list_corner_detected.push_back(point_display);
-            if(nbrPt<4)
-            point_display = new Point(list_corner_markers[nbrPt]->x, list_corner_markers[nbrPt]->y);
+            cout<<"point_read : "<<point_read->x<<" , "<<point_read->y<<endl;
+            cout<<"margin old : x:"<<p_old->x-2*pasX<<"-"<<p_old->x+2*pasX<<" , y:"<<p_old->y-2*pasY<<"-"<<p_old->y+2*pasY<<endl;
+            if(point_read->x<p_old->x-2*pasX ||point_read->x>p_old->x+2*pasX || point_read->y<p_old->y-2*pasY ||point_read->y>p_old->y+2*pasY )
+            newP = true;
         }
     if(thresh<=60)
+        newP = true;
+
+    if(newP)
     {
         cout << "different"<<endl;
         nbrPt++;
@@ -303,6 +317,21 @@ void Goban::detectCalibPt()
         list_corner_detected.push_back(point_display);
         if(nbrPt<4)
         point_display = new Point(list_corner_markers[nbrPt]->x, list_corner_markers[nbrPt]->y);
+        pasX=50;
+        pasY=50;
+    }
+    else
+    {
+        ///Pas dynamique
+        if(p_old!=NULL)
+        {
+            cout<<"X : "<<abs(point_read->x-list_corner_markers[nbrPt]->x)<<" ; Y : "<<abs(point_read->y-list_corner_markers[nbrPt]->y)<<endl;
+            while(pasX>=abs(point_read->x-list_corner_markers[nbrPt]->x) && pasX>margin_corner)
+                {pasX/=2;}
+            while(pasY>=abs(point_read->y-list_corner_markers[nbrPt]->y) && pasY>margin_corner)
+                {pasY/=2;}
+            cout<<"pasX : "<<pasX<<" ; pasY : "<<pasY<<endl;
+        }
     }
     thresh=200;
 }

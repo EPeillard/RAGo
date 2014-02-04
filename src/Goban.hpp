@@ -12,8 +12,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "Clock.hpp"
 
-#define MARGIN_DETECT_CORNER 5
+
 #define MARGIN_DETECT_CALIB 2
 
 using namespace std;
@@ -28,6 +29,7 @@ public:
     ~Goban();
     void init();
     void detection();
+    void draw();
 
 private:
     vector<Point*> cornerHarris_demo(int, void*);
@@ -52,6 +54,11 @@ private:
 
     //capture stream
     CvCapture* capture;
+
+    Clock* clock;
+
+    int margin_corner;
+    int pasX, pasY;
 
 };
 
