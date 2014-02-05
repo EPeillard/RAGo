@@ -18,6 +18,7 @@ int main(int argc, char** argv)
     Goban* goban = new Goban();
     goban->init();
     goban->detection();
+    goban->setGoban();
     goban->draw();
     return(0);
 

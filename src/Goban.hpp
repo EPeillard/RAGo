@@ -13,6 +13,7 @@
 #include <math.h>
 
 #include "Clock.hpp"
+#include "Stone.hpp"
 
 
 #define MARGIN_DETECT_CALIB 2
@@ -30,6 +31,7 @@ public:
     void init();
     void detection();
     void draw();
+    void setGoban();
 
 private:
     vector<Point*> cornerHarris_demo(int, void*);
@@ -59,6 +61,8 @@ private:
 
     int margin_corner;
     int pasX, pasY;
+
+    vector<vector<Stone*> > tab_stone;
 
 };
 

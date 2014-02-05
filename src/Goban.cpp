@@ -23,7 +23,7 @@ Goban::Goban()
     namedWindow(GOBAN, CV_WINDOW_NORMAL);
     namedWindow(CORNER, CV_WINDOW_AUTOSIZE);
 
-    margin_corner = 5;
+    margin_corner = 3;
     pasX = 50;
     pasY = 50;
 }
@@ -40,7 +40,37 @@ void Goban::draw()
     imshow(GOBAN, matGoban);
     clock = new Clock(list_corner_detected[1]->x, list_corner_detected[1]->y, list_corner_detected[2]->y);
     clock->draw(GOBAN, &matGoban);
+
+    for(int i=0; i<tab_stone.size(); i++)
+        for(int j=0; j<tab_stone[0].size(); j++)
+            tab_stone[i][j]->draw(GOBAN, &matGoban);
+
+    circle(matGoban, Point(10, 10) , 10,  Scalar(255, 255, 255), 2);
+
+    imshow(GOBAN, matGoban);
+    cout<<"draw finish"<<endl;
     waitKey(0);
+}
+
+void Goban::setGoban()
+
+{
+    float X1 = (list_corner_detected[0]->x+list_corner_detected[3]->x)/2;
+    float X2 = (list_corner_detected[1]->x+list_corner_detected[2]->x)/2;
+    float Y1 = (list_corner_detected[0]->y+list_corner_detected[1]->y)/2;
+    float Y2 = (list_corner_detected[2]->y+list_corner_detected[3]->y)/2;
+
+    for(int i=0; i<19; i++)
+    {
+        vector<Stone*> vec;
+        tab_stone.push_back(vec);
+        for(int j=0; j<19; j++)
+        {
+            tab_stone[i].push_back(new Stone());
+            tab_stone[i][j]->setPoint(X1+i*(X2-X1)/19, Y1+j*(Y2-Y1)/19, 2, 0.9*(X2-X1)/(19*2));
+            cout<<"stone "<<i<<","<<j<<" coord : "<<X1+i*(X2-X1)/19<<","<<Y1+j*(Y2-Y1)/(19*2)<<endl;
+        }
+    }
 }
 
 
@@ -57,7 +87,8 @@ void Goban::draw()
 void Goban::refresh()
 {
     matGoban = cv::Scalar(0, 0, 0);
-    rectangle(matGoban, Rect(point_display->x-3, point_display->y-3, 6, 6), Scalar(255, 255, 255), 1);
+    //rectangle(matGoban, Rect(point_display->x-3, point_display->y-3, 6, 6), Scalar(255, 255, 255), 1);
+    circle(matGoban, Point(point_display->x, point_display->y), 3, Scalar(255, 255, 255), 1);
     imshow(GOBAN, matGoban);
 }
 
@@ -326,9 +357,9 @@ void Goban::detectCalibPt()
         if(p_old!=NULL)
         {
             cout<<"X : "<<abs(point_read->x-list_corner_markers[nbrPt]->x)<<" ; Y : "<<abs(point_read->y-list_corner_markers[nbrPt]->y)<<endl;
-            while(pasX>=abs(point_read->x-list_corner_markers[nbrPt]->x) && pasX>margin_corner)
+            while(pasX>=abs(point_read->x-list_corner_markers[nbrPt]->x) && pasX>=margin_corner)
                 {pasX/=2;}
-            while(pasY>=abs(point_read->y-list_corner_markers[nbrPt]->y) && pasY>margin_corner)
+            while(pasY>=abs(point_read->y-list_corner_markers[nbrPt]->y) && pasY>=margin_corner)
                 {pasY/=2;}
             cout<<"pasX : "<<pasX<<" ; pasY : "<<pasY<<endl;
         }
