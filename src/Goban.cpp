@@ -4,7 +4,6 @@
   * @author Nicolas David and Sylvain Palominos
   *
   **/
-
 #define CORNER "Corners detected"
 #define GOBAN "Goban"
 
@@ -26,12 +25,34 @@ Goban::Goban()
     margin_corner = 3;
     pasX = 50;
     pasY = 50;
+/*
+    list_corner_detected.push_back(new Point(88, 77));
+    list_corner_detected.push_back(new Point(751, 88));
+    list_corner_detected.push_back(new Point(751, 714));
+    list_corner_detected.push_back(new Point(92, 714));*/
 }
 
 Goban::~Goban()
 {
     delete point_display;
     delete point_read;
+}
+
+void Goban::getG2PMat()
+{
+    vector<Point2f> destPoints;
+    destPoints.push_back(*list_corner_detected[0]);
+    destPoints.push_back(*list_corner_detected[1]);
+    destPoints.push_back(*list_corner_detected[2]);
+    destPoints.push_back(*list_corner_detected[3]);
+    vector<Point2f> srcPoints;
+    srcPoints.push_back(Point(0, 0));
+    srcPoints.push_back(Point(18, 0));
+    srcPoints.push_back(Point(18, 18));
+    srcPoints.push_back(Point(0, 18));
+    findHomography(srcPoints, destPoints).convertTo(G2P, CV_32FC1);
+
+    cout<<"Mat get"<<endl;
 }
 
 void Goban::draw()
@@ -45,8 +66,6 @@ void Goban::draw()
         for(int j=0; j<tab_stone[0].size(); j++)
             tab_stone[i][j]->draw(GOBAN, &matGoban);
 
-    circle(matGoban, Point(10, 10) , 10,  Scalar(255, 255, 255), 2);
-
     imshow(GOBAN, matGoban);
     cout<<"draw finish"<<endl;
     waitKey(0);
@@ -55,11 +74,13 @@ void Goban::draw()
 void Goban::setGoban()
 
 {
-    float X1 = (list_corner_detected[0]->x+list_corner_detected[3]->x)/2;
-    float X2 = (list_corner_detected[1]->x+list_corner_detected[2]->x)/2;
-    float Y1 = (list_corner_detected[0]->y+list_corner_detected[1]->y)/2;
-    float Y2 = (list_corner_detected[2]->y+list_corner_detected[3]->y)/2;
-
+    float width = sqrt((list_corner_detected[0]->x-list_corner_detected[1]->x) *
+                       (list_corner_detected[0]->x-list_corner_detected[1]->x) +
+                       (list_corner_detected[0]->y-list_corner_detected[1]->y) *
+                       (list_corner_detected[0]->y-list_corner_detected[1]->y));
+    width/=19;
+    width/=2;
+    width*=0.9;
     for(int i=0; i<19; i++)
     {
         vector<Stone*> vec;
@@ -67,8 +88,7 @@ void Goban::setGoban()
         for(int j=0; j<19; j++)
         {
             tab_stone[i].push_back(new Stone());
-            tab_stone[i][j]->setPoint(X1+i*(X2-X1)/19, Y1+j*(Y2-Y1)/19, 2, 0.9*(X2-X1)/(19*2));
-            cout<<"stone "<<i<<","<<j<<" coord : "<<X1+i*(X2-X1)/19<<","<<Y1+j*(Y2-Y1)/(19*2)<<endl;
+            tab_stone[i][j]->setDraw(i, j, 2, width, &G2P);
         }
     }
 }
@@ -94,6 +114,7 @@ void Goban::refresh()
 
 void Goban::detection()
 {
+    if(list_corner_detected.size()!=4)
     do{
         //while(list_corner_read.size()>0){list_corner_read.pop_back();}
 
@@ -134,12 +155,61 @@ void Goban::detection()
 
 void Goban::init()
 {
+    while(list_corner_markers.size()!=4)
+    {
     vector<Point*> list_temp;
     int thresh = 255;
 
     ///Initialisation of the goban display Mat
     matGoban = Mat::zeros(768, 1024, CV_8UC3);
     matGoban = cv::Scalar(255, 255, 255);
+
+    circle(matGoban, Point(50, 50), 70, Scalar(0, 0, 0), 40);
+    Point rook_points[1][5];
+      rook_points[0][0] = Point( 0, 50 );
+      rook_points[0][1] = Point( 50, 0 );
+      rook_points[0][2] = Point( 200, 0 );
+      rook_points[0][3] = Point( 200, 200 );
+      rook_points[0][4] = Point( 0, 200 );
+
+      const Point* ppt[1] = { rook_points[0] };
+      int npt[] = { 5 };
+      fillPoly( matGoban, ppt, npt, 1, Scalar( 255, 255, 255 ));
+
+    circle(matGoban, Point(50, 768-50), 70, Scalar(0, 0, 0), 40);
+    rook_points[1][5];
+      rook_points[0][0] = Point( 0, 768-50 );
+      rook_points[0][1] = Point( 50, 768-0 );
+      rook_points[0][2] = Point( 200, 768-0 );
+      rook_points[0][3] = Point( 200, 768-200 );
+      rook_points[0][4] = Point( 0, 768-200 );
+
+    const Point* ppt2[1] = { rook_points[0] };
+      fillPoly( matGoban, ppt2, npt, 1, Scalar( 255, 255, 255 ));
+
+    circle(matGoban, Point(1024-50, 768-50), 70, Scalar(0, 0, 0), 40);
+    rook_points[1][5];
+      rook_points[0][0] = Point( 1024-0, 768-50 );
+      rook_points[0][1] = Point( 1024-50, 768-0 );
+      rook_points[0][2] = Point( 1024-200, 768-0 );
+      rook_points[0][3] = Point( 1024-200, 768-200 );
+      rook_points[0][4] = Point( 1024-0, 768-200 );
+
+      const Point* ppt3[1] = { rook_points[0] };
+      fillPoly( matGoban, ppt3, npt, 1, Scalar( 255, 255, 255 ));
+
+    circle(matGoban, Point(1024-50, 50), 70, Scalar(0, 0, 0), 40);
+    rook_points[1][5];
+      rook_points[0][0] = Point( 1024-0, 50 );
+      rook_points[0][1] = Point( 1024-50, 0 );
+      rook_points[0][2] = Point( 1024-200, 0 );
+      rook_points[0][3] = Point( 1024-200, 200 );
+      rook_points[0][4] = Point( 1024-0, 200 );
+
+      const Point* ppt4[1] = { rook_points[0] };
+
+      fillPoly( matGoban, ppt4, npt, 1, Scalar( 255, 255, 255 ));
+
     imshow(GOBAN, matGoban);
 
     //waiting the conformation of the user to let time to place the window
@@ -166,14 +236,15 @@ void Goban::init()
 
     ///Once the detection of corner is done, the goban is display
     list_corner_markers = list_temp;
+        if(list_corner_markers.size()!=4)
+            cout<<"Retrying to get the 4 corners";
+    }
 
     ///Ordering the points to have the top left corner in 0, the top right corner in 1 ...
     reorderPoints(list_corner_markers);
     point_display = new Point(*list_corner_markers[nbrPt]);
 
     this->refresh();
-
-
     waitKey(100);
 }
 
@@ -196,10 +267,35 @@ vector<Point*> Goban::cornerHarris_demo(int thresh, void*)
     normalize(dst, dst_norm, 0, 255, NORM_MINMAX, CV_32FC1, Mat());
     convertScaleAbs(dst_norm, dst_norm_scaled);
 
-    /// Drawing a circle around corners and saving the corners in a vector
-    for( int j = 0; j < dst_norm.rows ; j++ )
+    ///definition of the size of thesub matrix to analise
+    int xStart = 0, xEnd = dst_norm.cols, yStart = 0, yEnd = dst_norm.rows;
+    if(point_read!=NULL)
     {
-        for( int i = 0; i < dst_norm.cols; i++ )
+        xStart = point_read->x;
+        yStart = point_read->y;
+
+        int pas;
+
+        (pasX>5) ? pas=pasX : pas=5;
+
+        if(point_read->x>list_corner_markers[nbrPt]->x)
+            xEnd=xStart-pas*2;
+        else
+            xEnd=xStart+pas*2;
+
+        (pasY>5) ? pas=pasY : pas=5;
+
+        if(point_read->y>list_corner_markers[nbrPt]->y)
+            yEnd=yStart-pas*2;
+        else
+            yEnd=yStart+pas*2;
+    }
+
+
+    /// Drawing a circle around corners and saving the corners in a vector
+    for( int j = yStart; j < yEnd ; j++ )
+    {
+        for( int i = xStart; i < xEnd; i++ )
         {
             if( (int) dst_norm.at<float>(j,i) > thresh )
             {
@@ -238,15 +334,11 @@ void Goban::showAllCorners()
 {
     matGoban = cv::Scalar(0, 0, 0);
     for(int i=0; i<list_corner_detected.size(); i++)
-        circle(matGoban, *list_corner_detected[i], 5,  Scalar(255, 255, 255), 5);
-    line( matGoban, *list_corner_detected[0], *list_corner_detected[1], Scalar(255, 255, 255), 4);
-    line( matGoban, *list_corner_detected[1], *list_corner_detected[2], Scalar(255, 255, 255), 4);
-    line( matGoban, *list_corner_detected[2], *list_corner_detected[3], Scalar(255, 255, 255), 4);
-    line( matGoban, *list_corner_detected[3], *list_corner_detected[0], Scalar(255, 255, 255), 4);
-
-    line( matGoban, Point(600, 350), Point(630, 400) , Scalar(0, 225, 200), 4);
-    circle(matGoban, Point(690, 380) , 30,  Scalar(0, 0, 200), 4);
-    line( matGoban, Point(750, 400), Point(780, 350) , Scalar(0, 225, 200), 4);
+        circle(matGoban, *list_corner_detected[i], 5,  Scalar(255, 255, 255), 2);
+    line( matGoban, *list_corner_detected[0], *list_corner_detected[1], Scalar(255, 255, 255), 1);
+    line( matGoban, *list_corner_detected[1], *list_corner_detected[2], Scalar(255, 255, 255), 1);
+    line( matGoban, *list_corner_detected[2], *list_corner_detected[3], Scalar(255, 255, 255), 1);
+    line( matGoban, *list_corner_detected[3], *list_corner_detected[0], Scalar(255, 255, 255), 1);
     imshow(GOBAN, matGoban);
 }
 
