@@ -19,61 +19,39 @@
 
 #include "Clock.hpp"
 #include "Stone.hpp"
+#include "Projector.hpp"
 
 
 #define MARGIN_DETECT_CALIB 2
 
 using namespace std;
 using namespace cv;
+using namespace rago;
 
 namespace rago{
 
 class Goban{
 
 public:
-    Goban();
+    Goban(Projector*);
     ~Goban();
-    void init();
-    void detection();
-    void draw();
-    void setGoban();
 
-    //Mat getC2PMat();
-    //Mat getC2GMat();
-    void getG2PMat();
+    void draw();
+    void setGoban(vector<Point2f*>);
+    void playTerminal();
 
 private:
-    vector<Point*> cornerHarris_demo(int, void*);
     void showAllCorners();
-    void detectCalibPt();
-    void reorderPoints(vector<Point*>&);
-    void emptyBuffer();
-    void refresh();
 
     /// Global variables
-    //OpenCV matrix
-    Mat src, src_gray, matGoban;
+    Mat matGoban;
 
-    //vector of point to save corners coodinates
-    vector<Point*> list_corner_markers;
-    vector<Point*> list_corner_detected;
-
-    //points
-    int nbrPt;
-    Point *point_display;
-    Point *point_read;
-
-    //capture stream
-    CvCapture* capture;
+    vector<Point2f*> list_corner_detected;
 
     Clock* clock;
-
-    int margin_corner;
-    int pasX, pasY;
+    Projector* proj;
 
     vector<vector<Stone*> > tab_stone;
-
-    Mat G2P;
 
 };
 

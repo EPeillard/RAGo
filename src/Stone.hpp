@@ -22,16 +22,14 @@ class Stone{
 public:
     Stone();
     ~Stone();
-    void draw(string, Mat*);
-    void set1();
-    void set2();
-    void setDraw(int, int, int, int, Mat*);
+
+    void setPlayer(int);
+    void setDraw(int, int, int);
+    int getPlayer();
 
 private:
-    int x, y, value, width;
+    int x, y, value;
     string window_name;
-    Mat* mat_draw;
-    Mat* G2P;
 
 
 };

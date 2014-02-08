@@ -6,6 +6,7 @@
   **/
 
 #include "Goban.hpp"
+#include "Core.hpp"
 
 using namespace cv;
 using namespace std;
@@ -15,12 +16,23 @@ using namespace rago;
 int main(int argc, char** argv)
 {
     string ret="";
-    Goban* goban = new Goban();
-    goban->init();
-    goban->detection();
-    goban->getG2PMat();
-    goban->setGoban();
-    goban->draw();
+    Camera* camera = new Camera();
+    Projector* proj = new Projector();
+    Core* core = new Core(camera, proj);
+    Goban* goban = new Goban(proj);
+
+    core->init();
+    core->detection();
+
+    camera->close();
+
+    core->genG2PMat();
+
+    proj->setG2P(core->getG2PMat());
+
+    goban->setGoban(core->getCorners());
+    goban->playTerminal();
+
     return(0);
 
 }
