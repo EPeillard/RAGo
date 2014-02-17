@@ -20,11 +20,11 @@ Core::Core(Camera* camera, Projector* proj)
     margin_corner = 3;
     pasX = 50;
     pasY = 50;
-/*
+
     list_corner_detected.push_back(new Point2f(85, 60));
     list_corner_detected.push_back(new Point2f(768, 67));
     list_corner_detected.push_back(new Point2f(769, 714));
-    list_corner_detected.push_back(new Point2f(90, 714));*/
+    list_corner_detected.push_back(new Point2f(90, 714));
 }
 
 Core::~Core()

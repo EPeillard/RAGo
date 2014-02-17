@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
     proj->setG2P(core->getG2PMat());
 
-    goban->setGoban(core->getCorners());
+    goban->setGoban();
     goban->playTerminal();
 
     return(0);

@@ -16,7 +16,7 @@ void Projector::draw(int mode, int x, int y, int i)
 {
     switch(mode)
     {
-    case 0:
+    case 0: // draw goabn's borders
         matDraw = cv::Scalar(0, 0, 0);
         for(int i=0; i<list_corner_detected.size(); i++)
             circle(matDraw, *list_corner_detected[i], 5,  Scalar(255, 255, 255), 2);
@@ -26,19 +26,19 @@ void Projector::draw(int mode, int x, int y, int i)
         line( matDraw, *list_corner_detected[3], *list_corner_detected[0], Scalar(255, 255, 255), 1);
         imshow("detection", matDraw);
         break;
-    case 1:
+    case 1: // round corners
         drawRoundCorner(0, 0);
         drawRoundCorner(0, y);
         drawRoundCorner(x, y);
         drawRoundCorner(x, 0);
         imshow("detection", matDraw);
         break;
-    case 2:
+    case 2: // display detection points
         matDraw = cv::Scalar(0, 0, 0);
         circle(matDraw, Point2f(x, y), 3, Scalar(255, 255, 255), 1);
         imshow("detection", matDraw);
         break;
-    case 3:
+    case 3: //
         float width = sqrt((list_corner_detected[0]->x-list_corner_detected[1]->x) *
                        (list_corner_detected[0]->x-list_corner_detected[1]->x) +
                        (list_corner_detected[0]->y-list_corner_detected[1]->y) *
@@ -46,6 +46,8 @@ void Projector::draw(int mode, int x, int y, int i)
         width/=19;
         width/=2;
         width*=0.9;
+        //inPts are points on the goban
+        //outPts are points for the projector
         std::vector<cv::Point2f> inPts, outPts;
         inPts.push_back(cv::Point2f(x, y));
         perspectiveTransform(inPts, outPts, *G2P);
