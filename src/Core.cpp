@@ -7,6 +7,16 @@
 #include "Core.hpp"
 using namespace rago;
 
+
+
+    int erosion_elem = 0;
+int erosion_size = 0;
+int const max_elem = 2;
+int const max_kernel_size = 21;
+void Erosion( int, void* );
+    Mat src2, erosion_dst;
+
+
 Core::Core(Camera* camera, Projector* proj)
 {
     this->camera = camera;
@@ -20,11 +30,11 @@ Core::Core(Camera* camera, Projector* proj)
     margin_corner = 3;
     pasX = 50;
     pasY = 50;
-/*
-    list_corner_detected.push_back(new Point2f(85, 60));
-    list_corner_detected.push_back(new Point2f(768, 67));
-    list_corner_detected.push_back(new Point2f(769, 714));
-    list_corner_detected.push_back(new Point2f(90, 714));*/
+
+    list_corner_detected.push_back(new Point2f(87, 62));
+    list_corner_detected.push_back(new Point2f(772, 66));
+    list_corner_detected.push_back(new Point2f(779, 714));
+    list_corner_detected.push_back(new Point2f(99, 720));
 }
 
 Core::~Core()
@@ -321,4 +331,63 @@ void Core::detectCalibPt()
 vector<Point2f*> Core::getCorners()
 {
     return list_corner_detected;
+}
+
+
+void Core::imagediff()
+{
+    proj->draw(4, 0, 0);
+    cout<<"image difference"<<endl;
+
+  namedWindow( "Erosion Demo", CV_WINDOW_AUTOSIZE );
+    Mat frame1,frame2;
+    int key=0;
+
+    while(key!='q'){
+        cout<<key<<endl;
+        Mat frame(camera->getFrame());
+        if(key=='c'){
+            cout<<"getting"<<endl;
+            frame.copyTo(frame1);
+            key = 0;
+        }
+        if(key =='x'){
+            cout<<"comparing"<<endl;
+            cv::absdiff(frame, frame1, frame2);
+            cv::imshow("difference ",frame2);
+            src2 = frame2;
+            erosion_elem=0;
+            erosion_size=5;
+            /*/// Create Erosion Trackbar
+              createTrackbar( "Element:\n 0: Rect \n 1: Cross \n 2: Ellipse", "Erosion Demo",
+                              &erosion_elem, max_elem,
+                              Erosion );
+
+              createTrackbar( "Kernel size:\n 2n +1", "Erosion Demo",
+                              &erosion_size, max_kernel_size,
+                              Erosion );*/
+            key =0;
+        }
+       cv::imshow("stream",frame);
+       key = cv::waitKey(0)%256;
+     }
+}
+
+
+
+void Erosion( int, void* )
+{
+  int erosion_type;
+  int erosion_elem = 0;
+  if( erosion_elem == 0 ){ erosion_type = MORPH_RECT; }
+  else if( erosion_elem == 1 ){ erosion_type = MORPH_CROSS; }
+  else if( erosion_elem == 2) { erosion_type = MORPH_ELLIPSE; }
+
+  Mat element = getStructuringElement( erosion_type,
+                                       Size( 2*erosion_size + 1, 2*erosion_size+1 ),
+                                       Point( erosion_size, erosion_size ) );
+
+  /// Apply the erosion operation
+  erode( src2, erosion_dst, element );
+  imshow( "Erosion Demo", erosion_dst );
 }

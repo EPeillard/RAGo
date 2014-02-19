@@ -23,6 +23,7 @@ int main(int argc, char** argv)
 
     core->init();
     core->detection();
+    core->imagediff(0);
 
     camera->close();
 

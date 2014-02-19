@@ -58,6 +58,7 @@ public:
     void init();
     void detection();
     void genG2PMat();
+    void imagediff();
 
 private:
     void detectCalibPt();
@@ -65,6 +66,7 @@ private:
     void emptyBuffer();
     void refresh();
     vector<Point2f*> cornerHarris_demo(int, void*);
+
 
 
     Mat src, src_gray, matDetect;
@@ -85,6 +87,7 @@ private:
 
     Camera* camera;
     Projector* proj;
+
 
 };
 
