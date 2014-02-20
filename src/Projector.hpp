@@ -29,9 +29,10 @@ public:
 
     void setG2P(Mat*);
 
+    Mat matDraw; //TODO faire un getter
 
 private:
-    Mat matDraw;
+
     void drawRoundCorner(int, int);
     vector<Point2f*> list_corner_detected;
 

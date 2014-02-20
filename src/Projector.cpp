@@ -39,6 +39,7 @@ void Projector::draw(int mode, int x, int y, int i)
         imshow("detection", matDraw);
         break;
     case 3: //
+    {
         float width = sqrt((list_corner_detected[0]->x-list_corner_detected[1]->x) *
                        (list_corner_detected[0]->x-list_corner_detected[1]->x) +
                        (list_corner_detected[0]->y-list_corner_detected[1]->y) *
@@ -63,6 +64,20 @@ void Projector::draw(int mode, int x, int y, int i)
         }
         imshow("detection", matDraw);
         break;
+    }
+        case 4: //clock
+        {
+        int xc, yc1, yc2;
+        xc = 800 ;
+        yc1 = 100;
+        yc2 = 500 ;
+
+        rectangle(matDraw, Rect(xc+60, yc1+(yc2-yc1)/4, 150, (yc2-yc1)/2), Scalar(255, 255, 255), 3);
+        circle(matDraw, Point(xc+60+75, yc1+5*(yc2-yc1)/8) , 60,  Scalar(0, 0, 200), 2);
+
+        break;
+        }
+
     }
 }
 
