@@ -37,7 +37,7 @@ public:
     ~Goban();
 
     void draw();
-    void setGoban(vector<Point2f*>);
+    void setGoban();
     void playTerminal();
 
 private:

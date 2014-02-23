@@ -29,9 +29,6 @@ public:
 
 private:
     int x, y, value;
-    string window_name;
-
-
 };
 
 }

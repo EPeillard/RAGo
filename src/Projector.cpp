@@ -5,8 +5,9 @@ using namespace rago;
 Projector::Projector()
 {
     matDraw = Mat::zeros(768, 1024, CV_8UC3);
-    matDraw = cv::Scalar(255, 255, 255);
+        matDraw = cv::Scalar(203, 214, 218);
     G2P=NULL;
+    namedWindow( "detection", CV_WINDOW_FREERATIO );
 }
 
 
@@ -16,29 +17,30 @@ void Projector::draw(int mode, int x, int y, int i)
 {
     switch(mode)
     {
-    case 0:
-        matDraw = cv::Scalar(0, 0, 0);
+    case 0: // draw goabn's borders
+        matDraw = cv::Scalar(203, 214, 218);
         for(int i=0; i<list_corner_detected.size(); i++)
-            circle(matDraw, *list_corner_detected[i], 5,  Scalar(255, 255, 255), 2);
-        line( matDraw, *list_corner_detected[0], *list_corner_detected[1], Scalar(255, 255, 255), 1);
-        line( matDraw, *list_corner_detected[1], *list_corner_detected[2], Scalar(255, 255, 255), 1);
-        line( matDraw, *list_corner_detected[2], *list_corner_detected[3], Scalar(255, 255, 255), 1);
-        line( matDraw, *list_corner_detected[3], *list_corner_detected[0], Scalar(255, 255, 255), 1);
+            circle(matDraw, *list_corner_detected[i], 5,  Scalar(0, 0, 255), 2);
+        line( matDraw, *list_corner_detected[0], *list_corner_detected[1], Scalar(0,0,255), 1);
+        line( matDraw, *list_corner_detected[1], *list_corner_detected[2], Scalar(0,0,255), 1);
+        line( matDraw, *list_corner_detected[2], *list_corner_detected[3], Scalar(0,0,255), 1);
+        line( matDraw, *list_corner_detected[3], *list_corner_detected[0], Scalar(0,0,255), 1);
         imshow("detection", matDraw);
         break;
-    case 1:
-        drawRoundCorner(0, 0);
+    case 1: // round corners
+        /*drawRoundCorner(0, 0);
         drawRoundCorner(0, y);
         drawRoundCorner(x, y);
-        drawRoundCorner(x, 0);
+        drawRoundCorner(x, 0);*/
         imshow("detection", matDraw);
         break;
-    case 2:
+    case 2: // display detection points
         matDraw = cv::Scalar(0, 0, 0);
-        circle(matDraw, Point2f(x, y), 3, Scalar(255, 255, 255), 1);
+        cout<<x<<" , "<<y<<endl;
+        circle(matDraw, Point2f(x, y), 20, Scalar(255, 255, 255), -1);
         imshow("detection", matDraw);
         break;
-    case 3:
+    case 3: //
         float width = sqrt((list_corner_detected[0]->x-list_corner_detected[1]->x) *
                        (list_corner_detected[0]->x-list_corner_detected[1]->x) +
                        (list_corner_detected[0]->y-list_corner_detected[1]->y) *
@@ -46,18 +48,20 @@ void Projector::draw(int mode, int x, int y, int i)
         width/=19;
         width/=2;
         width*=0.9;
+        //inPts are points on the goban
+        //outPts are points for the projector
         std::vector<cv::Point2f> inPts, outPts;
         inPts.push_back(cv::Point2f(x, y));
         perspectiveTransform(inPts, outPts, *G2P);
         if(i==1)
         {
-            circle(matDraw, outPts[0] , width,  Scalar(0, 0, 0), -1);
-            circle(matDraw, outPts[0] , width+1,  Scalar(255, 255, 255), 1);
+            circle(matDraw, outPts[0] , width,  Scalar(255, 255, 255), -1);
+            circle(matDraw, outPts[0] , width+1,  Scalar(0, 0, 0), 1);
         }
         else if(i==2)
         {
-            circle(matDraw, outPts[0] , width,  Scalar(255, 255, 255), -1);
-            circle(matDraw, outPts[0] , width+1,  Scalar(0, 0, 0), 1);
+            circle(matDraw, outPts[0] , width,  Scalar(0, 0, 0), -1);
+            circle(matDraw, outPts[0] , width+1,  Scalar(255, 255, 255), 1);
         }
         imshow("detection", matDraw);
         break;
@@ -91,7 +95,7 @@ void Projector::drawRoundCorner(int x, int y)
 
     const Point* ppt[1] = { rook_points[0] };
     int npt[] = { 5 };
-    fillPoly( matDraw, ppt, npt, 1, Scalar( 255, 255, 255 ));
+    fillPoly( matDraw, ppt, npt, 1, Scalar(203, 214, 218));
 }
 
 void Projector::setCorner(vector<Point2f*> list_corner_detected)

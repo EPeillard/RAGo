@@ -54,10 +54,12 @@ public:
     /**\brief Getter for the Mat object for the transformation from the Goban coordinate into the Projector coordinate
     **/
     Mat* getG2PMat();
+    Mat* getC2GMat();
 
     void init();
     void detection();
     void genG2PMat();
+    void genC2GMat();
     void imagediff();
 
 private:
@@ -66,6 +68,9 @@ private:
     void emptyBuffer();
     void refresh();
     vector<Point2f*> cornerHarris_demo(int, void*);
+    vector<Point2f*> corner(int , void*);
+    vector<Point2f*> getFrameCircles(Mat, int);
+    void detectCalibPtCirlces();
 
 
 
@@ -84,6 +89,7 @@ private:
     int pasX, pasY;
 
     Mat G2P;
+    Mat C2G;
 
     Camera* camera;
     Projector* proj;

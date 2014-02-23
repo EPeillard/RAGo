@@ -23,7 +23,7 @@ Goban::~Goban()
 {
 }
 
-void Goban::setGoban(vector<Point2f*> vec)
+void Goban::setGoban()
 {
     for(int i=0; i<19; i++)
     {
@@ -53,6 +53,7 @@ void Goban::playTerminal()
             proj->draw(3, x-1, y-1, tab_stone[x-1][y-1]->getPlayer());
             waitKey(10);
         }
+        //TODO need to check if the user gives x between 1 and 19 and ask again if not
         (player==1) ? player=2 : player=1;
 
         cout<<"Player "<<player<<endl;

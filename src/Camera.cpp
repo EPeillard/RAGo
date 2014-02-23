@@ -2,12 +2,19 @@
 
 using namespace rago;
 
+/**
+  *Create a new Camera and Capture of a picture
+  *
+  **/
 Camera::Camera()
 {
-    ///Capture of a picture
     capture = cvCreateCameraCapture(0);
 }
 
+/**
+  *Destructor of Camera
+  *
+  **/
 Camera::~Camera()
 {
     delete capture;
