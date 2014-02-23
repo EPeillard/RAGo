@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "Projector.hpp"
 
 using namespace std;
 using namespace cv;
@@ -20,14 +21,23 @@ namespace rago{
 class Clock{
 
 public:
-    Clock(int, int, int);
+    Clock(Projector*);
     ~Clock();
-    void draw(string, Mat*);
+    void draw();
+    void increaseTime();
+
+
 
 private:
-    int x, y1, y2;
+    double opTime;
+    double myTime;
+    clock_t temps;
     string window_name;
     Mat* mat_draw;
+    Projector* proj;
+    clock_t init(void);
+    double getCurrentTime();
+    void printCurrentTime(double);
 
 
 };

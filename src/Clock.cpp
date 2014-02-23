@@ -2,11 +2,13 @@
 
 using namespace rago;
 
-Clock::Clock(int x, int y1, int y2)
+Clock::Clock(Projector *p)
 {
-    this->x=x;
-    this->y1=y1;
-    this->y2=y2;
+    this->myTime=0;
+    this->opTime=0;
+    this->proj=p;
+    clock_t temps;
+    srand(time(NULL));
 }
 
 Clock::~Clock()
@@ -14,9 +16,68 @@ Clock::~Clock()
     delete mat_draw;
 }
 
-void Clock::draw(string name, Mat* mat)
+void Clock::draw()
 {
-    //TODO dynamics values
-    rectangle(*mat, Rect(x+60, y1+(y2-y1)/4, 150, (y2-y1)/2), Scalar(255, 255, 255), 3);
-    circle(*mat, Point(x+60+75, y1+5*(y2-y1)/8) , 60,  Scalar(0, 0, 200), 2);
+    Mat matDraw;
+    this->proj->draw(4,0,0);
+
+    matDraw = this->proj->matDraw;
+
+    std::stringstream s;
+    s << "coup" ;
+    s << this->myTime;
+
+    int fontFace =  FONT_HERSHEY_SIMPLEX;
+    double fontScale = 0.5;
+    int thickness = 1;
+    Point textOrg(10, 130+ 20*this->myTime);
+    putText(matDraw, s.str(), textOrg, fontFace, fontScale, Scalar::all(0), thickness,8);
+    circle(matDraw, Point(300, 300) , 10+2*this->myTime,  Scalar(0, 0, 255), 2);
+
+    imshow("detection", matDraw);
+    waitKey(10);
+    this->printCurrentTime(this->getCurrentTime());
+}
+
+void Clock::increaseTime(){
+    this->myTime ++;
+}
+
+
+
+clock_t Clock::init(void)
+{
+    clock_t temps;
+    srand(time(NULL));
+
+
+}
+
+double Clock::getCurrentTime(){
+
+    clock_t tpsStop = this->temps;
+    tpsStop = clock();
+    return (double) tpsStop/CLOCKS_PER_SEC;
+}
+
+void Clock::printCurrentTime(double tps){
+
+        Mat matDraw;
+    matDraw = this->proj->matDraw;
+
+    std::stringstream s;
+    s << "temps actuel" ;
+    s << tps;
+
+    int fontFace =  FONT_HERSHEY_SIMPLEX;
+    double fontScale = 0.5;
+    int thickness = 1;
+    Point textOrg(10, 10);
+
+    rectangle(matDraw, Rect(0, 0, 800, 20), Scalar(255, 0, 0), -1);
+    putText(matDraw, s.str(), textOrg, fontFace, fontScale, Scalar::all(0), thickness,8);
+
+    imshow("detection", matDraw);
+    waitKey(10);
+
 }
