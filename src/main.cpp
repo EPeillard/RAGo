@@ -6,7 +6,8 @@
   **/
 
 #include "Goban.hpp"
-#include "Core.hpp"#include <iostream>
+#include "Core.hpp"
+#include <iostream>
 #include <sstream>
 #include <time.h>
 #include <stdio.h>
@@ -45,11 +46,13 @@ int main(int argc, char** argv)
     Core* core = new Core(camera, proj);
     Goban* goban = new Goban(proj);
 
-    core->init();
+
+    core->detectHand();
+    /*core->init();
     core->detection();
     core->genConvMat();
     proj->setG2P(core->getG2PMat());
-    core->imagediff();
+    core->imagediff();*/
 
     camera->close();
 

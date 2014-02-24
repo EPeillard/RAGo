@@ -62,6 +62,7 @@ public:
     void genC2GMat();*/
     void genConvMat();
     void imagediff();
+    void detectHand();
 
 private:
     //void detectCalibPt();
