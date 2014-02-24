@@ -45,12 +45,14 @@ int main(int argc, char** argv)
     Core* core = new Core(camera, proj);
     Goban* goban = new Goban(proj);
 
-    core->init();
-    core->detection();
-    core->genC2GMat();
-    core->genG2PMat();
-    proj->setG2P(core->getG2PMat());
-    core->imagediff();
+
+    core->detectHand();
+    //core->init();
+    //core->detection();
+    //core->genC2GMat();
+    //core->genG2PMat();
+    //proj->setG2P(core->getG2PMat());
+    //core->imagediff();
 
     camera->close();
 

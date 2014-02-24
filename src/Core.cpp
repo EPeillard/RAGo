@@ -693,3 +693,57 @@ vector<Point2f*> Core::getFrameCircles(Mat frame, int width)
             //waitKey(0);
     return list_center;
 }
+
+void Core::detectHand()
+{
+    cout<<"detection de la main"<<endl;
+
+    Mat frame1,frame2,maskDraw;
+    Mat maskedFrame1, maskedFrame2; // stores masked Image
+    Mat test(camera->getFrame());
+    //create black picture
+    maskDraw = Mat::zeros(test.size(), test.type());
+    maskDraw = cv::Scalar(0, 0, 0);
+
+    //get the horloge size & draw it in white
+     int xc, yc1, yc2;
+        xc = 500 ;
+        yc1 = 100;
+        yc2 = 500 ;
+    circle(maskDraw, Point(xc, yc1+5*(yc2-yc1)/8) , 60,  Scalar(255, 255, 255), -1);
+    //TODO need to apply to the clock * matrice de convertion projo->cam = P2G
+
+
+    //apply the mask
+    cv::imshow("difference ",maskDraw);
+    waitKey(0);
+    int key=0;
+
+    while(key!='q'){
+        cout<<key<<endl;
+        Mat frame(camera->getFrame());
+        Mat maskedFrame; // stores masked Image
+        if(key=='c'){
+            cout<<"getting"<<endl;
+            frame.copyTo(frame1);
+            key = 0;
+        }
+        if(key =='x'){
+            cout<<"comparing"<<endl;
+            cv::absdiff(frame, frame1, frame2);
+            cv::imshow("difference ",frame2);
+            bitwise_and(frame2, maskDraw,frame2);
+            cv::imshow("difference ",frame2);
+            waitKey(0);
+            src2 = frame2;
+            /*erosion_elem=0;
+            erosion_size=2;
+            Erosion(0, 0);
+            key =0;*/
+        }
+        key = cv::waitKey(0)%256;
+    }
+
+    cout<<"hand detected"<<endl;
+
+}
