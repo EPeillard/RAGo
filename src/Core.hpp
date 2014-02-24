@@ -58,17 +58,18 @@ public:
 
     void init();
     void detection();
-    void genG2PMat();
-    void genC2GMat();
+    /*void genG2PMat();
+    void genC2GMat();*/
+    void genConvMat();
     void imagediff();
 
 private:
-    void detectCalibPt();
+    //void detectCalibPt();
     void reorderPoints(vector<Point2f*>&);
     void emptyBuffer();
     void refresh();
-    vector<Point2f*> cornerHarris_demo(int, void*);
-    vector<Point2f*> corner(int , void*);
+    //vector<Point2f*> cornerHarris_demo(int, void*);
+    //vector<Point2f*> corner(int , void*);
     vector<Point2f*> getFrameCircles(Mat, int);
     void detectCalibPtCirlces();
 

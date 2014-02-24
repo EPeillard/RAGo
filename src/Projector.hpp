@@ -23,7 +23,7 @@ public:
     Projector();
     ~Projector();
 
-    void draw(int, int, int, int=0);
+    void draw(int, int=0, int=0, int=0);
     void unDraw(int);
     void setCorner(vector<Point2f*>);
 

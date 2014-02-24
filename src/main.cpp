@@ -47,17 +47,13 @@ int main(int argc, char** argv)
 
     core->init();
     core->detection();
-    core->genC2GMat();
-    core->genG2PMat();
+    core->genConvMat();
     proj->setG2P(core->getG2PMat());
     core->imagediff();
 
     camera->close();
 
-    /*core->genG2PMat();
-
-    proj->setG2P(core->getG2PMat());
-
+    /*
     goban->setGoban();
     goban->playTerminal();*/
 

@@ -1,4 +1,5 @@
 #include "Projector.hpp"
+#include "define.hpp"
 
 using namespace rago;
 
@@ -27,12 +28,7 @@ void Projector::draw(int mode, int x, int y, int i)
         line( matDraw, *list_corner_detected[3], *list_corner_detected[0], Scalar(0,0,255), 1);
         imshow("detection", matDraw);
         break;
-    case 1: // round corners
-        /*drawRoundCorner(0, 0);
-        drawRoundCorner(0, y);
-        drawRoundCorner(x, y);
-        drawRoundCorner(x, 0);*/
-        imshow("detection", matDraw);
+    case 1:
         break;
     case 2: // display detection points
         matDraw = cv::Scalar(0, 0, 0);
@@ -46,7 +42,7 @@ void Projector::draw(int mode, int x, int y, int i)
                        (list_corner_detected[0]->x-list_corner_detected[1]->x) +
                        (list_corner_detected[0]->y-list_corner_detected[1]->y) *
                        (list_corner_detected[0]->y-list_corner_detected[1]->y));
-        width/=19;
+        width/=GOBAN_SIZE;
         width/=2;
         width*=0.9;
         //inPts are points on the goban
@@ -67,8 +63,8 @@ void Projector::draw(int mode, int x, int y, int i)
         imshow("detection", matDraw);
         break;
     }
-        case 4: //clock
-        {
+    case 4: //clock
+    {
         int xc, yc1, yc2;
         xc = 800 ;
         yc1 = 100;
@@ -78,9 +74,9 @@ void Projector::draw(int mode, int x, int y, int i)
         circle(matDraw, Point(xc+60+75, yc1+5*(yc2-yc1)/8) , 60,  Scalar(0, 0, 200), 2);
 
         break;
-        }
-
     }
+    }
+    imshow("detection", matDraw);
 }
 
 
@@ -97,7 +93,7 @@ void Projector::unDraw(int mode)
     }
     cvDestroyWindow("detection");
 }
-
+/*
 void Projector::drawRoundCorner(int x, int y)
 {
     circle(matDraw, Point(abs(x-50), abs(y-50)), 70, Scalar(0, 0, 0), 40);
@@ -111,7 +107,7 @@ void Projector::drawRoundCorner(int x, int y)
     const Point* ppt[1] = { rook_points[0] };
     int npt[] = { 5 };
     fillPoly( matDraw, ppt, npt, 1, Scalar(203, 214, 218));
-}
+}*/
 
 void Projector::setCorner(vector<Point2f*> list_corner_detected)
 {
