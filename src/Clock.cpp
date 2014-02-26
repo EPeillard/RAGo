@@ -26,7 +26,7 @@ void Clock::draw()
     std::stringstream s;
     s << "coup" ;
     s << this->myTime;
-
+/*
     int fontFace =  FONT_HERSHEY_SIMPLEX;
     double fontScale = 0.5;
     int thickness = 1;
@@ -36,7 +36,7 @@ void Clock::draw()
 
     imshow("detection", matDraw);
     waitKey(10);
-    this->printCurrentTime(this->getCurrentTime());
+    this->printCurrentTime(this->getCurrentTime());*/
 }
 
 void Clock::increaseTime(){

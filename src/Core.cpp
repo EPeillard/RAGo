@@ -91,6 +91,7 @@ void Core::genConvMat()
 
     findHomography(cornersCamera, cornersGoban).convertTo(C2G, CV_32F);
     findHomography(cornersGoban, cornersProj).convertTo(G2P, CV_32F);
+    findHomography(cornersProj, cornersCamera).convertTo(P2C, CV_32F);
 }
 
 void Core::init()
@@ -344,7 +345,9 @@ void Core::imagediff()
     rectangle(maskDraw, Point(x0, y0), Point(x1, y1), Scalar(255, 255, 255), -1);
     int key=0;
 
-    while(key!='q'){
+    bool flag=false;
+
+    while(key!='q' && !flag){
         cout<<key<<endl;
         Mat frame(camera->getFrame());
         if(key=='c'){
@@ -398,6 +401,8 @@ void Core::imagediff()
             cout<<x<<endl;
             cout<<y<<endl;
             proj->draw(PROJ_MOD_STONE, x, y, 1);
+            flag=true;
+            cout<<"press any key"<<endl;
             waitKey(0);
 
             cout<<"end"<<endl;
@@ -451,9 +456,24 @@ vector<Point2f*> Core::getFrameCircles(Mat frame, int width)
     return list_center;
 }
 
-void Core::detectHand()
+bool Core::detectHand()
 {
+
+    //zone in the projector area
+    int xc_proj, yc_proj;
+        xc_proj = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
+        yc_proj = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
+
+    //zone in the camera
+
+    std::vector<cv::Point2f> inPts, outPts;
+    inPts.push_back(cv::Point2f(xc_proj, yc_proj));
+    perspectiveTransform(inPts, outPts, P2C);
+
+
     cout<<"detection de la main"<<endl;
+
+
 
     Mat frame1,frame2,maskDraw;
     Mat maskedFrame1, maskedFrame2; // stores masked Image
@@ -467,7 +487,7 @@ void Core::detectHand()
         xc = 500 ;
         yc1 = 100;
         yc2 = 500 ;
-    circle(maskDraw, Point(xc, yc1+5*(yc2-yc1)/8) , 60,  Scalar(255, 255, 255), -1);
+    circle(maskDraw, Point(outPts[0].x, outPts[0].y) , 40*((float)outPts[0].x/xc_proj),  Scalar(255, 255, 255), -1);
     //TODO need to apply to the clock * matrice de convertion projo->cam = P2G
 
 
@@ -476,7 +496,8 @@ void Core::detectHand()
     waitKey(0);
     int key=0;
 
-    while(key!='q'){
+
+    while(key!='q' ){
         cout<<key<<endl;
         Mat frame(camera->getFrame());
         Mat maskedFrame; // stores masked Image
@@ -495,9 +516,12 @@ void Core::detectHand()
             cv::imshow("difference ",src_gray);
             if (countNotBlack(src_gray,80)>20){
                 cout<<"yes there is a hand"<<endl;
+                    cout<<"hand detected"<<endl;
+                    return true;
             }
             else{
                 cout<<"nope sorry"<<endl;
+                return false;
             }
             waitKey(0);
             //src2 = frame2;
@@ -507,9 +531,9 @@ void Core::detectHand()
             key =0;*/
         }
         key = cv::waitKey(0)%256;
+
     }
 
-    cout<<"hand detected"<<endl;
 
 }
 

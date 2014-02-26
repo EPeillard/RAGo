@@ -64,7 +64,7 @@ public:
     void genC2GMat();*/
     void genConvMat();
     void imagediff();
-    void detectHand();
+    bool detectHand();
     int countNotBlack(Mat img, int lim);
 
 private:
@@ -95,6 +95,7 @@ private:
 
     Mat G2P;
     Mat C2G;
+    Mat P2C;
 
     Camera* camera;
     Projector* proj;

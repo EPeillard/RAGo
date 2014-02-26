@@ -47,18 +47,30 @@ int main(int argc, char** argv)
     Goban* goban = new Goban(proj);
 
 
-    //core->detectHand();
+
     core->init();
     core->detection();
     core->genConvMat();
+
     proj->setG2P(core->getG2PMat());
-    core->imagediff();
 
-    camera->close();
-
-    /*
     goban->setGoban();
-    goban->playTerminal();*/
+
+    for(int i=0; i<10; i++)
+    {
+        core->imagediff();
+        while(!core->detectHand())
+        {
+            cout<<"meme pas"<<endl;
+            waitKey(1000);
+        }
+    }
+
+    //camera->close();
+
+
+    waitKey(0);
+  //  goban->playTerminal();
 
     return(0);
 

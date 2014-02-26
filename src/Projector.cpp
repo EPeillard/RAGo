@@ -65,13 +65,14 @@ void Projector::draw(int mode, int x, int y, int i)
     }
     case 4: //clock
     {
-        int xc, yc1, yc2;
-        xc = 800 ;
+        int xc, yc, yc1, yc2;
+        xc = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
+        yc = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
         yc1 = 100;
         yc2 = 500 ;
 
-        rectangle(matDraw, Rect(xc+60, yc1+(yc2-yc1)/4, 150, (yc2-yc1)/2), Scalar(255, 255, 255), 3);
-        circle(matDraw, Point(xc+60+75, yc1+5*(yc2-yc1)/8) , 60,  Scalar(0, 0, 200), 2);
+        //rectangle(matDraw, Rect(xc+60, yc1+(yc2-yc1)/4, 150, (yc2-yc1)/2), Scalar(255, 255, 255), 3);
+        circle(matDraw, Point(xc, yc) , 45,  Scalar(0, 0, 200), 2);
 
         break;
     }
