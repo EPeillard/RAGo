@@ -5,7 +5,7 @@
   **/
 
 ///To avoid to get corner coordinate (camera coordinate)
-//#define COMP_MOD_NO_INIT
+#define COMP_MOD_NO_INIT
 
 ///To avoid to get corner coordinate (projector coordinate)
 //#define COMP_MOD_NO_DETECT
@@ -39,10 +39,10 @@ Core::Core(Camera* camera, Projector* proj)
     pasY = 50;
 
 #ifdef COMP_MOD_NO_INIT
-    list_corner_markers.push_back(new Point2f(127, 87));
-    list_corner_markers.push_back(new Point2f(425, 95));
-    list_corner_markers.push_back(new Point2f(430, 372));
-    list_corner_markers.push_back(new Point2f(122, 377));
+    list_corner_markers.push_back(new Point2f(172, 136));
+    list_corner_markers.push_back(new Point2f(432, 138));
+    list_corner_markers.push_back(new Point2f(462, 412));
+    list_corner_markers.push_back(new Point2f(156, 424));
 #endif // COMP_MOD_NO_INIT
 
 #ifdef COMP_MOD_NO_DETECT
@@ -51,6 +51,7 @@ Core::Core(Camera* camera, Projector* proj)
     list_corner_detected.push_back(new Point2f(860, 695));
     list_corner_detected.push_back(new Point2f(183, 696));
 #endif // COMP_MOD_NO_DETECT
+
 
 }
 
@@ -402,7 +403,7 @@ vector<Point2f*> Core::getFrameCircles(Mat frame, int width)
     cvtColor( frame, src_gray, CV_BGR2GRAY );
 
     /// Reduce the noise so we avoid false circle detection
-    GaussianBlur( src_gray, src_gray, Size(9,9), 3, 3 );
+    GaussianBlur( src_gray, src_gray, Size(7,7), 3, 3 );
 
     vector<Vec3f> circles;
     HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/18, 200, 10, width, src_gray.rows/18 );
