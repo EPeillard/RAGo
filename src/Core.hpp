@@ -17,6 +17,8 @@
   * the conversion between point get from the camera to the Stone tab and from the stone tab to the projector.
   **/
 
+
+
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"

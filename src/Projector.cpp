@@ -20,8 +20,8 @@ void Projector::draw(int mode, int x, int y, int i)
     {
     case 0: // draw goabn's borders
         matDraw = cv::Scalar(203, 214, 218);
-        for(int i=0; i<list_corner_detected.size(); i++)
-            circle(matDraw, *list_corner_detected[i], 5,  Scalar(0, 0, 255), 2);
+        for(int j=0; j<list_corner_detected.size(); j++)
+            circle(matDraw, *list_corner_detected[j], 5,  Scalar(0, 0, 255), 2);
         line( matDraw, *list_corner_detected[0], *list_corner_detected[1], Scalar(0,0,255), 1);
         line( matDraw, *list_corner_detected[1], *list_corner_detected[2], Scalar(0,0,255), 1);
         line( matDraw, *list_corner_detected[2], *list_corner_detected[3], Scalar(0,0,255), 1);

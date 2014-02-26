@@ -47,12 +47,12 @@ int main(int argc, char** argv)
     Goban* goban = new Goban(proj);
 
 
-    core->detectHand();
-    /*core->init();
+    //core->detectHand();
+    core->init();
     core->detection();
     core->genConvMat();
     proj->setG2P(core->getG2PMat());
-    core->imagediff();*/
+    core->imagediff();
 
     camera->close();
 

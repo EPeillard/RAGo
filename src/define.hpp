@@ -1,3 +1,8 @@
+/**
+ * This file only contains define values such as the goban size for example
+ *
+ */
+
 ///This value indicate the margin (in pixels) accepted during the corners detections between
 ///the corners getted in the @function init() function
 ///and the center of the circle detected in the @function detection()
