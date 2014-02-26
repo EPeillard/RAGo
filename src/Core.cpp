@@ -138,34 +138,33 @@ void Core::init()
 
 void Core::detection()
 {
-#ifndef COMP_MOD_NO_DETECT
+if(list_corner_detected.size()!=CORNER_NUMBER)
+    {
+
     point_display = new Point2f(*list_corner_markers[nbrPt]);
 
-#ifdef COMP_MOD_VERBOSE
-    namedWindow( "Verbose mod", CV_WINDOW_AUTOSIZE );
-#endif // COMP_MOD_VERBOSE
-
+        namedWindow( "detection circles", CV_WINDOW_AUTOSIZE );
     proj->draw(PROJ_MOD_DETECTION, point_display->x, point_display->y);
-
-#ifdef COMP_MOD_NO_INIT
     cout<<"Detection"<<endl;
     cout<<"press any key"<<endl;
     waitKey(0);
-#endif // COMP_MOD_NO_INIT
+        cout<<"detection"<<endl;
         do{
             ///Reloading a picture to detect points displayed
             src = Mat(camera->getFrame());
             cvtColor(src, src_gray, CV_BGR2GRAY);
 
-#ifdef COMP_MOD_VERBOSE
             imshow( "detection circles", src );
             cout<<"press any key"<<endl;
-            waitKey(0);
-#endif // COMP_MOD_VERBOSE
+            //waitKey(0);
 
             ///Save of the points displayed in a vector
-            waitKey(100);
-            detectCalibPtCirlces();
+
+                waitKey(100);
+                detectCalibPtCirlces();
+
+            cout<<"size"<<list_corner_detected.size()<<endl;
+
 
             ///Changing the coordinate of the display points to adapt them to physicals corners
             if(point_read!=NULL)
@@ -187,19 +186,15 @@ void Core::detection()
 
             waitKey(10);
         }while(nbrPt<CORNER_NUMBER);
-
-#ifdef COMP_MOD_VERBOSE
-    //Used to get point coordinates to avoid the detection
-    for(int i=0; i<list_corner_detected.size(); i++){
-            cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
     }
-#endif // COMP_MOD_VERBOSE
-#endif // COMP_MOD_NO_DETECT
     proj->setCorner(list_corner_detected);
+    //Used to get point coordinates to avoid the detection
+    /*for(int i=0; i<list_corner_detected.size(); i++){
+            cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
+    }*/
     proj->draw(PROJ_MOD_BORDERS);
     waitKey(1000);
 }
-
 /** Function reordering the point this way : 0 : top left corner, 1 top right corner, 2 bottom right corner, 3 bottom left corner
   *
   * @function reorderPoints()
@@ -250,43 +245,39 @@ void Core::detectCalibPtCirlces()
     point_read = NULL;
 
     ///Acquisition of the calibration point
-    while(list_temp.size()>0){list_temp.pop_back();}
+    /*while(point_read==NULL)
+    {*/
+        while(list_temp.size()>0){list_temp.pop_back();}
 
-    ///Still etecting the circles until there's only one
-    //do{
-            list_temp = getFrameCircles(camera->getFrame(), 0);
-    //}
-    /**while(list_temp.size()>1);
+        list_temp = getFrameCircles(camera->getFrame(), 0);
 
-    if(list_temp.size()==1)
-        point_read = list_temp[0];*/
-//No use because we don't have any other stone exept the light for detection
-    for(int i=0; i<list_temp.size(); i++)
-    {
-        bool flag=true;
-        for(int j=0; j<list_corner_markers.size(); j++)
-            if(list_temp[i]->x<list_corner_markers[j]->x+margin_corner &&
-               list_temp[i]->x>list_corner_markers[j]->x-margin_corner &&
-               list_temp[i]->y<list_corner_markers[j]->y+margin_corner &&
-               list_temp[i]->y>list_corner_markers[j]->y-margin_corner)
-               {
-                flag = false;
-                break;
-               }
-        if(flag)
+        for(int i=0; i<list_temp.size(); i++)
         {
-            point_read = list_temp[i];
-            break;
+            bool flag=true;
+            for(int j=0; j<list_corner_markers.size(); j++)
+                if(list_temp[i]->x<list_corner_markers[j]->x+margin_corner &&
+                   list_temp[i]->x>list_corner_markers[j]->x-margin_corner &&
+                   list_temp[i]->y<list_corner_markers[j]->y+margin_corner &&
+                   list_temp[i]->y>list_corner_markers[j]->y-margin_corner)
+                   {
+                    flag = false;
+                    break;
+                   }
+            if(flag)
+            {
+                point_read = list_temp[i];
+                break;
+            }
         }
-    }
+    //}
 
     ///Comparison with the old values of the point to ensure that is the same which has moved
     bool newP=false;
     if(point_read!=NULL && p_old!=NULL)
-    {
-        if(point_read->x<p_old->x-2*pasX ||point_read->x>p_old->x+2*pasX || point_read->y<p_old->y-2*pasY ||point_read->y>p_old->y+2*pasY);
-        newP=true;
-    }
+        {
+           if(point_read->x<p_old->x-2*pasX ||point_read->x>p_old->x+2*pasX || point_read->y<p_old->y-2*pasY ||point_read->y>p_old->y+2*pasY )
+            newP = true;
+        }
 
     if(newP || point_read==NULL)
     {
@@ -294,7 +285,7 @@ void Core::detectCalibPtCirlces()
         point_read=NULL;
         list_corner_detected.push_back(point_display);
         if(nbrPt<CORNER_NUMBER)
-            point_display = new Point2f(list_corner_markers[nbrPt]->x, list_corner_markers[nbrPt]->y);
+        point_display = new Point2f(list_corner_markers[nbrPt]->x, list_corner_markers[nbrPt]->y);
         pasX=50;
         pasY=50;
     }
