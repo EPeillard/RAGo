@@ -8,7 +8,7 @@
 #define COMP_MOD_NO_INIT
 
 ///To avoid to get corner coordinate (projector coordinate)
-//#define COMP_MOD_NO_DETECT
+#define COMP_MOD_NO_DETECT
 
 ///To display all the information
 #define COMP_MOD_VERBOSE
@@ -139,9 +139,8 @@ void Core::init()
 
 void Core::detection()
 {
-if(list_corner_detected.size()!=CORNER_NUMBER)
-    {
 
+#ifndef COMP_MOD_NO_DETECT
     point_display = new Point2f(*list_corner_markers[nbrPt]);
 
         namedWindow( "detection circles", CV_WINDOW_AUTOSIZE );
@@ -155,16 +154,16 @@ if(list_corner_detected.size()!=CORNER_NUMBER)
             src = Mat(camera->getFrame());
             cvtColor(src, src_gray, CV_BGR2GRAY);
 
+#ifndef COMP_MOD_VERBOSE
             imshow( "detection circles", src );
             cout<<"press any key"<<endl;
-            //waitKey(0);
+            waitKey(0);
+#endif // COMP_MOD_VERBOSE
 
             ///Save of the points displayed in a vector
 
                 waitKey(100);
                 detectCalibPtCirlces();
-
-            cout<<"size"<<list_corner_detected.size()<<endl;
 
 
             ///Changing the coordinate of the display points to adapt them to physicals corners
@@ -188,11 +187,13 @@ if(list_corner_detected.size()!=CORNER_NUMBER)
             waitKey(10);
         }while(nbrPt<CORNER_NUMBER);
     }
+#endif // COMP_MOD_NO_DETECT
     proj->setCorner(list_corner_detected);
-    //Used to get point coordinates to avoid the detection
-    /*for(int i=0; i<list_corner_detected.size(); i++){
+#ifndef COMP_MOD_VERBOSE
+    for(int i=0; i<list_corner_detected.size(); i++){
             cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
-    }*/
+    }
+#endif // COMP_MOD_VERBOSE
     proj->draw(PROJ_MOD_BORDERS);
     waitKey(1000);
 }
