@@ -39,11 +39,10 @@ void Goban::setGoban()
     clock->draw();
 }
 
-void Goban::playTerminal()
+void Goban::playTerminal(int player)
 {
-    cout<<"Enter wher you want to play ( X -> Enter -> Y -> Enter) or '0' two times to quit"<<endl<<endl;
+    cout<<"Enter where you want to play ( X -> Enter -> Y -> Enter) or '0' two times to quit"<<endl<<endl;
     int x, y;
-    int player = 1;
     cout<<"Player "<<player<<endl;
     cin>>x;
     cin>>y;

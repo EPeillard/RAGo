@@ -38,7 +38,7 @@ public:
 
     void draw();
     void setGoban();
-    void playTerminal();
+    void playTerminal(int);
 
 private:
     void showAllCorners();

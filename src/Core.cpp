@@ -312,8 +312,36 @@ vector<Point2f*> Core::getCorners()
 void Core::imagediff()
 {
     cout<<"image difference"<<endl;
+    int x0, x1, y0, y1;
 
-    Mat frame1,frame2;
+    if(list_corner_markers[0]->x>list_corner_markers[3]->x)
+        x0=list_corner_markers[3]->x;
+    else
+        x0=list_corner_markers[0]->x;
+
+    if(list_corner_markers[1]->x>list_corner_markers[2]->x)
+        x1=list_corner_markers[1]->x;
+    else
+        x1=list_corner_markers[2]->x;
+
+    if(list_corner_markers[0]->y>list_corner_markers[1]->y)
+        y0=list_corner_markers[1]->y;
+    else
+        y0=list_corner_markers[0]->y;
+
+    if(list_corner_markers[2]->y>list_corner_markers[3]->y)
+        y1=list_corner_markers[2]->y;
+    else
+        y1=list_corner_markers[3]->y;
+
+
+    Mat frame1,frame2,maskDraw;
+    Mat maskedFrame1, maskedFrame2; // stores masked Image
+    Mat test(camera->getFrame());
+    //create black picture
+    maskDraw = Mat::zeros(test.size(), test.type());
+    maskDraw = cv::Scalar(0, 0, 0);
+    rectangle(maskDraw, Point(x0, y0), Point(x1, y1), Scalar(255, 255, 255), -1);
     int key=0;
 
     while(key!='q'){
@@ -327,6 +355,7 @@ void Core::imagediff()
         if(key =='x'){
             cout<<"comparing"<<endl;
             cv::absdiff(frame, frame1, frame2);
+            bitwise_and(frame2, maskDraw,frame2);
             cv::imshow("difference ",frame2);
             //src2 = frame2;
         }
