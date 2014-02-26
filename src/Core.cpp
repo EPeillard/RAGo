@@ -11,7 +11,7 @@
 //#define COMP_MOD_NO_DETECT
 
 ///To display all the information
-#define COMP_MOD_VERBOSE
+//#define COMP_MOD_VERBOSE
 
 #include "define.hpp"
 #include "Core.hpp"
@@ -39,10 +39,10 @@ Core::Core(Camera* camera, Projector* proj)
     pasY = 50;
 
 #ifdef COMP_MOD_NO_INIT
-    list_corner_markers.push_back(new Point2f(172, 136));
-    list_corner_markers.push_back(new Point2f(432, 138));
-    list_corner_markers.push_back(new Point2f(462, 412));
-    list_corner_markers.push_back(new Point2f(156, 424));
+    list_corner_markers.push_back(new Point2f(160, 136));
+    list_corner_markers.push_back(new Point2f(460, 135));
+    list_corner_markers.push_back(new Point2f(468, 414));
+    list_corner_markers.push_back(new Point2f(152, 422));
 #endif // COMP_MOD_NO_INIT
 
 #ifdef COMP_MOD_NO_DETECT
@@ -460,7 +460,15 @@ void Core::detectHand()
             cv::absdiff(frame, frame1, frame2);
             cv::imshow("difference ",frame2);
             bitwise_and(frame2, maskDraw,frame2);
-            cv::imshow("difference ",frame2);
+            cvtColor( frame2, src_gray, CV_BGR2GRAY );
+            GaussianBlur( src_gray, src_gray, Size(9,9), 3, 3 );
+            cv::imshow("difference ",src_gray);
+            if (countNotBlack(src_gray,80)>20){
+                cout<<"yes there is a hand"<<endl;
+            }
+            else{
+                cout<<"nope sorry"<<endl;
+            }
             waitKey(0);
             //src2 = frame2;
             /*erosion_elem=0;
@@ -474,3 +482,19 @@ void Core::detectHand()
     cout<<"hand detected"<<endl;
 
 }
+
+int Core::countNotBlack(Mat img,int lim){
+    int compt=0;
+  for( int j = 0; j < img.rows ; j++ )
+     { for( int i = 0; i < img.cols; i++ )
+          {
+            if( (int) img.at<float>(j,i) > lim )
+              {
+               compt++;
+              }
+          }
+     }
+     return compt;
+}
+
+

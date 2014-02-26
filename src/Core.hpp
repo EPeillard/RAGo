@@ -65,6 +65,7 @@ public:
     void genConvMat();
     void imagediff();
     void detectHand();
+    int countNotBlack(Mat img, int lim);
 
 private:
     //void detectCalibPt();
