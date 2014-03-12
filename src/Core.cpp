@@ -5,7 +5,7 @@
   **/
 
 ///To avoid to get corner coordinate (camera coordinate)
-//#define COMP_MOD_NO_INIT
+#define COMP_MOD_NO_INIT
 
 ///To avoid to get corner coordinate (projector coordinate)
 #define COMP_MOD_NO_DETECT

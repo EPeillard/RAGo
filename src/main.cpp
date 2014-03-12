@@ -67,6 +67,7 @@ int main(int argc, char** argv)
         //the human player put a stone on the goban
         //we wait that he put his hand in the clock
         int count = 0;
+        proj->setCountClock(count);
         while(count<5)
         {
             if(core->detectHand())
@@ -78,6 +79,7 @@ int main(int argc, char** argv)
             else
             {
                 count = 0;
+                proj->setCountClock(count);
                 cout<<count<<endl;
             }
             waitKey(500);

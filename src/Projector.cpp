@@ -75,6 +75,12 @@ void Projector::draw(int mode, int x, int y, int i)
         //rectangle(matDraw, Rect(xc+60, yc1+(yc2-yc1)/4, 150, (yc2-yc1)/2), Scalar(255, 255, 255), 3);
         circle(matDraw, Point(xc, yc) , 45,  Scalar(0, 0, 200), 2);
 
+        if (this->countClock>0)
+        {
+            circle(matDraw, Point(xc, yc) , 65-4*countClock+1,  Scalar(0, 0, 200), 4);
+            circle(matDraw, Point(xc, yc) , 65-4*countClock,  Scalar(0, 0, 200), 2);
+        }
+
         break;
     }
     }
