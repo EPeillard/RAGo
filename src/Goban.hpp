@@ -5,6 +5,8 @@
   *
   **/
 
+#ifndef GOBAN_HPP
+#define GOBAN_HPP
 
 #include "opencv2/calib3d/calib3d.hpp"
 #include "opencv2/highgui/highgui.hpp"
@@ -39,6 +41,7 @@ public:
     void draw();
     void setGoban();
     void playTerminal(int);
+    void play(int, int, int);
 
 private:
     void showAllCorners();
@@ -56,3 +59,5 @@ private:
 };
 
 }
+
+#endif

@@ -5,6 +5,9 @@
   *
   **/
 
+#ifndef STONE_HPP
+#define STONE_HPP
+
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 #include <iostream>
@@ -32,3 +35,5 @@ private:
 };
 
 }
+
+#endif

@@ -43,8 +43,8 @@ int main(int argc, char** argv)
     string ret="";
     Camera* camera = new Camera();
     Projector* proj = new Projector();
-    Core* core = new Core(camera, proj);
     Goban* goban = new Goban(proj);
+    Core* core = new Core(camera, proj, goban);
 
 
 
@@ -55,15 +55,38 @@ int main(int argc, char** argv)
     proj->setG2P(core->getG2PMat());
 
     goban->setGoban();
-
+    waitKey(0);
     for(int i=0; i<10; i++)
     {
-        core->imagediff();
-        while(!core->detectHand())
+        waitKey(100);
+        //take the picture at the beginning of the turn
+        core->generateBeginningTurnMat();
+        waitKey(100);
+
+
+        //the human player put a stone on the goban
+        //we wait that he put his hand in the clock
+        int count = 0;
+        while(count<5)
         {
-            cout<<"meme pas"<<endl;
-            waitKey(1000);
+            if(core->detectHand())
+            {
+                count++;
+                proj->setCountClock(count);
+                cout<<count<<endl;
+            }
+            else
+            {
+                count = 0;
+                cout<<count<<endl;
+            }
+            waitKey(500);
         }
+        cout<<"hand OK"<<endl;
+        //once he put his hand in the clock we calculate the idfference between our actual goban and the one at the beginning of the turn
+        core->imagediff(2);
+        waitKey(100);
+        goban->playTerminal(1);
     }
 
     //camera->close();

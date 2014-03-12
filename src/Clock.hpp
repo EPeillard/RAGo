@@ -4,6 +4,8 @@
   * @author Nicolas David and Sylvain Palominos
   *
   **/
+#ifndef CLOCK_HPP
+#define CLOCK_HPP
 
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -43,3 +45,4 @@ private:
 };
 
 }
+#endif

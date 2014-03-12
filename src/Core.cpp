@@ -5,13 +5,13 @@
   **/
 
 ///To avoid to get corner coordinate (camera coordinate)
-#define COMP_MOD_NO_INIT
+//#define COMP_MOD_NO_INIT
 
 ///To avoid to get corner coordinate (projector coordinate)
 #define COMP_MOD_NO_DETECT
 
 ///To display all the information
-//#define COMP_MOD_VERBOSE
+#define COMP_MOD_VERBOSE
 
 #include "define.hpp"
 #include "Core.hpp"
@@ -24,10 +24,11 @@ Mat verbose;
 
 using namespace rago;
 
-Core::Core(Camera* camera, Projector* proj)
+Core::Core(Camera* camera, Projector* proj, Goban* goban)
 {
     this->camera = camera;
     this->proj = proj;
+    this->goban = goban;
 
     nbrPt=0;
 
@@ -39,10 +40,10 @@ Core::Core(Camera* camera, Projector* proj)
     pasY = 50;
 
 #ifdef COMP_MOD_NO_INIT
-    list_corner_markers.push_back(new Point2f(160, 136));
-    list_corner_markers.push_back(new Point2f(460, 135));
-    list_corner_markers.push_back(new Point2f(468, 414));
-    list_corner_markers.push_back(new Point2f(152, 422));
+    list_corner_markers.push_back(new Point2f(166, 106));
+    list_corner_markers.push_back(new Point2f(460, 106));
+    list_corner_markers.push_back(new Point2f(476, 382));
+    list_corner_markers.push_back(new Point2f(168, 394));
 #endif // COMP_MOD_NO_INIT
 
 #ifdef COMP_MOD_NO_DETECT
@@ -69,6 +70,11 @@ Mat* Core::getG2PMat()
 Mat* Core::getC2GMat()
 {
     return &C2G;
+}
+
+void Core::generateBeginningTurnMat()
+{
+     Mat (camera->getFrame()).copyTo(beginningTurn);
 }
 
 void Core::genConvMat()
@@ -144,7 +150,7 @@ void Core::detection()
 #ifndef COMP_MOD_NO_DETECT
     point_display = new Point2f(*list_corner_markers[nbrPt]);
 
-        namedWindow( "detection circles", CV_WINDOW_AUTOSIZE );
+    namedWindow( "detection circles", CV_WINDOW_AUTOSIZE );
     proj->draw(PROJ_MOD_DETECTION, point_display->x, point_display->y);
     cout<<"Detection"<<endl;
     cout<<"press any key"<<endl;
@@ -187,7 +193,6 @@ void Core::detection()
 
             waitKey(10);
         }while(nbrPt<CORNER_NUMBER);
-    }
 #endif // COMP_MOD_NO_DETECT
     proj->setCorner(list_corner_detected);
 #ifndef COMP_MOD_VERBOSE
@@ -310,7 +315,7 @@ vector<Point2f*> Core::getCorners()
     return list_corner_detected;
 }
 
-void Core::imagediff()
+void Core::imagediff(int player)
 {
     cout<<"image difference"<<endl;
     int x0, x1, y0, y1;
@@ -343,73 +348,78 @@ void Core::imagediff()
     maskDraw = Mat::zeros(test.size(), test.type());
     maskDraw = cv::Scalar(0, 0, 0);
     rectangle(maskDraw, Point(x0, y0), Point(x1, y1), Scalar(255, 255, 255), -1);
-    int key=0;
+    //int key=0;
 
-    bool flag=false;
+    //bool flag=false;
 
-    while(key!='q' && !flag){
-        cout<<key<<endl;
-        Mat frame(camera->getFrame());
-        if(key=='c'){
+    //while(key!='q' && !flag){
+        //cout<<key<<endl;
+        //Mat frame(camera->getFrame());
+        /*if(key=='c'){
             cout<<"getting"<<endl;
             frame.copyTo(frame1);
             key = 0;
-        }
-        if(key =='x'){
+        }*/
+        //if(key =='x'){
+            Mat frame(camera->getFrame());
             cout<<"comparing"<<endl;
-            cv::absdiff(frame, frame1, frame2);
+            cv::absdiff(beginningTurn, frame, frame2);
             bitwise_and(frame2, maskDraw,frame2);
-            cv::imshow("difference ",frame2);
+            //cv::imshow("difference ",frame2);
             //src2 = frame2;
-        }
-        if(key=='d')
-        {
-            namedWindow( "Hough Circle Transform Demo", CV_WINDOW_AUTOSIZE );
+        //}
+        //if(key=='d')
+        //{
+            //namedWindow( "Hough Circle Transform Demo", CV_WINDOW_AUTOSIZE );
             /// Convert it to gray
+            cout<<"Convert it to gray"<<endl;
             cvtColor( frame2, src_gray, CV_BGR2GRAY );
-            imshow( "Hough Circle Transform Demo", src_gray );
-            waitKey(0);
+            //imshow( "Hough Circle Transform Demo", src_gray );
+            //waitKey(0);
 
   /// Reduce the noise so we avoid false circle detection
+            cout<<"blur"<<endl;
             GaussianBlur( src_gray, src_gray, Size(5,5), 2, 2 );
-            imshow( "Hough Circle Transform Demo", src_gray );
-            waitKey(0);
+            //imshow( "Hough Circle Transform Demo", src_gray );
+            //waitKey(0);
+            cout<<"cilcles"<<endl;
             vector<Vec3f> circles;
             HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 200, 10, 0, src_gray.rows/18 );
 
             /// Draw the circles detected
-            for( size_t i = 0; i < circles.size(); i++ )
+            /*for( size_t i = 0; i < circles.size(); i++ )
             {
               Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
               int radius = cvRound(circles[i][2]);
               // circle center
-              circle( frame2, center, 3, Scalar(0,255,0), -1, 8, 0 );
+              //circle( frame2, center, 3, Scalar(0,255,0), -1, 8, 0 );
               // circle outline
-              circle( frame2, center, radius, Scalar(0,0,255), 3, 8, 0 );
-            }
+              //circle( frame2, center, radius, Scalar(0,0,255), 3, 8, 0 );
+            }*/
 
             /// Show your results
-            imshow( "Hough Circle Transform Demo", frame2 );
-
+            //imshow( "Hough Circle Transform Demo", frame2 );
+            cout<<"drawing"<<endl;
             std::vector<cv::Point2f> inPts, outPts;
             inPts.push_back(cv::Point2f(circles[0][0], circles[0][1]));
             perspectiveTransform(inPts, outPts, C2G);
-            cout<<outPts.size()<<endl;
-            cout<<"x:"<<outPts[0].x<<  "y:"<<outPts[0].y<<endl;
+            //cout<<outPts.size()<<endl;
+            //cout<<"x:"<<outPts[0].x<<  "y:"<<outPts[0].y<<endl;
             int x=round(outPts[0].x);
             int y=round(outPts[0].y);
-            cout<<x<<endl;
-            cout<<y<<endl;
-            proj->draw(PROJ_MOD_STONE, x, y, 1);
-            flag=true;
-            cout<<"press any key"<<endl;
-            waitKey(0);
+            //cout<<x<<endl;
+            //cout<<y<<endl;
+            proj->draw(PROJ_MOD_STONE, x, y, player);
+            goban->play(x, y, player);
+            //flag=true;
+            //cout<<"press any key"<<endl;
+            //waitKey(0);
 
             cout<<"end"<<endl;
-        }
-       cv::imshow("stream",frame);
-       key = cv::waitKey(0)%256;
-     }
+        //}
+       //cv::imshow("stream",frame);
+       //key = cv::waitKey(0)%256;
+     //}
 }
 
 
@@ -461,81 +471,48 @@ bool Core::detectHand()
 
     //zone in the projector area
     int xc_proj, yc_proj;
-        xc_proj = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
-        yc_proj = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
+    xc_proj = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
+    yc_proj = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
 
     //zone in the camera
-
     std::vector<cv::Point2f> inPts, outPts;
     inPts.push_back(cv::Point2f(xc_proj, yc_proj));
     perspectiveTransform(inPts, outPts, P2C);
 
-
     cout<<"detection de la main"<<endl;
 
-
-
-    Mat frame1,frame2,maskDraw;
-    Mat maskedFrame1, maskedFrame2; // stores masked Image
+    Mat frame2,maskDraw;
     Mat test(camera->getFrame());
+
     //create black picture
     maskDraw = Mat::zeros(test.size(), test.type());
     maskDraw = cv::Scalar(0, 0, 0);
 
     //get the horloge size & draw it in white
-     int xc, yc1, yc2;
-        xc = 500 ;
-        yc1 = 100;
-        yc2 = 500 ;
     circle(maskDraw, Point(outPts[0].x, outPts[0].y) , 40*((float)outPts[0].x/xc_proj),  Scalar(255, 255, 255), -1);
-    //TODO need to apply to the clock * matrice de convertion projo->cam = P2G
-
 
     //apply the mask
-    cv::imshow("difference ",maskDraw);
-    waitKey(0);
-    int key=0;
+    Mat frame(camera->getFrame());
+    cout<<"comparing"<<endl;
+    absdiff( beginningTurn,frame, frame2);
 
 
-    while(key!='q' ){
-        cout<<key<<endl;
-        Mat frame(camera->getFrame());
-        Mat maskedFrame; // stores masked Image
-        if(key=='c'){
-            cout<<"getting"<<endl;
-            frame.copyTo(frame1);
-            key = 0;
-        }
-        if(key =='x'){
-            cout<<"comparing"<<endl;
-            cv::absdiff(frame, frame1, frame2);
-            cv::imshow("difference ",frame2);
-            bitwise_and(frame2, maskDraw,frame2);
-            cvtColor( frame2, src_gray, CV_BGR2GRAY );
-            GaussianBlur( src_gray, src_gray, Size(9,9), 3, 3 );
-            cv::imshow("difference ",src_gray);
-            if (countNotBlack(src_gray,80)>20){
-                cout<<"yes there is a hand"<<endl;
-                    cout<<"hand detected"<<endl;
-                    return true;
-            }
-            else{
-                cout<<"nope sorry"<<endl;
-                return false;
-            }
-            waitKey(0);
-            //src2 = frame2;
-            /*erosion_elem=0;
-            erosion_size=2;
-            Erosion(0, 0);
-            key =0;*/
-        }
-        key = cv::waitKey(0)%256;
+    bitwise_and(frame2, maskDraw,frame2);
 
+    cvtColor( frame2, src_gray, CV_BGR2GRAY );
+    GaussianBlur( src_gray, src_gray, Size(9,9), 3, 3 );
+    if (countNotBlack(src_gray,80)>20)
+    {
+        cout<<"yes there is a hand"<<endl;
+            return true;
     }
-
-
+    else
+    {
+        cout<<"nope sorry"<<endl;
+        return false;
+    }
 }
+
 
 int Core::countNotBlack(Mat img,int lim){
     int compt=0;

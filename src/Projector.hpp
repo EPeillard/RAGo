@@ -30,6 +30,7 @@ public:
     void setG2P(Mat*);
 
     Mat matDraw; //TODO faire un getter
+    void setCountClock(int);
 
 private:
 
@@ -37,6 +38,7 @@ private:
     vector<Point2f*> list_corner_detected;
 
     Mat* G2P;
+    int countClock;
 
 };
 

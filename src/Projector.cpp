@@ -9,6 +9,7 @@ Projector::Projector()
         matDraw = cv::Scalar(203, 214, 218);
     G2P=NULL;
     namedWindow( "detection", CV_WINDOW_FREERATIO );
+    int countClock;
 }
 
 
@@ -78,6 +79,11 @@ void Projector::draw(int mode, int x, int y, int i)
     }
     }
     imshow("detection", matDraw);
+}
+
+void Projector::setCountClock(int clockIteration)
+{
+    this->countClock=clockIteration;
 }
 
 

@@ -32,6 +32,7 @@
 
 #include "Camera.hpp"
 #include "Projector.hpp"
+#include "Goban.hpp"
 
 using namespace cv;
 using namespace std;
@@ -43,7 +44,7 @@ class Core{
 public:
     /**\brief Main void constructor
       **/
-    Core(Camera*, Projector*);
+    Core(Camera*, Projector*, Goban*);
 
     /**\brief Main void destructor
       **/
@@ -63,9 +64,14 @@ public:
     /*void genG2PMat();
     void genC2GMat();*/
     void genConvMat();
-    void imagediff();
+    void imagediff(int);
     bool detectHand();
     int countNotBlack(Mat img, int lim);
+
+    void generateBeginningTurnMat();
+
+
+    Mat beginningTurn; //TODO private
 
 private:
     //void detectCalibPt();
@@ -76,7 +82,6 @@ private:
     //vector<Point2f*> corner(int , void*);
     vector<Point2f*> getFrameCircles(Mat, int);
     void detectCalibPtCirlces();
-
 
 
     Mat src, src_gray, matDetect;
@@ -99,6 +104,7 @@ private:
 
     Camera* camera;
     Projector* proj;
+    Goban* goban;
 
 
 };
