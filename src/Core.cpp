@@ -5,13 +5,13 @@
   **/
 
 ///To avoid to get corner coordinate (camera coordinate)
-//#define COMP_MOD_NO_INIT
+#define COMP_MOD_NO_INIT
 
 ///To avoid to get corner coordinate (projector coordinate)
 #define COMP_MOD_NO_DETECT
 
 ///To display all the information
-#define COMP_MOD_VERBOSE
+//#define COMP_MOD_VERBOSE
 
 #include "define.hpp"
 #include "Core.hpp"
@@ -40,17 +40,17 @@ Core::Core(Camera* camera, Projector* proj, Goban* goban)
     pasY = 50;
 
 #ifdef COMP_MOD_NO_INIT
-    list_corner_markers.push_back(new Point2f(166, 106));
-    list_corner_markers.push_back(new Point2f(460, 106));
-    list_corner_markers.push_back(new Point2f(476, 382));
-    list_corner_markers.push_back(new Point2f(168, 394));
+    list_corner_markers.push_back(new Point2f(195, 61));
+    list_corner_markers.push_back(new Point2f(484, 56));
+    list_corner_markers.push_back(new Point2f(497, 332));
+    list_corner_markers.push_back(new Point2f(200, 339));
 #endif // COMP_MOD_NO_INIT
 
 #ifdef COMP_MOD_NO_DETECT
-    list_corner_detected.push_back(new Point2f(185, 63));
-    list_corner_detected.push_back(new Point2f(856, 70));
-    list_corner_detected.push_back(new Point2f(860, 695));
-    list_corner_detected.push_back(new Point2f(183, 696));
+    list_corner_detected.push_back(new Point2f(167, 61));
+    list_corner_detected.push_back(new Point2f(829, 57));
+    list_corner_detected.push_back(new Point2f(840, 698));
+    list_corner_detected.push_back(new Point2f(179, 699));
 #endif // COMP_MOD_NO_DETECT
 
 
@@ -195,7 +195,7 @@ void Core::detection()
         }while(nbrPt<CORNER_NUMBER);
 #endif // COMP_MOD_NO_DETECT
     proj->setCorner(list_corner_detected);
-#ifndef COMP_MOD_VERBOSE
+#ifdef COMP_MOD_VERBOSE
     for(int i=0; i<list_corner_detected.size(); i++){
             cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
     }
@@ -461,8 +461,8 @@ vector<Point2f*> Core::getFrameCircles(Mat frame, int width)
     }
 
     imshow( "Circle Detection", frame );
-    cout<<"Press any key to continue"<<endl;
-    waitKey(0);
+    //cout<<"Press any key to continue"<<endl;
+    //waitKey(0);
     return list_center;
 }
 
