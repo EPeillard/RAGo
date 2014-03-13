@@ -62,22 +62,26 @@ int main(int argc, char** argv)
         //take the picture at the beginning of the turn
         core->generateBeginningTurnMat();
         waitKey(100);
-
+        proj->draw(5,0,0);
 
         //the human player put a stone on the goban
         //we wait that he put his hand in the clock
         int count = 0;
+        proj->setCountClock(count);
         while(count<5)
         {
             if(core->detectHand())
             {
                 count++;
                 proj->setCountClock(count);
+                proj->draw(4,0,0);
                 cout<<count<<endl;
             }
             else
             {
                 count = 0;
+                proj->setCountClock(count);
+                proj->draw(4,0,0);
                 cout<<count<<endl;
             }
             waitKey(500);
@@ -85,6 +89,7 @@ int main(int argc, char** argv)
         cout<<"hand OK"<<endl;
         //once he put his hand in the clock we calculate the idfference between our actual goban and the one at the beginning of the turn
         core->imagediff(2);
+        proj->draw(6,0,0);
         waitKey(100);
         goban->playTerminal(1);
     }
