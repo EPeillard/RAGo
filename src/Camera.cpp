@@ -50,3 +50,36 @@ void Camera::close()
 {
     cvReleaseCapture(&capture);
 }
+
+void read_camera_params( const char* in_filename,
+                         CvMat* camera_matrix,
+                         CvMat* dist_coeffs)
+{
+    CvFileStorage* fs = cvOpenFileStorage( in_filename, 0, CV_STORAGE_READ );
+    camera_matrix = (CvMat *) cvRead (fs, cvGetFileNodeByName (fs, NULL, "camera_matrix"));
+    dist_coeffs = (CvMat *) cvRead (fs, cvGetFileNodeByName (fs, NULL, "distortion_coefficients"));
+    cvReleaseFileStorage (&fs);
+}
+
+void corection(vector<string> image, char* argv)
+{
+    const char* in_filename = 0;
+    CvMat* camera_matrix;
+    CvMat* dist_coeffs;
+    vector<CvMat> vec_camera_matrix;
+    vector<CvMat> vec_dist_coeffs;
+
+    read_camera_params(in_filename, camera_matrix, dist_coeffs);
+    vec_camera_matrix.push_back(*camera_matrix);
+    vec_dist_coeffs.push_back(*dist_coeffs);
+
+    vector<IplImage> view;
+    view.push_back(*cvLoadImage( image[0].c_str(), 1 ));
+
+    vector<IplImage> undistorted;
+    undistorted.push_back(*cvLoadImage( image[0].c_str(), 1 ));
+    cv::undistort( view, undistorted, vec_camera_matrix, vec_dist_coeffs );
+
+    //cvReleaseImage( &undistorted );
+    //cvReleaseImage( &view );
+}
