@@ -44,7 +44,7 @@ bool Network::sendRequest(int code, std::string request)
     std::ostringstream oss1, oss2;
     oss1<<code;
     std::string send = oss1.str()+"#"+request;
-    n = write(sockfd,request.c_str(),strlen(request.c_str()));
+    n = write(sockfd,send.c_str(),strlen(send.c_str()));
     if (n < 0)
     {
          perror("ERROR writing to socket");
