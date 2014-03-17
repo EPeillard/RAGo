@@ -19,6 +19,11 @@ void Projector::draw(int mode, int x, int y, int i)
 {
     switch(mode)
     {
+    case -1: //loading screen
+    {
+
+    }
+
     case 0: // draw goabn's borders
     {
         matDraw = cv::Scalar(0, 0, 0);
@@ -100,7 +105,7 @@ cout<<"coin OK"<<endl;
     case 4: //detection zone
     {
         int xc, yc, yc1, yc2;
-        xc = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80 +5;
+        xc = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80 ;
         yc = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
         yc1 = 100;
         yc2 = 500 ;
