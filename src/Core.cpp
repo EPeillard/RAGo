@@ -200,8 +200,7 @@ void Core::detection()
             cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
     }
 #endif // COMP_MOD_VERBOSE
-    proj->draw(PROJ_MOD_BORDERS);
-    waitKey(1000);
+
 }
 /** Function reordering the point this way : 0 : top left corner, 1 top right corner, 2 bottom right corner, 3 bottom left corner
   *

@@ -53,6 +53,8 @@ int main(int argc, char** argv)
     core->genConvMat();
 
     proj->setG2P(core->getG2PMat());
+        proj->draw(0);
+    waitKey(1000);
 
     goban->setGoban();
     waitKey(0);

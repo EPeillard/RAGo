@@ -20,7 +20,39 @@ void Projector::draw(int mode, int x, int y, int i)
     switch(mode)
     {
     case 0: // draw goabn's borders
-        matDraw = cv::Scalar(203, 214, 218);
+    {
+        matDraw = cv::Scalar(0, 0, 0);
+cout<<"coin OK"<<endl;
+        Point2f corner1 = Point2f(-1,-1);
+        Point2f corner2 = Point2f(19,-1);
+        Point2f corner3 = Point2f(19,19);
+        Point2f corner4 = Point2f(-1,19);
+        std::vector<Point2f> goban;
+        goban.push_back(corner1);
+        goban.push_back(corner2);
+        goban.push_back(corner3);
+        goban.push_back(corner4);
+        std::vector<Point2f> gobanProj;
+        cout<<"coin OK"<<endl;
+        perspectiveTransform(goban, gobanProj, *G2P);
+        std::vector<Point> gobanProjArrayDef;
+        cout<<"coin OK"<<endl;
+        int i;
+        for (i=0;i<4;i++){
+            gobanProjArrayDef.push_back(Point(gobanProj[i].x, gobanProj[i].y));
+            cout<<"coin OK"<<i<<endl;
+        }
+        cout<<"coin OK"<<endl;
+        cv::Point *points; //on déclare un tableau de points
+        points = &gobanProjArrayDef[0]; //on copie l'adresse du premier élément du vecteur
+        int nbtab = 4; //on copie le nombre de points du vecteur
+        cout<<"coin OK"<<endl;
+
+        fillPoly(matDraw,(const cv::Point **) &points, &nbtab, 1 ,Scalar(203, 214, 218));
+
+
+
+
         for(int j=0; j<list_corner_detected.size(); j++)
             circle(matDraw, *list_corner_detected[j], 5,  Scalar(0, 0, 255), 2);
         line( matDraw, *list_corner_detected[0], *list_corner_detected[1], Scalar(0,0,255), 1);
@@ -29,6 +61,7 @@ void Projector::draw(int mode, int x, int y, int i)
         line( matDraw, *list_corner_detected[3], *list_corner_detected[0], Scalar(0,0,255), 1);
         imshow("detection", matDraw);
         break;
+    }
     case 1:
         break;
     case 2: // display detection points
@@ -67,23 +100,23 @@ void Projector::draw(int mode, int x, int y, int i)
     case 4: //detection zone
     {
         int xc, yc, yc1, yc2;
-        xc = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
+        xc = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80 +5;
         yc = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
         yc1 = 100;
         yc2 = 500 ;
 
-
+        circle(matDraw, Point(xc, yc) , 45,  Scalar(203, 214, 218), -1);
         circle(matDraw, Point(xc, yc) , 45,  Scalar(0, 0, 200), 2);
 
         if (this->countClock>0)
         {
-            circle(matDraw, Point(xc, yc) , 65-4*countClock+1,  Scalar(203, 214, 218), 10);
+            circle(matDraw, Point(xc, yc) , 65-3*countClock+1,  Scalar(0, 0, 0), 7);
             circle(matDraw, Point(xc, yc) , 65-4*countClock,  Scalar(0, 0, 200),2);
 
         }
         else
         {
-            circle(matDraw, Point(xc, yc) , 55,  Scalar(203, 214, 218), 20);
+            circle(matDraw, Point(xc, yc) , 55,  Scalar(0, 0, 0), 16);
         }
 
         break;
