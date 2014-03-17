@@ -7,6 +7,8 @@
 
 #include "Goban.hpp"
 #include "Core.hpp"
+#include "Network.hpp"
+
 #include <iostream>
 #include <sstream>
 #include <time.h>
@@ -40,13 +42,11 @@ int main(int argc, char** argv)
     //fs["distortion_coefficients"] >> distortion;
 
 
-    string ret="";
-    Camera* camera = new Camera();
+    //string ret="";
+    //Camera* camera = new Camera();
     Projector* proj = new Projector();
     Goban* goban = new Goban(proj);
-    Core* core = new Core(camera, proj, goban);
-
-
+    //Core* core = new Core(camera, proj, goban);
 
     core->init();
     core->detection();

@@ -22,6 +22,7 @@
 #include "Clock.hpp"
 #include "Stone.hpp"
 #include "Projector.hpp"
+#include "Network.hpp"
 
 
 #define MARGIN_DETECT_CALIB 2
@@ -53,6 +54,7 @@ private:
 
     Clock* clock;
     Projector* proj;
+    Network* net;
 
     vector<vector<Stone*> > tab_stone;
 

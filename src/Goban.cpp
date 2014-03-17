@@ -58,7 +58,14 @@ void Goban::playTerminal(int player)
             //clock->increaseTime();
             clock->draw();
             flag=true;
+            std::ostringstream oss1, oss2;
+            oss1 << x;
+            oss2 << y;
+            std::string str = oss1.str() + "," + oss2.str();
 
+            net = new Network("127.0.0.1", 5001);
+            net->connexion();
+            std::cout<<"request : "<<str<<"result : "<<net->sendRequest(str)<<std::endl;
             waitKey(10);
 
         }
