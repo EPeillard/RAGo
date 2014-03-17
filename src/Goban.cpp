@@ -65,7 +65,7 @@ void Goban::playTerminal(int player)
 
             net = new Network("127.0.0.1", 5001);
             net->connexion();
-            std::cout<<"request : "<<str<<"result : "<<net->sendRequest(str)<<std::endl;
+            std::cout<<"request : "<<str<<"result : "<<net->sendRequest(0, str)<<std::endl;
             waitKey(10);
 
         }

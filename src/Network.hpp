@@ -29,6 +29,12 @@
 #include <strings.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <list>
+#include <vector>
 
 namespace rago{
 

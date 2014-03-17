@@ -37,10 +37,13 @@ void Network::connexion()
     }
 }
 
-bool Network::sendRequest(std::string request)
+bool Network::sendRequest(int code, std::string request)
 {
     char buffer[256];
     int n;
+    std::ostringstream oss1, oss2;
+    oss1<<code;
+    std::string send = oss1.str()+"#"+request;
     n = write(sockfd,request.c_str(),strlen(request.c_str()));
     if (n < 0)
     {

@@ -43,10 +43,10 @@ int main(int argc, char** argv)
 
 
     //string ret="";
-    //Camera* camera = new Camera();
+    Camera* camera = new Camera();
     Projector* proj = new Projector();
     Goban* goban = new Goban(proj);
-    //Core* core = new Core(camera, proj, goban);
+    Core* core = new Core(camera, proj, goban);
 
     core->init();
     core->detection();
