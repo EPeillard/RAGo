@@ -67,14 +67,17 @@ cout<<"coin OK"<<endl;
         imshow("detection", matDraw);
         break;
     }
+
     case 1:
         break;
+
     case 2: // display detection points
         matDraw = cv::Scalar(0, 0, 0);
         cout<<x<<" , "<<y<<endl;
         circle(matDraw, Point2f(x, y), 20, Scalar(255, 255, 255), -1);
         imshow("detection", matDraw);
         break;
+
     case 3: //
     {
         float width = sqrt((list_corner_detected[0]->x-list_corner_detected[1]->x) *
@@ -128,8 +131,6 @@ cout<<"coin OK"<<endl;
     }
     case 5: //information for the player turn
     {
-
-
         int xc, yc, yc1, yc2;
         xc = (list_corner_detected[0]->x + list_corner_detected[1]->x)/2-(list_corner_detected[0]->x+list_corner_detected[1]->x)/4;
         yc = (list_corner_detected[0]->y + list_corner_detected[1]->y)/2-5;
@@ -149,7 +150,6 @@ cout<<"coin OK"<<endl;
 
         String mess = "A vous de jouer !";
 
-
         int length = mess.size();
         for (int k =0 ; k<length ; k++)
         {
@@ -161,10 +161,9 @@ cout<<"coin OK"<<endl;
 
         break;
     }
+
        case 6: //information for the player turn ordinateur //TODO meger with the precedent part by adding a number for each player
         {
-
-
         int xc, yc, yc1, yc2;
         xc = (list_corner_detected[0]->x + list_corner_detected[1]->x)/2-(list_corner_detected[0]->x+list_corner_detected[1]->x)/4;
         yc = (list_corner_detected[0]->y + list_corner_detected[1]->y)/2-5;

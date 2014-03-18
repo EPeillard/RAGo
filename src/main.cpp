@@ -58,53 +58,99 @@ int main(int argc, char** argv)
 
     goban->setGoban();
     waitKey(0);
-    for(int i=0; i<10; i++)
+
+    while(true)
     {
-        waitKey(100);
-        //take the picture at the beginning of the turn
-        core->generateBeginningTurnMat();
-        waitKey(100);
-        proj->draw(5,0,0);
 
-        //the human player put a stone on the goban
-        //we wait that he put his hand in the clock
-        int count = 0;
-        proj->setCountClock(count);
-        while(count<5)
+
+        cout<<"What do you want to do with RAGo ?"<<endl;
+        cout<<"1 - play Go"<<endl;
+        cout<<"2 - watch Go"<<endl;
+        cout<<"3 - help me I'm lost"<<endl;
+
+        int mode;
+        cin>>mode;
+
+        switch(mode)
         {
-            if(core->detectHand())
+        case 1: //play
+        {
+             for(int i=0; i<10; i++)
             {
-                count++;
-                proj->setCountClock(count);
-                proj->draw(4,0,0);
-                cout<<count<<endl;
-            }
-            else
-            {
-                count = 0;
-                proj->setCountClock(count);
-                proj->draw(4,0,0);
-                cout<<count<<endl;
-            }
-            waitKey(500);
-        }
-        cout<<"hand OK"<<endl;
-        //once he put his hand in the clock we calculate the idfference between our actual goban and the one at the beginning of the turn
-        core->imagediff(2);
-        proj->draw(6,0,0);
-        waitKey(100);
-        goban->playTerminal(1);
-    }
+                waitKey(100);
+                //take the picture at the beginning of the turn
+                core->generateBeginningTurnMat();
+                waitKey(100);
+                proj->draw(5,0,0);
 
+                //the human player put a stone on the goban
+                //we wait that he put his hand in the clock
+                int count = 0;
+                proj->setCountClock(count);
+                while(count<5)
+                {
+                    if(core->detectHand())
+                    {
+                        count++;
+                        proj->setCountClock(count);
+                        proj->draw(4,0,0);
+                        cout<<count<<endl;
+                    }
+                    else
+                    {
+                        count = 0;
+                        proj->setCountClock(count);
+                        proj->draw(4,0,0);
+                        cout<<count<<endl;
+                    }
+                    waitKey(500);
+                }
+                cout<<"hand OK"<<endl;
+                //once he put his hand in the clock we calculate the idfference between our actual goban and the one at the beginning of the turn
+                core->imagediff(2);
+                proj->draw(6,0,0);
+                waitKey(100);
+                goban->playTerminal(1);
+            }
+
+break;
+
+        }
+        case 2 : //watch
+        {
+
+break;
+        }
+
+        case 3 : //help
+        {
+
+            // ask to put hand in the detection zone
+
+            //ask to put a stone on the goban and validate it in the zone, draw the neighboors in 4-connexity
+break;
+
+        }
+
+        default :
+        {
+            cout<<"chose an existing mode, please"<<endl;
+break;
+        }
+               waitKey(0);
+      //  goban->playTerminal();
+
+
+
+        }
+
+    }
+    return(0);
+}
     //camera->close();
 
 
-    waitKey(0);
-  //  goban->playTerminal();
 
-    return(0);
-
-}
 
 
 /** fonction de calibration */
