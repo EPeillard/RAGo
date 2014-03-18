@@ -8,7 +8,7 @@ using namespace rago;
   **/
 Camera::Camera()
 {
-    capture = cvCreateCameraCapture(0);
+    capture = cvCreateCameraCapture(1);
 }
 
 /**

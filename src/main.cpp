@@ -125,7 +125,76 @@ break;
         case 3 : //help
         {
 
+                            core->generateBeginningTurnMat();
+                waitKey(100);
             // ask to put hand in the detection zone
+            cout<<"put your hand in the detection zone in red until the red circle gets smaller"<<endl;
+            //use a draw method that print put your hand in the clock with an arrow
+            int count = 0;
+            proj->setCountClock(count);
+             while(count<5)
+                {
+                    if(core->detectHand())
+                    {
+                        count++;
+                        proj->setCountClock(count);
+                        proj->draw(4,0,0);
+                        cout<<count<<endl;
+                    }
+                    else
+                    {
+                        count = 0;
+                        proj->setCountClock(count);
+                        proj->draw(4,0,0);
+                        cout<<count<<endl;
+                    }
+                    waitKey(500);
+                }
+             cout<<"well done"<<endl;
+             cout<<"no hands now please"<<endl;
+             waitKey(0);
+
+                            core->generateBeginningTurnMat();
+                            cout<<"took picture"<<endl;
+                waitKey(100);
+
+
+            //ask to put a stone on the goban and put the hand in the detection zone
+            cout<<"now put a stone on the goban and validate with your hand"<<endl;
+            bool isStone = false;
+
+            while(!isStone)
+            {
+
+            int count = 0;
+            proj->setCountClock(count);
+            while(count<5)
+                {
+                    if(core->detectHand())
+                    {
+                        count++;
+                        proj->setCountClock(count);
+                        proj->draw(4,0,0);
+                        cout<<count<<endl;
+                    }
+                    else
+                    {
+                        count = 0;
+                        proj->setCountClock(count);
+                        proj->draw(4,0,0);
+                        cout<<count<<endl;
+                    }
+                    waitKey(500);
+                }
+            if (core->imagediff(2))
+            {
+                isStone = true;
+            }
+
+
+            }
+
+
 
             //ask to put a stone on the goban and validate it in the zone, draw the neighboors in 4-connexity
 break;
