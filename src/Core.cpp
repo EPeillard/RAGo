@@ -216,8 +216,7 @@ void Core::detection()
             cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
     }
 #endif // COMP_MOD_VERBOSE
-    proj->draw(PROJ_MOD_BORDERS);
-    waitKey(1000);
+
 }
 /** Function reordering the point this way : 0 : top left corner, 1 top right corner, 2 bottom right corner, 3 bottom left corner
   *
@@ -331,7 +330,7 @@ vector<Point2f*> Core::getCorners()
     return list_corner_detected;
 }
 
-void Core::imagediff(int player)
+int Core::imagediff(int player)
 {
     cout<<"image difference"<<endl;
     int x0, x1, y0, y1;
@@ -417,27 +416,40 @@ void Core::imagediff(int player)
             //imshow( "Hough Circle Transform Demo", frame2 );
             cout<<"drawing"<<endl;
             std::vector<cv::Point2f> inPts, outPts;
+            if (circles.size())
+            {
             inPts.push_back(cv::Point2f(circles[0][0], circles[0][1]));
-            perspectiveTransform(inPts, outPts, C2G);
-            //cout<<outPts.size()<<endl;
-            //cout<<"x:"<<outPts[0].x<<  "y:"<<outPts[0].y<<endl;
-            int x=round(outPts[0].x);
-            int y=round(outPts[0].y);
-            //cout<<x<<endl;
-            //cout<<y<<endl;
-            proj->draw(PROJ_MOD_STONE, x, y, player);
-            goban->play(x, y, player);
-            //flag=true;
-            //cout<<"press any key"<<endl;
-            //waitKey(0);
 
-            cout<<"end"<<endl;
-        //}
-       //cv::imshow("stream",frame);
-       //key = cv::waitKey(0)%256;
-     //}
+                    perspectiveTransform(inPts, outPts, C2G);
+                    //cout<<outPts.size()<<endl;
+                    //cout<<"x:"<<outPts[0].x<<  "y:"<<outPts[0].y<<endl;
+
+
+
+                    int x=round(outPts[0].x);
+                    int y=round(outPts[0].y);
+                    //cout<<x<<endl;
+                    //cout<<y<<endl;
+                    proj->draw(PROJ_MOD_STONE, x, y, player);
+                    goban->play(x, y, player);
+                    //flag=true;
+                    //cout<<"press any key"<<endl;
+                    //waitKey(0);
+
+                    cout<<"end"<<endl;
+                             return 1;
+             }
+                //}
+               //cv::imshow("stream",frame);
+               //key = cv::waitKey(0)%256;
+             //}
+
+         else
+         {
+            cout<<"no difference"<<endl;
+            return 0;
+         }
 }
-
 
 /*
 void Erosion( int, void* )

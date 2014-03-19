@@ -65,7 +65,7 @@ public:
     /*void genG2PMat();
     void genC2GMat();*/
     void genConvMat();
-    void imagediff(int);
+    int imagediff(int);
     bool detectHand();
     int countNotBlack(Mat img, int lim);
 

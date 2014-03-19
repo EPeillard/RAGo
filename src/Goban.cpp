@@ -64,9 +64,9 @@ void Goban::playTerminal(int player)
             oss2 << y;
             std::string str = oss1.str() + "," + oss2.str();
 
-            net = new Network("127.0.0.1", 5001);
-            net->connexion();
-            std::cout<<"request : "<<str<<"result : "<<net->sendRequest(0, str)<<std::endl;
+          net = new Network("127.0.0.1", 5001);
+           net->connexion();
+         std::cout<<"request : "<<str<<"result : "<<net->sendRequest(0, str)<<std::endl;
             waitKey(10);
 
         }
