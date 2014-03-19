@@ -1,0 +1,6 @@
+
+#define CODE_MOVE_COORD 11
+
+#define CODE_TIME_PLAYER 21
+
+#define CODE_TIME_COMPUTER 22
