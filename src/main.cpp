@@ -85,6 +85,8 @@ int main(int argc, char** argv)
                 core->generateBeginningTurnMat();
                 waitKey(100);
                 proj->draw(5,0,0);
+                                core->generateBeginningTurnMat();
+                waitKey(100);
 
                 //the human player put a stone on the goban
                 //we wait that he put his hand in the clock
@@ -153,7 +155,10 @@ int main(int argc, char** argv)
 
         case 3 : //help
         {
+            waitKey(10);
+            proj->draw(4,0,0);
             core->generateBeginningTurnMat();
+            imshow("verbose",core->beginningTurn);
             waitKey(100);
             // ask to put hand in the detection zone
             cout<<"put your hand in the detection zone in red until the red circle gets smaller"<<endl;

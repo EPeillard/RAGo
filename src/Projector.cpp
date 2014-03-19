@@ -81,7 +81,7 @@ cout<<"coin OK"<<endl;
     case 2: // display detection points
         matDraw = cv::Scalar(0, 0, 0);
         cout<<x<<" , "<<y<<endl;
-        circle(matDraw, Point2f(x, y), 20, Scalar(255, 255, 255), -1);
+        circle(matDraw, Point2f(x, y), 10, Scalar(255, 255, 255), -1);
         imshow("detection", matDraw);
         break;
 

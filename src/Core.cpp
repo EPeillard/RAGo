@@ -5,13 +5,13 @@
   **/
 
 ///To avoid to get corner coordinate (camera coordinate)
-#define COMP_MOD_NO_INIT
+//#define COMP_MOD_NO_INIT
 
 ///To avoid to get corner coordinate (projector coordinate)
-#define COMP_MOD_NO_DETECT
+//#define COMP_MOD_NO_DETECT
 
 ///To display all the information
-//#define COMP_MOD_VERBOSE
+#define COMP_MOD_VERBOSE
 
 #include "define.hpp"
 #include "Core.hpp"
@@ -137,6 +137,7 @@ void Core::init()
     while(list_temp.size()!=CORNER_NUMBER && i<src_gray.rows/15)
     {
         list_temp = getFrameCircles(src, i);
+        i++;
     }
 
 #ifdef COMP_MOD_VERBOSE
@@ -154,7 +155,11 @@ void Core::init()
     list_corner_markers=list_temp;
 
     ///Ordering the points to have the top left corner in 0, the top right corner in 1 ...
-    reorderPoints(list_corner_markers);
+
+    cout<<"debug"<<endl;
+
+    list_corner_markers=reorderPoints(list_corner_markers);
+    cout<<"debug"<<endl;
     waitKey(10);
 #endif // COMP_MOD_NO_INIT
 }
@@ -222,7 +227,7 @@ void Core::detection()
   *
   * @function reorderPoints()
   **/
-void Core::reorderPoints(vector<Point2f*>& list_point)
+vector<Point2f*> Core::reorderPoints(vector<Point2f*>& list_point)
 {
     vector<Point2f*> list_corner_absolute_camera;
     list_corner_absolute_camera.push_back(new Point2f(0, 0));
@@ -250,7 +255,7 @@ void Core::reorderPoints(vector<Point2f*>& list_point)
         }
     }
     while(list_point.size()>0){list_point.pop_back();}
-    list_point = ret;
+    return ret;
 }
 
 /** Function detecting the calibration point displayed throw the projector

@@ -76,7 +76,7 @@ public:
 
 private:
     //void detectCalibPt();
-    void reorderPoints(vector<Point2f*>&);
+    vector<Point2f*> reorderPoints(vector<Point2f*>&);
     void emptyBuffer();
     void refresh();
     //vector<Point2f*> cornerHarris_demo(int, void*);
