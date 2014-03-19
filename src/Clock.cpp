@@ -2,7 +2,8 @@
 
 using namespace rago;
 
-Clock::Clock(Projector *p)
+//Start modification with p
+Clock::Clock(VirtualGoban *p)
 {
     this->myTime=0;
     this->opTime=0;
@@ -19,9 +20,12 @@ Clock::~Clock()
 void Clock::draw()
 {
     Mat matDraw;
-    this->proj->draw(4,0,0);
 
-    matDraw = this->proj->matDraw;
+//modification with virtiualGoban
+    //this->proj->draw(4,0,0);
+
+//modification with virtiualGoban
+    //matDraw = this->proj->matDraw;
 
     std::stringstream s;
     s << "coup" ;
@@ -63,7 +67,8 @@ double Clock::getCurrentTime(){
 void Clock::printCurrentTime(double tps){
 
         Mat matDraw;
-    matDraw = this->proj->matDraw;
+//modification with virtiualGoban
+    //matDraw = this->proj->matDraw;
 
     std::stringstream s;
     s << "temps actuel" ;

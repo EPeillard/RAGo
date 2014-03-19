@@ -8,6 +8,7 @@
 #include "Goban.hpp"
 #include "Core.hpp"
 #include "Network.hpp"
+#include "VirtualGoban.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -43,9 +44,10 @@ int main(int argc, char** argv)
 
 
     //string ret="";
-    Camera* camera = new Camera();
     Projector* proj = new Projector();
-    Goban* goban = new Goban(proj);
+    VirtualGoban* vg = new VirtualGoban(proj);
+    Camera* camera = new Camera();
+    Goban* goban = new Goban(vg);
     Core* core = new Core(camera, proj, goban);
 
     core->init();
@@ -53,8 +55,11 @@ int main(int argc, char** argv)
     core->genConvMat();
 
     proj->setG2P(core->getG2PMat());
+    proj->setVG2P(core->getVG2PMat());
 
     goban->setGoban();
+    vg->drawBorders();
+    /*
     waitKey(0);
     for(int i=0; i<10; i++)
     {
@@ -92,13 +97,41 @@ int main(int argc, char** argv)
         proj->draw(6,0,0);
         waitKey(100);
         goban->playTerminal(1);
-    }
+    }*/
 
     //camera->close();
 
 
-    waitKey(0);
   //  goban->playTerminal();
+  std::cout<<"network"<<std::endl;
+    while(1)
+    {
+        Network net("127.0.0.1", 5001);
+        net.connexion();
+        std::string str = net.getInfo();
+        std::cout<<"result : "<<str<<std::endl;
+        if(std::atoi(str.substr(0, 2).c_str())==11)
+        {
+            int x, y;
+            int color = std::atoi(str.substr(3, 4).c_str());
+            if(str[6]==',')
+            {
+                x=std::atoi(str.substr(5, 6).c_str());
+                y=std::atoi(str.substr(7).c_str());
+            }
+            else{
+                x=std::atoi(str.substr(5, 7).c_str());
+                y=std::atoi(str.substr(8).c_str());
+            }
+            std::cout<<color<<","<<x<<","<<y<<std::endl;
+            goban->play(color, x, y);
+        }
+        else
+        {
+            std::cout<<"not a move"<<std::endl;
+        }
+        waitKey(10);
+    }
 
     return(0);
 

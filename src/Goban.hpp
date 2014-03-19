@@ -21,7 +21,7 @@
 
 #include "Clock.hpp"
 #include "Stone.hpp"
-#include "Projector.hpp"
+#include "VirtualGoban.hpp"
 #include "Network.hpp"
 
 
@@ -36,7 +36,7 @@ namespace rago{
 class Goban{
 
 public:
-    Goban(Projector*);
+    Goban(VirtualGoban*);
     ~Goban();
 
     void draw();
@@ -53,7 +53,7 @@ private:
     vector<Point2f*> list_corner_detected;
 
     Clock* clock;
-    Projector* proj;
+    VirtualGoban* vg;
     Network* net;
 
     vector<vector<Stone*> > tab_stone;

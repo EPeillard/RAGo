@@ -67,6 +67,11 @@ Mat* Core::getG2PMat()
     return &G2P;
 }
 
+Mat* Core::getVG2PMat()
+{
+    return &VG2P;
+}
+
 Mat* Core::getC2GMat()
 {
     return &C2G;
@@ -94,10 +99,21 @@ void Core::genConvMat()
     cornersCamera.push_back(*list_corner_markers[1]);
     cornersCamera.push_back(*list_corner_markers[2]);
     cornersCamera.push_back(*list_corner_markers[3]);
+    vector<Point2f> cornersVirtualGoban;/*
+    cornersVirtualGoban.push_back(Point2f(0, 0));
+    cornersVirtualGoban.push_back(Point2f(210, 0));
+    cornersVirtualGoban.push_back(Point2f(210, 240));
+    cornersVirtualGoban.push_back(Point2f(0, 240));*/
+    cornersVirtualGoban.push_back(Point2f(10, 10));
+    cornersVirtualGoban.push_back(Point2f(190, 10));
+    cornersVirtualGoban.push_back(Point2f(190, 190));
+    cornersVirtualGoban.push_back(Point2f(10, 190));
 
     findHomography(cornersCamera, cornersGoban).convertTo(C2G, CV_32F);
     findHomography(cornersGoban, cornersProj).convertTo(G2P, CV_32F);
     findHomography(cornersProj, cornersCamera).convertTo(P2C, CV_32F);
+    findHomography(cornersVirtualGoban, cornersProj).convertTo(VG2P, CV_32F);
+    //findHomography(cornersProj, cornersVirtualGoban).convertTo(VG2P, CV_32F);
 }
 
 void Core::init()

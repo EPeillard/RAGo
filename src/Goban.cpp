@@ -11,9 +11,9 @@
 
 using namespace rago;
 
-Goban::Goban(Projector* proj)
+Goban::Goban(VirtualGoban* vg)
 {
-    this->proj = proj;
+    this->vg = vg;
     ///Initialisation of the goban display Mat
     matGoban = Mat::zeros(768, 1024, CV_8UC3);
     matGoban = cv::Scalar(255, 255, 255);
@@ -35,7 +35,7 @@ void Goban::setGoban()
             tab_stone[i][j]->setDraw(i, j, 0);
         }
     }
-    clock = new Clock(this->proj);
+    clock = new Clock(this->vg);
     clock->draw();
 }
 
@@ -53,7 +53,8 @@ void Goban::playTerminal(int player)
         {
             tab_stone[x-1][y-1]->setPlayer(player);
 
-            proj->draw(3, x-1, y-1, tab_stone[x-1][y-1]->getPlayer());
+            //vg->draw(1, x-1, y-1, tab_stone[x-1][y-1]->getPlayer());
+            vg->addStone(tab_stone[x-1][y-1]->getPlayer(), x-1, y-1);
             waitKey(10);
             //clock->increaseTime();
             clock->draw();
@@ -72,10 +73,11 @@ void Goban::playTerminal(int player)
     }
 }
 
-void Goban::play(int x, int y, int player)
+void Goban::play(int player, int x, int y)
 {
     if(x>0 && x<20 && y>0 && y<20)
     {
-        tab_stone[x][y]->setPlayer(player);
+        tab_stone[x-1][y-1]->setPlayer(player);
+        vg->addStone(player, x, y);
     }
 }

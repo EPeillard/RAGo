@@ -24,10 +24,12 @@ public:
     ~Projector();
 
     void draw(int, int=0, int=0, int=0);
+    void draw(Mat *mat);
     void unDraw(int);
     void setCorner(vector<Point2f*>);
 
     void setG2P(Mat*);
+    void setVG2P(Mat*);
 
     Mat matDraw; //TODO faire un getter
     void setCountClock(int);
@@ -38,6 +40,7 @@ private:
     vector<Point2f*> list_corner_detected;
 
     Mat* G2P;
+    Mat* VG2P;
     int countClock;
 
 };

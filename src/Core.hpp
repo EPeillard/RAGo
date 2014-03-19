@@ -58,6 +58,7 @@ public:
     **/
     Mat* getG2PMat();
     Mat* getC2GMat();
+    Mat* getVG2PMat();
 
     void init();
     void detection();
@@ -101,6 +102,7 @@ private:
     Mat G2P;
     Mat C2G;
     Mat P2C;
+    Mat VG2P;
 
     Camera* camera;
     Projector* proj;

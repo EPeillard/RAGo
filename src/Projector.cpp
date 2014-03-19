@@ -15,6 +15,13 @@ Projector::Projector()
 
 Projector::~Projector(){}
 
+void Projector::draw(Mat *mat)
+{
+    std::cout<<"drawing"<<std::endl;
+    cv::warpPerspective(*mat, matDraw, *VG2P, matDraw.size());
+    imshow("detection", matDraw);
+}
+
 void Projector::draw(int mode, int x, int y, int i)
 {
     switch(mode)
@@ -207,4 +214,8 @@ void Projector::setCorner(vector<Point2f*> list_corner_detected)
 void Projector::setG2P(Mat* mat)
 {
     G2P = mat;
+}
+void Projector::setVG2P(Mat* mat)
+{
+    VG2P = mat;
 }
