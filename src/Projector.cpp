@@ -1,5 +1,4 @@
 #include "Projector.hpp"
-#include "define.hpp"
 
 using namespace rago;
 

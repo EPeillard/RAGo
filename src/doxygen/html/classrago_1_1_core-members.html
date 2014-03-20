@@ -44,6 +44,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -91,7 +92,7 @@ $(document).ready(function(){initNavTree('classrago_1_1_core.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -108,19 +109,26 @@ $(document).ready(function(){initNavTree('classrago_1_1_core.html','');});
 
 <p>This is the complete list of members for <a class="el" href="classrago_1_1_core.html">rago::Core</a>, including all inherited members.</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#a14e63188e0aa7c4a6f72d5501384d1f9">Core</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#a742c251c28b54e7cd02d904cdda28c15">detection</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>genG2PMat</b>() (defined in <a class="el" href="classrago_1_1_core.html">rago::Core</a>)</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#a9eb984de4f653a04927279f64c63df98">getCorners</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#a3942a18a0c74579611730d22cfe894eb">getG2PMat</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
-  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#a95b5c90a86bd4f1dec37edb1f32a6406">init</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#a776f8c46504b14183883c6273f93eaed">~Core</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#a832fe64c539d907da77bb8dc5571f8ad">beginningTurn</a></td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#a8684a5954d86eaff6098ad9930a4356b">Core</a>(Camera *, Projector *, Goban *)</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#ab600360724a37b9711133e2257cb773c">countNotBlack</a>(Mat img, int lim)</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#a835002e7611947699f665f09b5aa8798">detectHand</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#a742c251c28b54e7cd02d904cdda28c15">detection</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#ab7ee2b43d7403ce4177ac3dc102c6b5a">genConvMat</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#ac466f150bcc60afdb2c067d161225a62">generateBeginningTurnMat</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#ab73568fa7737b65bbcc7396d40eec7e9">getC2GMat</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#afa2ce20fa64bb275fcddec762e229ff6">getCorners</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#aa1f381953349bc8b546b4fb048072cc0">getG2PMat</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#aa50cba00b1a61374bf88f3e39da80102">getVG2PMat</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#a9c9356ff2cdd858c6cbf87e310d6daa2">imagediff</a>(int)</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classrago_1_1_core.html#a95b5c90a86bd4f1dec37edb1f32a6406">init</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
+  <tr><td class="entry"><a class="el" href="classrago_1_1_core.html#a4ba873af3177d84841cd702f162767f0">~Core</a>()</td><td class="entry"><a class="el" href="classrago_1_1_core.html">rago::Core</a></td><td class="entry"></td></tr>
 </table></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Feb 7 2014 15:05:24 for RAGo by
+    <li class="footer">Generated on Wed Mar 19 2014 18:31:38 for RAGo by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

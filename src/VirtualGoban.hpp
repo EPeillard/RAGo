@@ -1,7 +1,6 @@
 #ifndef VIRTUALGOBAN_HPP
 #define VIRTUALGOBAN_HPP
 
-#include <iostream>
 #include "Projector.hpp"
 
 namespace rago{

@@ -44,6 +44,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -91,7 +92,7 @@ $(document).ready(function(){initNavTree('classrago_1_1_goban.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -111,27 +112,31 @@ $(document).ready(function(){initNavTree('classrago_1_1_goban.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3544d30f54fbb54bd9e4fed08aa4bce6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrago_1_1_goban.html#a3544d30f54fbb54bd9e4fed08aa4bce6">Goban</a> ()</td></tr>
-<tr class="separator:a3544d30f54fbb54bd9e4fed08aa4bce6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f380be0c2846c0ee8a3b14cc6ff96bb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f380be0c2846c0ee8a3b14cc6ff96bb"></a>
+<tr class="memitem:a3194bc07d65f70fef10e19b00024d723"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrago_1_1_goban.html#a3194bc07d65f70fef10e19b00024d723">Goban</a> (<a class="el" href="classrago_1_1_virtual_goban.html">VirtualGoban</a> *)</td></tr>
+<tr class="separator:a3194bc07d65f70fef10e19b00024d723"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab4902f23312df3c1a906d6b4a8bb699"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab4902f23312df3c1a906d6b4a8bb699"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>draw</b> ()</td></tr>
-<tr class="separator:a8f380be0c2846c0ee8a3b14cc6ff96bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36ff917868785a6e897a3e7c731f118f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a36ff917868785a6e897a3e7c731f118f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setGoban</b> (Mat, vector&lt; Point * &gt;)</td></tr>
-<tr class="separator:a36ff917868785a6e897a3e7c731f118f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99cab2079f57b5cc57458ac90abd27c5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a99cab2079f57b5cc57458ac90abd27c5"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>playTerminal</b> ()</td></tr>
-<tr class="separator:a99cab2079f57b5cc57458ac90abd27c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:aab4902f23312df3c1a906d6b4a8bb699"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a153e60f9290104553a15a8ba533da117"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a153e60f9290104553a15a8ba533da117"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setGoban</b> ()</td></tr>
+<tr class="separator:a153e60f9290104553a15a8ba533da117"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a723a1dfbb7c99079f4e31ede6de8b669"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a723a1dfbb7c99079f4e31ede6de8b669"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>playTerminal</b> (int)</td></tr>
+<tr class="separator:a723a1dfbb7c99079f4e31ede6de8b669"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a036d59cb0e78762e9e479ed408bc6295"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a036d59cb0e78762e9e479ed408bc6295"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>play</b> (int, int, int)</td></tr>
+<tr class="separator:a036d59cb0e78762e9e479ed408bc6295"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a3544d30f54fbb54bd9e4fed08aa4bce6"></a>
+<a class="anchor" id="a3194bc07d65f70fef10e19b00024d723"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">Goban::Goban </td>
           <td>(</td>
-          <td class="paramname">)</td><td></td>
+          <td class="paramtype"><a class="el" href="classrago_1_1_virtual_goban.html">VirtualGoban</a> *&#160;</td>
+          <td class="paramname"><em>vg</em>)</td><td></td>
           <td></td>
         </tr>
       </table>
@@ -149,8 +154,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>playTerminal</b> ()</
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><b>rago</b></li><li class="navelem"><a class="el" href="classrago_1_1_goban.html">Goban</a></li>
-    <li class="footer">Generated on Fri Feb 7 2014 15:05:24 for RAGo by
+    <li class="navelem"><a class="el" href="namespacerago.html">rago</a></li><li class="navelem"><a class="el" href="classrago_1_1_goban.html">Goban</a></li>
+    <li class="footer">Generated on Wed Mar 19 2014 18:31:38 for RAGo by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

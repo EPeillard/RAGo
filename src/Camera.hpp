@@ -1,13 +1,11 @@
-#include "opencv2/calib3d/calib3d.hpp"
+#ifndef CAMERA_HPP
+#define CAMERA_HPP
+
+//OpenCV include
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/features2d/features2d.hpp"
+
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <list>
-#include <vector>
 
 using namespace cv;
 using namespace std;
@@ -31,3 +29,5 @@ private:
 };
 
 }
+
+#endif // CAMERA_HPP

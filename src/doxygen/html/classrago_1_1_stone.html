@@ -44,6 +44,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -91,7 +92,7 @@ $(document).ready(function(){initNavTree('classrago_1_1_stone.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -111,15 +112,15 @@ $(document).ready(function(){initNavTree('classrago_1_1_stone.html','');});
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9ffc11c8626198035c4ba2b37f394892"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9ffc11c8626198035c4ba2b37f394892"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>draw</b> (string, Mat *)</td></tr>
-<tr class="separator:a9ffc11c8626198035c4ba2b37f394892"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f0b1ce3f7c1c4ba16436642cc151c0d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f0b1ce3f7c1c4ba16436642cc151c0d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setPlayer</b> (int)</td></tr>
 <tr class="separator:a3f0b1ce3f7c1c4ba16436642cc151c0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4eeb838d5735bb75cb91ae8f98bc7c8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae4eeb838d5735bb75cb91ae8f98bc7c8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setDraw</b> (int, int, int, int, Mat *)</td></tr>
-<tr class="separator:ae4eeb838d5735bb75cb91ae8f98bc7c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a875621c89bd8ac14e88a0a6a393117ab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a875621c89bd8ac14e88a0a6a393117ab"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setDraw</b> (int, int, int)</td></tr>
+<tr class="separator:a875621c89bd8ac14e88a0a6a393117ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afef9636b40fed3b8e626c9f082a1a3bd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afef9636b40fed3b8e626c9f082a1a3bd"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getPlayer</b> ()</td></tr>
+<tr class="separator:afef9636b40fed3b8e626c9f082a1a3bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="_stone_8hpp_source.html">Stone.hpp</a></li>
@@ -130,8 +131,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setDraw</b> (int, int
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><b>rago</b></li><li class="navelem"><a class="el" href="classrago_1_1_stone.html">Stone</a></li>
-    <li class="footer">Generated on Fri Feb 7 2014 15:05:24 for RAGo by
+    <li class="navelem"><a class="el" href="namespacerago.html">rago</a></li><li class="navelem"><a class="el" href="classrago_1_1_stone.html">Stone</a></li>
+    <li class="footer">Generated on Wed Mar 19 2014 18:31:38 for RAGo by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

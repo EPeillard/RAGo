@@ -44,6 +44,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="namespaces.html"><span>Namespaces</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
@@ -75,6 +76,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="functions.html"><span>All</span></a></li>
       <li class="current"><a href="functions_func.html"><span>Functions</span></a></li>
+      <li><a href="functions_vars.html"><span>Variables</span></a></li>
     </ul>
   </div>
 </div><!-- top -->
@@ -97,7 +99,7 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -108,26 +110,53 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 
 <div class="contents">
 &#160;<ul>
+<li>Camera()
+: <a class="el" href="classrago_1_1_camera.html#a01f94c3543f56ede7af49dc778f19331">rago::Camera</a>
+</li>
 <li>Core()
-: <a class="el" href="classrago_1_1_core.html#a14e63188e0aa7c4a6f72d5501384d1f9">rago::Core</a>
+: <a class="el" href="classrago_1_1_core.html#a8684a5954d86eaff6098ad9930a4356b">rago::Core</a>
+</li>
+<li>countNotBlack()
+: <a class="el" href="classrago_1_1_core.html#ab600360724a37b9711133e2257cb773c">rago::Core</a>
+</li>
+<li>detectHand()
+: <a class="el" href="classrago_1_1_core.html#a835002e7611947699f665f09b5aa8798">rago::Core</a>
 </li>
 <li>detection()
 : <a class="el" href="classrago_1_1_core.html#a742c251c28b54e7cd02d904cdda28c15">rago::Core</a>
 </li>
+<li>genConvMat()
+: <a class="el" href="classrago_1_1_core.html#ab7ee2b43d7403ce4177ac3dc102c6b5a">rago::Core</a>
+</li>
+<li>generateBeginningTurnMat()
+: <a class="el" href="classrago_1_1_core.html#ac466f150bcc60afdb2c067d161225a62">rago::Core</a>
+</li>
+<li>getC2GMat()
+: <a class="el" href="classrago_1_1_core.html#ab73568fa7737b65bbcc7396d40eec7e9">rago::Core</a>
+</li>
 <li>getCorners()
-: <a class="el" href="classrago_1_1_core.html#a9eb984de4f653a04927279f64c63df98">rago::Core</a>
+: <a class="el" href="classrago_1_1_core.html#afa2ce20fa64bb275fcddec762e229ff6">rago::Core</a>
 </li>
 <li>getG2PMat()
-: <a class="el" href="classrago_1_1_core.html#a3942a18a0c74579611730d22cfe894eb">rago::Core</a>
+: <a class="el" href="classrago_1_1_core.html#aa1f381953349bc8b546b4fb048072cc0">rago::Core</a>
+</li>
+<li>getVG2PMat()
+: <a class="el" href="classrago_1_1_core.html#aa50cba00b1a61374bf88f3e39da80102">rago::Core</a>
 </li>
 <li>Goban()
-: <a class="el" href="classrago_1_1_goban.html#a3544d30f54fbb54bd9e4fed08aa4bce6">rago::Goban</a>
+: <a class="el" href="classrago_1_1_goban.html#a3194bc07d65f70fef10e19b00024d723">rago::Goban</a>
+</li>
+<li>imagediff()
+: <a class="el" href="classrago_1_1_core.html#a9c9356ff2cdd858c6cbf87e310d6daa2">rago::Core</a>
 </li>
 <li>init()
 : <a class="el" href="classrago_1_1_core.html#a95b5c90a86bd4f1dec37edb1f32a6406">rago::Core</a>
 </li>
+<li>~Camera()
+: <a class="el" href="classrago_1_1_camera.html#ad1897942d0ccf91052386388a497349f">rago::Camera</a>
+</li>
 <li>~Core()
-: <a class="el" href="classrago_1_1_core.html#a776f8c46504b14183883c6273f93eaed">rago::Core</a>
+: <a class="el" href="classrago_1_1_core.html#a4ba873af3177d84841cd702f162767f0">rago::Core</a>
 </li>
 </ul>
 </div><!-- contents -->
@@ -135,7 +164,7 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Fri Feb 7 2014 15:05:24 for RAGo by
+    <li class="footer">Generated on Wed Mar 19 2014 18:31:38 for RAGo by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.4 </li>
   </ul>

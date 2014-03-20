@@ -26,20 +26,25 @@ using namespace rago;
 
 Core::Core(Camera* camera, Projector* proj, Goban* goban)
 {
+    ///Setting the RAGo objects
     this->camera = camera;
     this->proj = proj;
     this->goban = goban;
 
+    ///Initialize of the number of points detected to 0
     nbrPt=0;
 
+    ///Initialize the points
     point_display=NULL;
     point_read=NULL;
 
+    ///Initialize the detection values
     margin_corner = 3;
     pasX = 50;
     pasY = 50;
 
 #ifdef COMP_MOD_NO_INIT
+    ///If the init() method is disabled, the corner Camera coordinate are set width the registered values
     list_corner_markers.push_back(new Point2f(195, 61));
     list_corner_markers.push_back(new Point2f(484, 56));
     list_corner_markers.push_back(new Point2f(497, 332));
@@ -47,6 +52,7 @@ Core::Core(Camera* camera, Projector* proj, Goban* goban)
 #endif // COMP_MOD_NO_INIT
 
 #ifdef COMP_MOD_NO_DETECT
+    ///If the detection() method is disabled, the corner Projector coordinate are set width the registered values
     list_corner_detected.push_back(new Point2f(167, 61));
     list_corner_detected.push_back(new Point2f(829, 57));
     list_corner_detected.push_back(new Point2f(840, 698));
@@ -58,6 +64,7 @@ Core::Core(Camera* camera, Projector* proj, Goban* goban)
 
 Core::~Core()
 {
+    ///Deletion of the point object
     delete point_read;
     delete point_display;
 }
@@ -72,11 +79,21 @@ Mat* Core::getVG2PMat()
     return &VG2P;
 }
 
+/** Getter for the C2G matrix
+  *
+  * \return Mat object for the convertion from Camera to Goban
+  *
+  * \fn Mat* reorderPoints()
+  **/
 Mat* Core::getC2GMat()
 {
     return &C2G;
 }
 
+/** Generation of the image that will be used to get where a stone is played and if an hand is in the circle of detection
+  *
+  * \fn void generateBeginningTurnMat()
+  **/
 void Core::generateBeginningTurnMat()
 {
      Mat (camera->getFrame()).copyTo(beginningTurn);
@@ -99,11 +116,7 @@ void Core::genConvMat()
     cornersCamera.push_back(*list_corner_markers[1]);
     cornersCamera.push_back(*list_corner_markers[2]);
     cornersCamera.push_back(*list_corner_markers[3]);
-    vector<Point2f> cornersVirtualGoban;/*
-    cornersVirtualGoban.push_back(Point2f(0, 0));
-    cornersVirtualGoban.push_back(Point2f(210, 0));
-    cornersVirtualGoban.push_back(Point2f(210, 240));
-    cornersVirtualGoban.push_back(Point2f(0, 240));*/
+    vector<Point2f> cornersVirtualGoban;
     cornersVirtualGoban.push_back(Point2f(10, 10));
     cornersVirtualGoban.push_back(Point2f(190, 10));
     cornersVirtualGoban.push_back(Point2f(190, 190));
@@ -113,9 +126,10 @@ void Core::genConvMat()
     findHomography(cornersGoban, cornersProj).convertTo(G2P, CV_32F);
     findHomography(cornersProj, cornersCamera).convertTo(P2C, CV_32F);
     findHomography(cornersVirtualGoban, cornersProj).convertTo(VG2P, CV_32F);
-    //findHomography(cornersProj, cornersVirtualGoban).convertTo(VG2P, CV_32F);
 }
-
+/** \fn void init()
+  *
+  **/
 void Core::init()
 {
 #ifndef COMP_MOD_NO_INIT
@@ -455,24 +469,6 @@ int Core::imagediff(int player)
             return 0;
          }
 }
-
-/*
-void Erosion( int, void* )
-{
-  int erosion_type;
-  int erosion_elem = 0;
-  if( erosion_elem == 0 ){ erosion_type = MORPH_RECT; }
-  else if( erosion_elem == 1 ){ erosion_type = MORPH_CROSS; }
-  else if( erosion_elem == 2) { erosion_type = MORPH_ELLIPSE; }
-
-  Mat element = getStructuringElement( erosion_type,
-                                       Size( 2*erosion_size + 1, 2*erosion_size+1 ),
-                                       Point( erosion_size, erosion_size ) );
-
-  /// Apply the erosion operation
-  erode( src2, erosion_dst, element );
-  imshow( "Erosion Demo", erosion_dst );
-}*/
 
 vector<Point2f*> Core::getFrameCircles(Mat frame, int width)
 {
