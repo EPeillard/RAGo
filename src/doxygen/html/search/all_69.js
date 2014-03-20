@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['imagediff',['imagediff',['../classrago_1_1_core.html#a9c9356ff2cdd858c6cbf87e310d6daa2',1,'rago::Core']]],
-  ['init',['init',['../classrago_1_1_core.html#a95b5c90a86bd4f1dec37edb1f32a6406',1,'rago::Core']]]
+  ['imagediff',['imagediff',['../classrago_1_1_core.html#ac127b5d470a5b3f2d53d31336a3caeb7',1,'rago::Core']]],
+  ['init',['init',['../classrago_1_1_core.html#a74bc36a5f90d30c55be2914968795fde',1,'rago::Core']]]
 ];

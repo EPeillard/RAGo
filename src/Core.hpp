@@ -42,7 +42,7 @@ public:
     /** \fn Core::Core(Camera* camera, Projector* proj, Goban* goban)
       *
       * \brief Main void constructor
-      * Main conctructor of the Core class
+      * Main constructor of the Core class
       *
       * \param camera Pointer to the Camera object used to get image from the device.
       * \param proj Pointer to the Projector object used to display images.
@@ -57,7 +57,9 @@ public:
       **/
     ~Core();
 
-    /**\brief Getter for the point list of corners
+    /** \fn vector<Point2f*> getCorners()
+      * \brief Getter for the point list of corners
+      * \return vector of the detected corners (Projector coordinates)
     **/
     vector<Point2f*> getCorners();
 
@@ -66,60 +68,99 @@ public:
       * \brief Getter for the G2P matrix
       * Getter for the Mat object for the transformation from the Goban coordinate into the Projector coordinate
       *
-      * \return Mat object for the convertion from Goban to Projector
-      *
+      * \return Mat object for the conversion from Goban to Projector
       **/
     Mat* getG2PMat();
-    /**\brief Getter for the Mat object for the transformation from the Camera coordinate into the Goban coordinate
-    **/
+
+    /** \fn Mat* getC2GMat()
+      * \brief Getter for the C2G matrix
+      * Getter for the Mat object for the transformation from the Camera coordinate into the Goban coordinate
+      *
+      * \return Mat object for the conversion from Camera to Goban
+      **/
     Mat* getC2GMat();
 
     /** \fn Mat* getVG2PMat()
-      * Getter for the Mat object for the transformation from the VirtualGoban coordinate into the Projector coordinate
       * \brief Getter for the VG2P matrix
+      * Getter for the Mat object for the transformation from the VirtualGoban coordinate into the Projector coordinate
       *
-      * \return Mat object for the convertion from VirtualGoban to Projector
+      * \return Mat object for the conversion from VirtualGoban to Projector
       *
       **/
     Mat* getVG2PMat();
 
-    /**\brief Initialisation of the detection by acquiring the Camera coordinate corners
+    /** \fn void init()
+      * \brief Initialization
+      * Initialization before the detection. First the stone on the corners are read and then saved.
     **/
     void init();
-    /**\brief Detection by moving a point to get the projector coordinate of the corners
+
+    /** \fn void detection()
+      * \brief Detection by moving a point to get the projector coordinate of the corners
+      * Detection of coordinates points. To obtains the projector coordinates, the point get by the camera is displayed.
+      * If it's no over the corner, it will be moved and detect again.
     **/
     void detection();
 
-    /**\brief Generation of the conversion matrix
+    /** \fn void genConvMat()
+      * \brief Generation of the conversion matrix
+      * Generation of all the conversion matrix to change the coordinate (for example from Goban to Projector)
     **/
     void genConvMat();
-    /**\brief Get the coordinate of a played stone on the goban
+
+    /** \fn int imagediff(int)
+      * \brief Get the coordinate of a played stone on the goban
+      * First the difference between to images is done (one just taken from the camera ans the other is the reference frame).
+      * Then a circle detection function is apply to get the played stone.
+      * \arg number of the player (0 for white, 1 for black)
     **/
     int imagediff(int);
-    /**\brief Detect if an hand is inside the circle of validation
+
+    /** \fn bool detectHand()
+      * \brief Detect if an hand is inside the circle of validation
+      * First a just taken image is compare to the reference frame only on the circle for detection.
+      * Then an other function is called to detect id an object is present.
     **/
     bool detectHand();
+
     /**\brief TODO
     **/
     int countNotBlack(Mat img, int lim);
-    /**\brief Take the reference image to use for comparing in detectHand and ImageDiff
-    **/
+
+    /** \fn void generateBeginningTurnMat()
+      * \brief Take the reference image to use for comparing in detectHand and ImageDiff
+      * Generation of the image that will be used to get where a stone is played and if an hand is in the circle of detection
+      **/
     void generateBeginningTurnMat();
 
-    /**\brief This Mat represent the picture take before human player move for comparaison. Should be
+    /** \brief Reference image
+      * This Mat represent the picture take before human player move for comparaison. Should be private
     **/
     Mat beginningTurn; //TODO private
 
 private:
 
-    /** It reorder the point to have the top left corner first, then the top right corner, the bottom right corner and at least the bottom left corner.
-    **/
+    /** \fn vector<Point2f*> reorderPoints(vector<Point2f*>&)
+      * \brief Function reordering the point this way : 0 : top left corner, 1 top right corner, 2 bottom right corner, 3 bottom left corner
+      * It reorder the point to have the top left corner first, then the top right corner, the bottom right corner and at least the bottom left corner.
+      * \arg vector of points
+      * \return reordered vector of points
+      **/
     vector<Point2f*> reorderPoints(vector<Point2f*>&);
-    /** Return a vector of point representing the circles detected in a frame
+
+    /** \fn vector<Point2f*> getFrameCircles(Mat, int)
+      * \brief Return a vector of point representing the circles detected in a frame.
+      * A detection is done with a matrix representing the picture. A function will detect all the circles under the argument width.
+      * \arg Matrix representing the frame.
+      * \arg Maximum width of the detected circles
+      * \return list of centers of detected circles
     **/
     vector<Point2f*> getFrameCircles(Mat, int);
-    /** Set point_read with de detection circle detected in a frame
-    **/
+
+    /** \fn detectCalibPt()
+      * \brief Set point_read with the detection circle detected in a frame
+      * The function read all the circles detected on a frame and tell if there is one which is different from the corner of the goban.
+      **/
     void detectCalibPtCirlces();
 
 
