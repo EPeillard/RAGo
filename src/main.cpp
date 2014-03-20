@@ -62,6 +62,9 @@ int main(int argc, char** argv)
     goban->setGoban();
     vg->drawBorders();
 
+
+
+
     waitKey(0);
 
     while(true)
@@ -85,27 +88,31 @@ int main(int argc, char** argv)
                 core->generateBeginningTurnMat();
                 waitKey(100);
                 proj->draw(5,0,0);
-                                core->generateBeginningTurnMat();
+                core->generateBeginningTurnMat();
                 waitKey(100);
 
                 //the human player put a stone on the goban
                 //we wait that he put his hand in the clock
                 int count = 0;
-                proj->setCountClock(count);
+                vg->drawClock();
+                //proj->setCountClock(count);
                 while(count<5)
                 {
                     if(core->detectHand())
                     {
                         count++;
+                        vg->drawClockBorders(5-count);
+                        /*
                         proj->setCountClock(count);
-                        proj->draw(4,0,0);
+                        proj->draw(4,0,0);*/
                         cout<<count<<endl;
                     }
                     else
                     {
                         count = 0;
-                        proj->setCountClock(count);
-                        proj->draw(4,0,0);
+                        vg->drawClock();
+                        //proj->setCountClock(count);
+                        //proj->draw(4,0,0);
                         cout<<count<<endl;
                     }
                     waitKey(500);
@@ -164,21 +171,24 @@ int main(int argc, char** argv)
             cout<<"put your hand in the detection zone in red until the red circle gets smaller"<<endl;
             //use a draw method that print put your hand in the clock with an arrow
             int count = 0;
-            proj->setCountClock(count);
+            vg->drawClock();
+            //proj->setCountClock(count);
             while(count<5)
             {
                 if(core->detectHand())
                 {
                     count++;
-                    proj->setCountClock(count);
-                    proj->draw(4,0,0);
+                    //proj->setCountClock(count);
+                    //proj->draw(4,0,0);
+                    vg->drawClockBorders(5-count);
                     cout<<count<<endl;
                 }
                 else
                 {
                     count = 0;
-                    proj->setCountClock(count);
-                    proj->draw(4,0,0);
+                    //proj->setCountClock(count);
+                    //proj->draw(4,0,0);
+                    vg->drawClock();
                     cout<<count<<endl;
                 }
                 waitKey(500);
@@ -204,21 +214,23 @@ int main(int argc, char** argv)
                 {
                     if(core->detectHand())
                     {
-                        count++;
-                        proj->setCountClock(count);
-                        proj->draw(4,0,0);
-                        cout<<count<<endl;
+                    count++;
+                    //proj->setCountClock(count);
+                    //proj->draw(4,0,0);
+                    vg->drawClockBorders(5-count);
+                    cout<<count<<endl;
                     }
                     else
                     {
-                        count = 0;
-                        proj->setCountClock(count);
-                        proj->draw(4,0,0);
-                        cout<<count<<endl;
+                    count = 1;
+                    //proj->setCountClock(count);
+                    //proj->draw(4,0,0);
+                    vg->drawClock();
+                    cout<<count<<endl;
                     }
                     waitKey(500);
                 }
-                if (core->imagediff(2))
+                if (core->imagediff(0))
                 {
                     isStone = true;
                 }

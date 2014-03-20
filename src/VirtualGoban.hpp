@@ -23,7 +23,8 @@ public:
     void setClock1(int);
     void setClock2(int);
     void setText(std::string);
-    void handDetected();
+    void drawClock();
+    void drawClockBorders(int);
     void drawBorders();
 };
 

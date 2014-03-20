@@ -6,6 +6,9 @@ VirtualGoban::VirtualGoban(Projector* proj)
 {
     this->proj = proj;
     matDraw = Mat(Mat::zeros(210, 240, CV_8UC3));
+    matDraw = cv::Scalar(0, 0, 0);
+    Rect cache = Rect(5, 5, 195, 195);
+    rectangle(matDraw,cache , Scalar(203, 214, 218), -1);
 }
 
 VirtualGoban::~VirtualGoban(){}
@@ -19,12 +22,12 @@ void VirtualGoban::draw()
 void VirtualGoban::addStone(int color, int x, int y)
 {
     std::cout<<"addstone "<<color<<std::endl;
-    if(color == 1)
+    if(color == 0)
     {
         circle(matDraw, Point(10*x, 10*y), 4,  Scalar(255, 255, 255), -1);
         std::cout<<"white"<<std::endl;
     }
-    if(color == 2)
+    if(color == 1)
     {
         circle(matDraw, Point(10*x, 10*y), 5,  Scalar(255, 255, 255), 1);
         std::cout<<"black"<<std::endl;
@@ -37,23 +40,40 @@ void VirtualGoban::addStone(int color, int x, int y)
 void VirtualGoban::drawBorders()
 {
     circle(matDraw, Point(10, 10), 5,  Scalar(0, 0, 255), 2);
-    circle(matDraw, Point(200, 10), 5,  Scalar(0, 0, 255), 2);
-    circle(matDraw, Point(200, 200), 5,  Scalar(0, 0, 255), 2);
-    circle(matDraw, Point(10, 200), 5,  Scalar(0, 0, 255), 2);
+    circle(matDraw, Point(190, 10), 5,  Scalar(0, 0, 255), 2);
+    circle(matDraw, Point(190, 190), 5,  Scalar(0, 0, 255), 2);
+    circle(matDraw, Point(10, 190), 5,  Scalar(0, 0, 255), 2);
 
-    line( matDraw, Point(10, 10), Point(200, 10), Scalar(0,0,255), 1);
-    line( matDraw, Point(200, 10), Point(200, 200), Scalar(0,0,255), 1);
-    line( matDraw, Point(200, 200), Point(10, 200), Scalar(0,0,255), 1);
-    line( matDraw, Point(10, 200), Point(10, 10), Scalar(0,0,255), 1);
+    line( matDraw, Point(10, 10), Point(190, 10), Scalar(0,0,255), 1);
+    line( matDraw, Point(190, 10), Point(190, 190), Scalar(0,0,255), 1);
+    line( matDraw, Point(190, 190), Point(10, 190), Scalar(0,0,255), 1);
+    line( matDraw, Point(10, 190), Point(10, 10), Scalar(0,0,255), 1);
 
     imshow("VirtualGoban", matDraw);
     draw();
+        waitKey(0);
+    matDraw = cv::Scalar(0, 0, 0);
+    Rect cache = Rect(5, 5, 195, 195);
+    rectangle(matDraw,cache , Scalar(203, 214, 218), -1);
+        waitKey(10);
+    draw();
+
 }
 
 void VirtualGoban::setClock1(int){};
 void VirtualGoban::setClock2(int){};
 void VirtualGoban::setText(std::string){};
-void VirtualGoban::handDetected(){};
+void VirtualGoban::drawClock()
+{
+    circle(matDraw, Point(105, 225) , 10,  Scalar(0, 0, 200), 1);
+}
+
+void VirtualGoban::drawClockBorders(int val)
+{
+    circle(matDraw, Point(105, 225) , 14,  Scalar(0, 0, 0), -1);
+    circle(matDraw, Point(105, 225) , 10,  Scalar(0, 0, 200), 1);
+    circle(matDraw, Point(105, 225) , 10+val,  Scalar(0, 0, 200), 1);
+}
 /*
     case 4: //detection zone
     {

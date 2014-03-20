@@ -103,6 +103,7 @@ private:
     Mat C2G;
     Mat P2C;
     Mat VG2P;
+    Mat VG2C;
 
     Camera* camera;
     Projector* proj;

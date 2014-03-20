@@ -113,7 +113,7 @@ void Core::genConvMat()
     findHomography(cornersGoban, cornersProj).convertTo(G2P, CV_32F);
     findHomography(cornersProj, cornersCamera).convertTo(P2C, CV_32F);
     findHomography(cornersVirtualGoban, cornersProj).convertTo(VG2P, CV_32F);
-    //findHomography(cornersProj, cornersVirtualGoban).convertTo(VG2P, CV_32F);
+    findHomography(cornersVirtualGoban, cornersCamera).convertTo(VG2C, CV_32F);
 }
 
 void Core::init()
@@ -433,10 +433,16 @@ int Core::imagediff(int player)
 
                     int x=round(outPts[0].x);
                     int y=round(outPts[0].y);
+                    x++;
+                    y++;
                     //cout<<x<<endl;
                     //cout<<y<<endl;
-                    proj->draw(PROJ_MOD_STONE, x, y, player);
-                    goban->play(x, y, player);
+                    //proj->draw(PROJ_MOD_STONE, x, y, player);
+                    goban->play(player, x, y);
+                    goban->play(0, x-1, y);
+                    goban->play(0, x+1, y);
+                    goban->play(0, x, y+1);
+                    goban->play(0, x, y-1);
                     //flag=true;
                     //cout<<"press any key"<<endl;
                     //waitKey(0);
@@ -507,22 +513,37 @@ bool Core::detectHand()
     xc_proj = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
     yc_proj = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
 
+
+
+    int xc_vg, yc_vg;
+    xc_vg = 225;
+    yc_vg = 105;
+    Mat frame2,maskDraw,maskDraw2;
+    maskDraw = Mat::zeros(210, 240, CV_8UC3);
+    maskDraw = cv::Scalar(0, 0, 0);
+        Mat test(camera->getFrame());
+    maskDraw2 = Mat::zeros(test.size(), test.type());
+
+    //get the horloge size & draw it in white
+    circle(maskDraw, Point(xc_vg, yc_vg) , 10,  Scalar(255, 255, 255), -1);
+    cv::warpPerspective(maskDraw, maskDraw2, VG2C, maskDraw2.size());
+
     //zone in the camera
-    std::vector<cv::Point2f> inPts, outPts;
-    inPts.push_back(cv::Point2f(xc_proj, yc_proj));
-    perspectiveTransform(inPts, outPts, P2C);
+   // std::vector<cv::Point2f> inPts, outPts;
+    //inPts.push_back(cv::Point2f(xc_proj, yc_proj));
+    //perspectiveTransform(inPts, outPts, P2C);
 
     cout<<"detection de la main"<<endl;
 
-    Mat frame2,maskDraw;
-    Mat test(camera->getFrame());
+
+
 
     //create black picture
-    maskDraw = Mat::zeros(test.size(), test.type());
-    maskDraw = cv::Scalar(0, 0, 0);
+    //maskDraw = Mat::zeros(test.size(), test.type());
+    //maskDraw = cv::Scalar(0, 0, 0);
 
     //get the horloge size & draw it in white
-    circle(maskDraw, Point(outPts[0].x, outPts[0].y) , 40*((float)outPts[0].x/xc_proj),  Scalar(255, 255, 255), -1);
+//    circle(maskDraw, Point(outPts[0].x, outPts[0].y) , 40*((float)outPts[0].x/xc_proj),  Scalar(255, 255, 255), -1);
 
     //apply the mask
     Mat frame(camera->getFrame());
@@ -530,18 +551,19 @@ bool Core::detectHand()
     absdiff( beginningTurn,frame, frame2);
 
 
-    bitwise_and(frame2, maskDraw,frame2);
-
+    bitwise_and(frame2, maskDraw2,frame2);
+imshow("test_diff_hand", frame2);
     cvtColor( frame2, src_gray, CV_BGR2GRAY );
-    GaussianBlur( src_gray, src_gray, Size(9,9), 3, 3 );
-    if (countNotBlack(src_gray,80)>20)
+    GaussianBlur( src_gray, src_gray, Size(9,9), 5, 5 );
+    int test2=countNotBlack(src_gray,230);
+    if (test2>200)
     {
-        cout<<"yes there is a hand"<<endl;
+        cout<<"yes there is a hand : "<<test2<<endl;
             return true;
     }
     else
     {
-        cout<<"nope sorry"<<endl;
+        cout<<"nope sorry : "<<test2<<endl;
         return false;
     }
 }
