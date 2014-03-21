@@ -8,24 +8,10 @@
 #ifndef GOBAN_HPP
 #define GOBAN_HPP
 
-#include "opencv2/calib3d/calib3d.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <list>
-#include <vector>
-
 #include "Clock.hpp"
 #include "Stone.hpp"
 #include "VirtualGoban.hpp"
 #include "Network.hpp"
-
-
-#define MARGIN_DETECT_CALIB 2
 
 using namespace std;
 using namespace cv;

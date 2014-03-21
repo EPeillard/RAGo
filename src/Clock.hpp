@@ -7,12 +7,17 @@
 #ifndef CLOCK_HPP
 #define CLOCK_HPP
 
+//OpenCV includes
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
+
+//C++ includes
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+//RAGo includes
 #include "VirtualGoban.hpp"
 
 using namespace std;

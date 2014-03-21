@@ -17,6 +17,7 @@ void VirtualGoban::draw()
 {
     std::cout<<"trying to draw"<<std::endl;
     proj->draw(&matDraw);
+    waitKey(10);
 }
 
 void VirtualGoban::addStone(int color, int x, int y)
@@ -39,10 +40,10 @@ void VirtualGoban::addStone(int color, int x, int y)
 
 void VirtualGoban::drawBorders()
 {
-    circle(matDraw, Point(10, 10), 5,  Scalar(0, 0, 255), 2);
-    circle(matDraw, Point(190, 10), 5,  Scalar(0, 0, 255), 2);
-    circle(matDraw, Point(190, 190), 5,  Scalar(0, 0, 255), 2);
-    circle(matDraw, Point(10, 190), 5,  Scalar(0, 0, 255), 2);
+    circle(matDraw, Point(10, 10), 5,  Scalar(0, 0, 255), 1);
+    circle(matDraw, Point(190, 10), 5,  Scalar(0, 0, 255), 1);
+    circle(matDraw, Point(190, 190), 5,  Scalar(0, 0, 255), 1);
+    circle(matDraw, Point(10, 190), 5,  Scalar(0, 0, 255), 1);
 
     line( matDraw, Point(10, 10), Point(190, 10), Scalar(0,0,255), 1);
     line( matDraw, Point(190, 10), Point(190, 190), Scalar(0,0,255), 1);
@@ -51,13 +52,15 @@ void VirtualGoban::drawBorders()
 
     imshow("VirtualGoban", matDraw);
     draw();
-        waitKey(0);
+}
+
+void VirtualGoban::removeBorders()
+{
     matDraw = cv::Scalar(0, 0, 0);
     Rect cache = Rect(5, 5, 195, 195);
     rectangle(matDraw,cache , Scalar(203, 214, 218), -1);
-        waitKey(10);
+    imshow("VirtualGoban", matDraw);
     draw();
-
 }
 
 void VirtualGoban::setClock1(int){};
@@ -65,14 +68,17 @@ void VirtualGoban::setClock2(int){};
 void VirtualGoban::setText(std::string){};
 void VirtualGoban::drawClock()
 {
-    circle(matDraw, Point(105, 225) , 10,  Scalar(0, 0, 200), 1);
+    circle(matDraw, Point(215, 105) , 19,  Scalar(150, 150, 150), -1);
+    imshow("VirtualGoban", matDraw);
+    draw();
 }
 
 void VirtualGoban::drawClockBorders(int val)
 {
-    circle(matDraw, Point(105, 225) , 14,  Scalar(0, 0, 0), -1);
-    circle(matDraw, Point(105, 225) , 10,  Scalar(0, 0, 200), 1);
-    circle(matDraw, Point(105, 225) , 10+val,  Scalar(0, 0, 200), 1);
+    circle(matDraw, Point(225, 50) , 20,  Scalar(0, 0, 0), 2);
+    circle(matDraw, Point(225, 50) , 10+val*2,  Scalar(0, 0, 200), 2);
+    imshow("VirtualGoban", matDraw);
+    draw();
 }
 /*
     case 4: //detection zone

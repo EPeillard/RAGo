@@ -5,10 +5,10 @@
   **/
 
 ///To avoid to get corner coordinate (camera coordinate)
-//#define COMP_MOD_NO_INIT
+#define COMP_MOD_NO_INIT
 
 ///To avoid to get corner coordinate (projector coordinate)
-//#define COMP_MOD_NO_DETECT
+#define COMP_MOD_NO_DETECT
 
 ///To display all the information
 #define COMP_MOD_VERBOSE
@@ -26,31 +26,37 @@ using namespace rago;
 
 Core::Core(Camera* camera, Projector* proj, Goban* goban)
 {
+    ///Setting the RAGo objects
     this->camera = camera;
     this->proj = proj;
     this->goban = goban;
 
+    ///Initialize of the number of points detected to 0
     nbrPt=0;
 
+    ///Initialize the points
     point_display=NULL;
     point_read=NULL;
 
+    ///Initialize the detection values
     margin_corner = 3;
-    pasX = 50;
-    pasY = 50;
+    pasX = 100;
+    pasY = 100;
 
 #ifdef COMP_MOD_NO_INIT
-    list_corner_markers.push_back(new Point2f(195, 61));
-    list_corner_markers.push_back(new Point2f(484, 56));
-    list_corner_markers.push_back(new Point2f(497, 332));
-    list_corner_markers.push_back(new Point2f(200, 339));
+    ///If the init() method is disabled, the corner Camera coordinate are set width the registered values
+    list_corner_markers.push_back(new Point2f(208, 60));
+    list_corner_markers.push_back(new Point2f(526, 52));
+    list_corner_markers.push_back(new Point2f(588, 314));
+    list_corner_markers.push_back(new Point2f(184, 328));
 #endif // COMP_MOD_NO_INIT
 
 #ifdef COMP_MOD_NO_DETECT
-    list_corner_detected.push_back(new Point2f(167, 61));
-    list_corner_detected.push_back(new Point2f(829, 57));
-    list_corner_detected.push_back(new Point2f(840, 698));
-    list_corner_detected.push_back(new Point2f(179, 699));
+    ///If the detection() method is disabled, the corner Projector coordinate are set width the registered values
+    list_corner_detected.push_back(new Point2f(102, 158));
+    list_corner_detected.push_back(new Point2f(790, 147));
+    list_corner_detected.push_back(new Point2f(866, 719));
+    list_corner_detected.push_back(new Point2f(58, 742));
 #endif // COMP_MOD_NO_DETECT
 
 
@@ -58,6 +64,7 @@ Core::Core(Camera* camera, Projector* proj, Goban* goban)
 
 Core::~Core()
 {
+    ///Deletion of the point object
     delete point_read;
     delete point_display;
 }
@@ -84,36 +91,38 @@ void Core::generateBeginningTurnMat()
 
 void Core::genConvMat()
 {
+    /// Setting Projector coordinate of corners
     vector<Point2f> cornersProj;
     cornersProj.push_back(*list_corner_detected[0]);
     cornersProj.push_back(*list_corner_detected[1]);
     cornersProj.push_back(*list_corner_detected[2]);
     cornersProj.push_back(*list_corner_detected[3]);
+    /// Setting Goban coordinate of corners
     vector<Point2f> cornersGoban;
     cornersGoban.push_back(Point2f(0, 0));
     cornersGoban.push_back(Point2f(GOBAN_SIZE-1, 0));
     cornersGoban.push_back(Point2f(GOBAN_SIZE-1, GOBAN_SIZE-1));
     cornersGoban.push_back(Point2f(0, GOBAN_SIZE-1));
+    /// Setting Camera coordinate of corners
     vector<Point2f> cornersCamera;
     cornersCamera.push_back(*list_corner_markers[0]);
     cornersCamera.push_back(*list_corner_markers[1]);
     cornersCamera.push_back(*list_corner_markers[2]);
     cornersCamera.push_back(*list_corner_markers[3]);
-    vector<Point2f> cornersVirtualGoban;/*
-    cornersVirtualGoban.push_back(Point2f(0, 0));
-    cornersVirtualGoban.push_back(Point2f(210, 0));
-    cornersVirtualGoban.push_back(Point2f(210, 240));
-    cornersVirtualGoban.push_back(Point2f(0, 240));*/
+    /// Setting VirtualGoban coordinate of corners
+    vector<Point2f> cornersVirtualGoban;
     cornersVirtualGoban.push_back(Point2f(10, 10));
     cornersVirtualGoban.push_back(Point2f(190, 10));
     cornersVirtualGoban.push_back(Point2f(190, 190));
     cornersVirtualGoban.push_back(Point2f(10, 190));
 
+    /// Generation of the conversion matrix
     findHomography(cornersCamera, cornersGoban).convertTo(C2G, CV_32F);
     findHomography(cornersGoban, cornersProj).convertTo(G2P, CV_32F);
     findHomography(cornersProj, cornersCamera).convertTo(P2C, CV_32F);
     findHomography(cornersVirtualGoban, cornersProj).convertTo(VG2P, CV_32F);
     findHomography(cornersVirtualGoban, cornersCamera).convertTo(VG2C, CV_32F);
+
 }
 
 void Core::init()
@@ -130,14 +139,45 @@ void Core::init()
     cout<<"Please, put the white window in the projector screen, in fullscreen mode"<<endl<<endl<<"Press any key to continue"<<endl;
     waitKey(0);
 
-    ///Load source image and convert it to gray
-    src = Mat(camera->getFrame());
-    cvtColor(src, src_gray, CV_BGR2GRAY);
-    int i=1;
-    while(list_temp.size()!=CORNER_NUMBER && i<src_gray.rows/15)
+    while(list_temp.size()!=CORNER_NUMBER)
     {
-        list_temp = getFrameCircles(src, i);
-        i++;
+        ///Load source image and convert it to gray
+        src = Mat(camera->getFrame());
+        cvtColor(src, src_gray, CV_BGR2GRAY);
+        int i=1;
+        int max=0;
+        while(list_temp.size()!=CORNER_NUMBER && i<src_gray.rows/15)
+        {
+            list_temp = getFrameCircles(src, i);
+            if(list_temp.size()>max)
+                max=list_temp.size();
+            i++;
+            waitKey(100);
+        }
+        if(list_temp.size()!=4)
+        {
+            string s="";
+            while(s[0]!='n' && s[0]!='o')
+            {
+                cout<<"Only "<<max<<" points are detected. Retry ? (o/n)";
+                cin>>s;
+            }
+            if(s[0]=='n')
+                exit(0);
+            i=1;
+        }
+        if(list_temp.size()==4)
+        {
+            string s="";
+            while(s[0]!='n' && s[0]!='o')
+            {
+                cout<<"Are corners detected good? (o/n)";
+                cin>>s;
+            }
+            if(s[0]=='n')
+                while(list_temp.size()!=0){list_temp.pop_back();}
+            i=1;
+        }
     }
 
 #ifdef COMP_MOD_VERBOSE
@@ -164,104 +204,106 @@ void Core::init()
 #endif // COMP_MOD_NO_INIT
 }
 
-
 void Core::detection()
 {
+    nbrPt=0;
+    #ifndef COMP_MOD_NO_DETECT
+        point_display = new Point2f(*list_corner_markers[nbrPt]);
 
-#ifndef COMP_MOD_NO_DETECT
-    point_display = new Point2f(*list_corner_markers[nbrPt]);
+        namedWindow( "detection circles", CV_WINDOW_AUTOSIZE );
+        proj->draw(PROJ_MOD_DETECTION, point_display->x, point_display->y);
+        cout<<"Detection"<<endl;
+        cout<<"press any key"<<endl;
+        waitKey(0);
+            cout<<"detection"<<endl;
+            do{
+                ///Reloading a picture to detect points displayed
+                src = Mat(camera->getFrame());
+                cvtColor(src, src_gray, CV_BGR2GRAY);
 
-    namedWindow( "detection circles", CV_WINDOW_AUTOSIZE );
-    proj->draw(PROJ_MOD_DETECTION, point_display->x, point_display->y);
-    cout<<"Detection"<<endl;
-    cout<<"press any key"<<endl;
-    waitKey(0);
-        cout<<"detection"<<endl;
-        do{
-            ///Reloading a picture to detect points displayed
-            src = Mat(camera->getFrame());
-            cvtColor(src, src_gray, CV_BGR2GRAY);
+    #ifndef COMP_MOD_VERBOSE
+                imshow( "detection circles", src );
+                cout<<"press any key"<<endl;
+                waitKey(0);
+    #endif // COMP_MOD_VERBOSE
 
-#ifndef COMP_MOD_VERBOSE
-            imshow( "detection circles", src );
-            cout<<"press any key"<<endl;
-            waitKey(0);
-#endif // COMP_MOD_VERBOSE
+                ///Save of the points displayed in a vector
 
-            ///Save of the points displayed in a vector
-
-                waitKey(100);
-                detectCalibPtCirlces();
+                    waitKey(100);
+                    detectCalibPtCirlces();
 
 
-            ///Changing the coordinate of the display points to adapt them to physicals corners
-            if(point_read!=NULL)
-            {
-                if(list_corner_markers[nbrPt]->x-MARGIN_MARKERS_CALIB>=point_read->x)
-                    *point_display += Point2f(pasX, 0);
-                if(list_corner_markers[nbrPt]->x+MARGIN_MARKERS_CALIB<=point_read->x)
-                    *point_display += Point2f(-pasX, 0);
+                ///Changing the coordinate of the display points to adapt them to physicals corners
+                if(point_read!=NULL)
+                {
+                    if(list_corner_markers[nbrPt]->x-MARGIN_MARKERS_CALIB>=point_read->x)
+                        *point_display += Point2f(pasX, 0);
+                    if(list_corner_markers[nbrPt]->x+MARGIN_MARKERS_CALIB<=point_read->x)
+                        *point_display += Point2f(-pasX, 0);
 
-                if(list_corner_markers[nbrPt]->y-MARGIN_MARKERS_CALIB>=point_read->y)
-                    *point_display += Point2f(0, pasY);
-                if(list_corner_markers[nbrPt]->y+MARGIN_MARKERS_CALIB<=point_read->y)
-                    *point_display += Point2f(0, -pasY);
+                    if(list_corner_markers[nbrPt]->y-MARGIN_MARKERS_CALIB>=point_read->y)
+                        *point_display += Point2f(0, pasY);
+                    if(list_corner_markers[nbrPt]->y+MARGIN_MARKERS_CALIB<=point_read->y)
+                        *point_display += Point2f(0, -pasY);
 
-                circle( src, *point_display , 3, Scalar(0,255,0), -1, 8, 0 );
+                    circle( src, *point_display , 3, Scalar(0,255,0), -1, 8, 0 );
 
-            }
-            proj->draw(PROJ_MOD_DETECTION, point_display->x, point_display->y);
+                }
+                proj->draw(PROJ_MOD_DETECTION, point_display->x, point_display->y);
 
-            waitKey(10);
-        }while(nbrPt<CORNER_NUMBER);
-#endif // COMP_MOD_NO_DETECT
-    proj->setCorner(list_corner_detected);
-#ifdef COMP_MOD_VERBOSE
-    for(int i=0; i<list_corner_detected.size(); i++){
-            cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
-    }
-#endif // COMP_MOD_VERBOSE
-
+                waitKey(10);
+            }while(nbrPt<CORNER_NUMBER);
+    #endif // COMP_MOD_NO_DETECT
+        proj->setCorner(list_corner_detected);
+    #ifndef COMP_MOD_VERBOSE
+        for(int i=0; i<list_corner_detected.size(); i++){
+                cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
+        }
+    #endif // COMP_MOD_VERBOSE
 }
-/** Function reordering the point this way : 0 : top left corner, 1 top right corner, 2 bottom right corner, 3 bottom left corner
-  *
-  * @function reorderPoints()
-  **/
+
 vector<Point2f*> Core::reorderPoints(vector<Point2f*>& list_point)
 {
+    /// Creation of the absolute corner of the camera
     vector<Point2f*> list_corner_absolute_camera;
+    Mat mat = camera->getFrame();
+    cout<<"x:"<<mat.cols<<" y :"<<mat.rows<<endl;
     list_corner_absolute_camera.push_back(new Point2f(0, 0));
-    list_corner_absolute_camera.push_back(new Point2f(CAMERA_WIDTH-1, 0));
-    list_corner_absolute_camera.push_back(new Point2f(CAMERA_WIDTH-1, CAMERA_HEIGHT-1));
-    list_corner_absolute_camera.push_back(new Point2f(0, CAMERA_HEIGHT-1));
+    list_corner_absolute_camera.push_back(new Point2f(mat.cols, 0));
+    list_corner_absolute_camera.push_back(new Point2f(mat.cols, mat.rows));
+    list_corner_absolute_camera.push_back(new Point2f(0, mat.rows));
 
     vector<Point2f*> temp = list_point;
     vector<Point2f*> ret;
 
+    /// While points still not ordered
     while(temp.size()>0)
     {
         for(int j=0; j<list_corner_absolute_camera.size(); j++)
         {
+            cout<<"point référence : "<<j<<"x:"<<list_corner_absolute_camera[j]->x<<", y :"<<list_corner_absolute_camera[j]->y<<endl;
             double d = 99999999999;
             int i, index=0;
             for(i=0; i<temp.size(); i++)
             {
+                /// Caculate the distance between the point and a corner
                 Point2f p(temp[i] - list_corner_absolute_camera[j]);
                 double norme = sqrt(pow((temp[i]->x - list_corner_absolute_camera[j]->x), 2)+pow((temp[i]->y - list_corner_absolute_camera[j]->y), 2));
+                cout<<"point num : "<<i<<" distance : "<<norme<<", x :"<<temp[i]->x<<", y :"<<temp[i]->y<<endl;
+                /// If the distance is the minimum, the index of the point is saved
                 if(d>norme){d=norme;index=i;}
             }
+            cout<<"Point choisi"<<index<<endl;
+            /// The nearest point of the corner is added to the list
             ret.push_back(temp[index]);
             temp.erase(temp.begin()+index);
         }
     }
+    // Useful ?
     while(list_point.size()>0){list_point.pop_back();}
     return ret;
 }
 
-/** Function detecting the calibration point displayed throw the projector
-  *
-  * @function detectCalibPt()
-  **/
 void Core::detectCalibPtCirlces()
 {
     vector<Point2f*> list_temp;
@@ -273,8 +315,6 @@ void Core::detectCalibPtCirlces()
     point_read = NULL;
 
     ///Acquisition of the calibration point
-    /*while(point_read==NULL)
-    {*/
         while(list_temp.size()>0){list_temp.pop_back();}
 
         list_temp = getFrameCircles(camera->getFrame(), 0);
@@ -283,21 +323,21 @@ void Core::detectCalibPtCirlces()
         {
             bool flag=true;
             for(int j=0; j<list_corner_markers.size(); j++)
+                /// Testing if the point is one of the corner of the goban
                 if(list_temp[i]->x<list_corner_markers[j]->x+margin_corner &&
                    list_temp[i]->x>list_corner_markers[j]->x-margin_corner &&
                    list_temp[i]->y<list_corner_markers[j]->y+margin_corner &&
                    list_temp[i]->y>list_corner_markers[j]->y-margin_corner)
-                   {
+                {
                     flag = false;
                     break;
-                   }
+                }
             if(flag)
             {
                 point_read = list_temp[i];
                 break;
             }
         }
-    //}
 
     ///Comparison with the old values of the point to ensure that is the same which has moved
     bool newP=false;
@@ -306,7 +346,7 @@ void Core::detectCalibPtCirlces()
            if(point_read->x<p_old->x-2*pasX ||point_read->x>p_old->x+2*pasX || point_read->y<p_old->y-2*pasY ||point_read->y>p_old->y+2*pasY )
             newP = true;
         }
-
+    /// If an new point isdetected or if no point are detected
     if(newP || point_read==NULL)
     {
         nbrPt++;
@@ -314,12 +354,12 @@ void Core::detectCalibPtCirlces()
         list_corner_detected.push_back(point_display);
         if(nbrPt<CORNER_NUMBER)
         point_display = new Point2f(list_corner_markers[nbrPt]->x, list_corner_markers[nbrPt]->y);
-        pasX=50;
-        pasY=50;
+        pasX=100;
+        pasY=100;
     }
     else
     {
-        ///Pas dynamique
+        /// Setting the step
         if(p_old!=NULL)
         {
             while(pasX>=abs(point_read->x-list_corner_markers[nbrPt]->x) && pasX>=margin_corner)
@@ -337,6 +377,7 @@ vector<Point2f*> Core::getCorners()
 
 int Core::imagediff(int player)
 {
+    /// Getting the goban mask coordinates
     cout<<"image difference"<<endl;
     int x0, x1, y0, y1;
 
@@ -360,14 +401,14 @@ int Core::imagediff(int player)
     else
         y1=list_corner_markers[3]->y;
 
-
-    Mat frame1,frame2,maskDraw;
-    Mat maskedFrame1, maskedFrame2; // stores masked Image
+    /// Initialisation of masks
+    Mat frame2,maskDraw;
+    Mat maskedFrame2; // stores masked Image
     Mat test(camera->getFrame());
-    //create black picture
     maskDraw = Mat::zeros(test.size(), test.type());
     maskDraw = cv::Scalar(0, 0, 0);
     rectangle(maskDraw, Point(x0, y0), Point(x1, y1), Scalar(255, 255, 255), -1);
+
     //int key=0;
 
     //bool flag=false;
@@ -463,21 +504,82 @@ int Core::imagediff(int player)
 }
 
 /*
-void Erosion( int, void* )
-{
-  int erosion_type;
-  int erosion_elem = 0;
-  if( erosion_elem == 0 ){ erosion_type = MORPH_RECT; }
-  else if( erosion_elem == 1 ){ erosion_type = MORPH_CROSS; }
-  else if( erosion_elem == 2) { erosion_type = MORPH_ELLIPSE; }
+    /// Difference and mask of he frame
+    Mat frame(camera->getFrame());
+    cout<<"comparing"<<endl;
+    cv::absdiff(beginningTurn, frame, frame2);
+    bitwise_and(frame2, maskDraw,frame2);
 
-  Mat element = getStructuringElement( erosion_type,
-                                       Size( 2*erosion_size + 1, 2*erosion_size+1 ),
-                                       Point( erosion_size, erosion_size ) );
+    #ifndef COMP_MOD_VERBOSE
+    imshow( "verbose", frame2 );
+    cout<<"Press any key to continue."<<endl;
+    waitKey(0);
+    #endif // COMP_MOD_VERBOSE
 
-  /// Apply the erosion operation
-  erode( src2, erosion_dst, element );
-  imshow( "Erosion Demo", erosion_dst );
+    /// Convert it to gray
+    cout<<"Convert it to gray"<<endl;
+    cvtColor( frame2, src_gray, CV_BGR2GRAY );
+
+    #ifndef COMP_MOD_VERBOSE
+    imshow( "verbose", src_gray );
+    cout<<"Press any key to continue."<<endl;
+    waitKey(0);
+    #endif // COMP_MOD_VERBOSE
+
+    /// Reduce the noise so we avoid false circle detection
+    cout<<"blur"<<endl;
+    GaussianBlur( src_gray, src_gray, Size(5,5), 2, 2 );
+
+    #ifndef COMP_MOD_VERBOSE
+    imshow( "verbose", src_gray );
+    cout<<"Press any key to continue."<<endl;
+    waitKey(0);
+    #endif // COMP_MOD_VERBOSE
+
+    /// Get the circles of the frame
+    cout<<"cilcles"<<endl;
+    vector<Vec3f> circles;
+    HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 200, 10, 0, src_gray.rows/18 );
+
+    #ifndef COMP_MOD_VERBOSE
+    /// Draw the circles detected
+    for( size_t i = 0; i < circles.size(); i++ )
+    {
+        Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+        int radius = cvRound(circles[i][2]);
+        circle( frame2, center, 3, Scalar(0,255,0), -1, 8, 0 );
+        circle( frame2, center, radius, Scalar(0,0,255), 3, 8, 0 );
+    }
+    imshow( "verbose", frame2 );
+    cout<<"Press any key to continue."<<endl;
+    #endif // COMP_MOD_VERBOSE
+
+    cout<<"drawing"<<endl;
+    std::vector<cv::Point2f> inPts, outPts;
+    if (circles.size())
+    {
+        inPts.push_back(cv::Point2f(circles[0][0], circles[0][1]));
+        perspectiveTransform(inPts, outPts, C2G);
+        int x=round(outPts[0].x);
+        int y=round(outPts[0].y);
+        proj->draw(PROJ_MOD_STONE, x, y, player);
+        goban->play(x, y, player);
+
+        #ifndef COMP_MOD_VERBOSE
+        cout<<x<<endl;
+        cout<<y<<endl;
+        cout<<"Press any key to continue."<<endl;
+        waitKey(0);
+        #endif // COMP_MOD_VERBOSE
+
+        cout<<"end"<<endl;
+                 return 1;
+    }
+    else
+    {
+        cout<<"no difference"<<endl;
+        return 0;
+    }
 }*/
 
 vector<Point2f*> Core::getFrameCircles(Mat frame, int width)
@@ -489,29 +591,35 @@ vector<Point2f*> Core::getFrameCircles(Mat frame, int width)
     /// Reduce the noise so we avoid false circle detection
     GaussianBlur( src_gray, src_gray, Size(7,7), 3, 3 );
 
+    /// Detection of the circles
     vector<Vec3f> circles;
     HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/18, 200, 10, width, src_gray.rows/18 );
+    cout<<"test"<<circles.size()<<endl;
 
+    Mat frameTemp = frame.clone();
+    //#ifdef COMP_MOD_VERBOSE
     /// Draw the circles detected
     for( size_t i = 0; i < circles.size(); i++ )
     {
       list_center.push_back(new Point2f(cvRound(circles[i][0]), cvRound(circles[i][1])));
-      circle(frame, Point2f(cvRound(circles[i][0]), cvRound(circles[i][1])) , 10,  Scalar(0, 255, 255), 2);
+      circle(frameTemp, Point2f(cvRound(circles[i][0]), cvRound(circles[i][1])) , 10,  Scalar(0, 255, 255), 2);
     }
 
-    imshow( "Circle Detection", frame );
-    //cout<<"Press any key to continue"<<endl;
+    imshow( "Circle Detection", frameTemp );
+    cout<<"Press any key to continue"<<endl;
     //waitKey(0);
+    //#endif // COMP_MOD_VERBOSE
+
     return list_center;
 }
 
 bool Core::detectHand()
 {
-
-    //zone in the projector area
+    ///Zone in the projector area
     int xc_proj, yc_proj;
     xc_proj = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
     yc_proj = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
+
 
 
 
@@ -533,6 +641,28 @@ bool Core::detectHand()
     //inPts.push_back(cv::Point2f(xc_proj, yc_proj));
     //perspectiveTransform(inPts, outPts, P2C);
 
+    /*cout<<"Setting the values"<<endl;
+    int minGray=255;
+    Mat frame(camera->getFrame());
+    cout<<"comparing"<<endl;
+    absdiff( beginningTurn,frame, frame2);
+    bitwise_and(frame2, maskDraw2,frame2);
+    cvtColor( frame2, src_gray, CV_BGR2GRAY );
+    GaussianBlur( src_gray, src_gray, Size(9,9), 3, 3 );
+    imshow("detecthand", src_gray);
+    int val=0;
+    while(val==0 && minGray>=0)
+    {
+        minGray--;
+        val=countNotBlack(src_gray,minGray);
+        cout<<minGray<<" , "<<val<<endl;
+        waitKey(100);
+    }
+    int minPixel = countNotBlack(src_gray,minGray);
+
+    cout<<"minGray"<<minGray<<" minPixel"<<minPixel<<endl;
+    waitKey(0);*/
+
     cout<<"detection de la main"<<endl;
 
 
@@ -545,18 +675,24 @@ bool Core::detectHand()
     //get the horloge size & draw it in white
 //    circle(maskDraw, Point(outPts[0].x, outPts[0].y) , 40*((float)outPts[0].x/xc_proj),  Scalar(255, 255, 255), -1);
 
-    //apply the mask
-    Mat frame(camera->getFrame());
+
+    ///Apply the mask
+    Mat frame = Mat(camera->getFrame());
+    imshow("camera image", frame);
+    imshow("beginning turn", beginningTurn);
     cout<<"comparing"<<endl;
     absdiff( beginningTurn,frame, frame2);
-
-
     bitwise_and(frame2, maskDraw2,frame2);
-imshow("test_diff_hand", frame2);
     cvtColor( frame2, src_gray, CV_BGR2GRAY );
-    GaussianBlur( src_gray, src_gray, Size(9,9), 5, 5 );
-    int test2=countNotBlack(src_gray,230);
-    if (test2>200)
+    GaussianBlur( src_gray, src_gray, Size(5,5), 3, 3 );
+    imshow("manipulate image", src_gray);
+    int test2;
+    for(int i=25; i>0; i--){
+    test2=countNotBlack(src_gray,i*10);
+    cout<<test2<<endl;
+    }
+    waitKey(0);
+    if (test2>150)
     {
         cout<<"yes there is a hand : "<<test2<<endl;
             return true;
@@ -569,18 +705,15 @@ imshow("test_diff_hand", frame2);
 }
 
 
-int Core::countNotBlack(Mat img,int lim){
+int Core::countNotBlack(Mat img,int lim)
+{
     int compt=0;
-  for( int j = 0; j < img.rows ; j++ )
-     { for( int i = 0; i < img.cols; i++ )
-          {
-            if( (int) img.at<float>(j,i) > lim )
-              {
-               compt++;
-              }
-          }
-     }
-     return compt;
+    for(int j=0; j<img.rows; j++)
+        for(int i=0; i<img.cols; i++)
+            if((int)img.at<float>(j,i)>lim)
+                compt++;
+
+    return compt;
 }
 
 

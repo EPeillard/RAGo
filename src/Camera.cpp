@@ -17,7 +17,6 @@ Camera::Camera()
   **/
 Camera::~Camera()
 {
-    delete capture;
 }
 
 IplImage* Camera::getFrame()

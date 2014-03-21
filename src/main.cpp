@@ -51,16 +51,23 @@ int main(int argc, char** argv)
     Core* core = new Core(camera, proj, goban);
 
     core->init();
-    core->detection();
-    core->genConvMat();
 
-    proj->setG2P(core->getG2PMat());
-    proj->setVG2P(core->getVG2PMat());
-    proj->draw(0);
+    string s="";
+    while(s[0]!='o')
+    {
+        cout<<"detect"<<endl;
+        core->detection();
+        core->genConvMat();
+        proj->setG2P(core->getG2PMat());
+        proj->setVG2P(core->getVG2PMat());
+        vg->drawBorders();
+        cout<<"Are cornes and borders displayed well? (o/n)"<<endl;
+        cin>>s;
+        vg->removeBorders();
+    }
     waitKey(1000);
 
     goban->setGoban();
-    vg->drawBorders();
 
 
 
@@ -162,16 +169,17 @@ int main(int argc, char** argv)
 
         case 3 : //help
         {
+            waitKey(100);
+            //proj->draw(4,0,0);
+            vg->drawClock();
             waitKey(10);
-            proj->draw(4,0,0);
             core->generateBeginningTurnMat();
             imshow("verbose",core->beginningTurn);
-            waitKey(100);
+            waitKey(10);
             // ask to put hand in the detection zone
             cout<<"put your hand in the detection zone in red until the red circle gets smaller"<<endl;
             //use a draw method that print put your hand in the clock with an arrow
             int count = 0;
-            vg->drawClock();
             //proj->setCountClock(count);
             while(count<5)
             {

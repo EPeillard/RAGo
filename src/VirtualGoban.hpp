@@ -1,7 +1,6 @@
 #ifndef VIRTUALGOBAN_HPP
 #define VIRTUALGOBAN_HPP
 
-#include <iostream>
 #include "Projector.hpp"
 
 namespace rago{
@@ -26,6 +25,7 @@ public:
     void drawClock();
     void drawClockBorders(int);
     void drawBorders();
+    void removeBorders();
 };
 
 }

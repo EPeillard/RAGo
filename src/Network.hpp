@@ -16,25 +16,19 @@
 #ifndef NETWORK_HPP
 #define NETWORK_HPP
 
-#include <stdio.h>
+//C includes
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <unistd.h>
+#include <string.h>
+
+//C++ includes
 #include <iostream>
 #include <cstdlib>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <strings.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <list>
-#include <vector>
+#include <cstdio>
 
 namespace rago{
 
