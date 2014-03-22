@@ -32,7 +32,7 @@ void Goban::setGoban()
         for(int j=0; j<19; j++)
         {
             tab_stone[i].push_back(new Stone());
-            tab_stone[i][j]->setDraw(i, j, 0);
+            tab_stone[i][j]->setDraw(i, j, PLAYER_NONE);
         }
     }
     clock = new Clock(this->vg);
@@ -75,9 +75,17 @@ void Goban::playTerminal(int player)
 
 void Goban::play(int player, int x, int y)
 {
-    if(x>0 && x<20 && y>0 && y<20)
+    if(x>=0 && x<=19 && y>=0 && y<=19)
     {
         tab_stone[x-1][y-1]->setPlayer(player);
         vg->addStone(player, x, y);
     }
+}
+
+
+bool Goban::isSomething(int x, int y)
+{
+    if(tab_stone[x][y]->getPlayer()!=PLAYER_NONE)
+        return true;
+    return false;
 }

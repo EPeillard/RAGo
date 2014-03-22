@@ -7,13 +7,15 @@
 
 #include "Stone.hpp"
 
+#include "define.hpp"
+
 using namespace rago;
 
 Stone::Stone()
 {
     this->x = 0;
     this->y = 0;
-    this->value = 0;
+    this->value = PLAYER_NONE;
 }
 
 Stone::~Stone()

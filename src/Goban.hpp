@@ -29,6 +29,7 @@ public:
     void setGoban();
     void playTerminal(int);
     void play(int, int, int);
+    bool isSomething(int, int);
 
 private:
     void showAllCorners();

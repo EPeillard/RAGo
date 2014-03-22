@@ -2,6 +2,7 @@
 #define VIRTUALGOBAN_HPP
 
 #include "Projector.hpp"
+#include "define.hpp"
 
 namespace rago{
 
@@ -24,6 +25,7 @@ public:
     void setText(std::string);
     void drawClock();
     void drawClockBorders(int);
+    void removeClockBorders();
     void drawBorders();
     void removeBorders();
 };

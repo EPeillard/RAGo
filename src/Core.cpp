@@ -5,13 +5,13 @@
   **/
 
 ///To avoid to get corner coordinate (camera coordinate)
-#define COMP_MOD_NO_INIT
+//#define COMP_MOD_NO_INIT
 
 ///To avoid to get corner coordinate (projector coordinate)
-#define COMP_MOD_NO_DETECT
+//#define COMP_MOD_NO_DETECT
 
 ///To display all the information
-#define COMP_MOD_VERBOSE
+//#define COMP_MOD_VERBOSE
 
 #include "define.hpp"
 #include "Core.hpp"
@@ -43,20 +43,23 @@ Core::Core(Camera* camera, Projector* proj, Goban* goban)
     pasX = 100;
     pasY = 100;
 
+    minGray=255;
+    minPixel=0;
+
 #ifdef COMP_MOD_NO_INIT
     ///If the init() method is disabled, the corner Camera coordinate are set width the registered values
-    list_corner_markers.push_back(new Point2f(208, 60));
-    list_corner_markers.push_back(new Point2f(526, 52));
-    list_corner_markers.push_back(new Point2f(588, 314));
-    list_corner_markers.push_back(new Point2f(184, 328));
+    list_corner_markers.push_back(new Point2f(172, 142));
+    list_corner_markers.push_back(new Point2f(482, 136));
+    list_corner_markers.push_back(new Point2f(548, 390));
+    list_corner_markers.push_back(new Point2f(144, 404));
 #endif // COMP_MOD_NO_INIT
 
 #ifdef COMP_MOD_NO_DETECT
     ///If the detection() method is disabled, the corner Projector coordinate are set width the registered values
-    list_corner_detected.push_back(new Point2f(102, 158));
-    list_corner_detected.push_back(new Point2f(790, 147));
-    list_corner_detected.push_back(new Point2f(866, 719));
-    list_corner_detected.push_back(new Point2f(58, 742));
+    list_corner_detected.push_back(new Point2f(83, 169));
+    list_corner_detected.push_back(new Point2f(771, 161));
+    list_corner_detected.push_back(new Point2f(848, 720));
+    list_corner_detected.push_back(new Point2f(41, 740));
 #endif // COMP_MOD_NO_DETECT
 
 
@@ -86,7 +89,9 @@ Mat* Core::getC2GMat()
 
 void Core::generateBeginningTurnMat()
 {
-     Mat (camera->getFrame()).copyTo(beginningTurn);
+     cout<<"prise image"<<endl;
+     Mat(camera->getFrame()).copyTo(beginningTurn);
+     cout<<"image prise"<<endl;
 }
 
 void Core::genConvMat()
@@ -111,10 +116,10 @@ void Core::genConvMat()
     cornersCamera.push_back(*list_corner_markers[3]);
     /// Setting VirtualGoban coordinate of corners
     vector<Point2f> cornersVirtualGoban;
-    cornersVirtualGoban.push_back(Point2f(10, 10));
-    cornersVirtualGoban.push_back(Point2f(190, 10));
-    cornersVirtualGoban.push_back(Point2f(190, 190));
-    cornersVirtualGoban.push_back(Point2f(10, 190));
+    cornersVirtualGoban.push_back(Point2f(FULL_VG_PADDING, FULL_VG_PADDING));
+    cornersVirtualGoban.push_back(Point2f(VG_HEIGHT+FULL_VG_PADDING, FULL_VG_PADDING));
+    cornersVirtualGoban.push_back(Point2f(VG_HEIGHT+FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING));
+    cornersVirtualGoban.push_back(Point2f(FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING));
 
     /// Generation of the conversion matrix
     findHomography(cornersCamera, cornersGoban).convertTo(C2G, CV_32F);
@@ -127,17 +132,18 @@ void Core::genConvMat()
 
 void Core::init()
 {
+    ///waiting the conformation of the user to let time to place the window in case of only corner detection
+    cout<<"Please, put the white window in the projector screen, in fullscreen mode"<<endl<<endl<<"Press any key to continue"<<endl;
+    waitKey(0);
+    proj->draw(PROJ_MOD_1 , PROJECTOR_WIDTH, PROJECTOR_HEIGHT);
 #ifndef COMP_MOD_NO_INIT
     vector<Point2f*> list_temp;
-    proj->draw(PROJ_MOD_1 , PROJECTOR_WIDTH, PROJECTOR_HEIGHT);
 
 #ifdef COMP_MOD_VERBOSE
     namedWindow("Verbose mod", CV_WINDOW_AUTOSIZE);
 #endif // COMP_MOD_VERBOSE
 
-    ///waiting the conformation of the user to let time to place the window in case of only corner detection
-    cout<<"Please, put the white window in the projector screen, in fullscreen mode"<<endl<<endl<<"Press any key to continue"<<endl;
-    waitKey(0);
+
 
     while(list_temp.size()!=CORNER_NUMBER)
     {
@@ -221,7 +227,7 @@ void Core::detection()
                 src = Mat(camera->getFrame());
                 cvtColor(src, src_gray, CV_BGR2GRAY);
 
-    #ifndef COMP_MOD_VERBOSE
+    #ifdef COMP_MOD_VERBOSE
                 imshow( "detection circles", src );
                 cout<<"press any key"<<endl;
                 waitKey(0);
@@ -255,23 +261,23 @@ void Core::detection()
             }while(nbrPt<CORNER_NUMBER);
     #endif // COMP_MOD_NO_DETECT
         proj->setCorner(list_corner_detected);
-    #ifndef COMP_MOD_VERBOSE
+    //#ifndef COMP_MOD_VERBOSE
         for(int i=0; i<list_corner_detected.size(); i++){
                 cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
         }
-    #endif // COMP_MOD_VERBOSE
+    //#endif // COMP_MOD_VERBOSE
 }
 
 vector<Point2f*> Core::reorderPoints(vector<Point2f*>& list_point)
 {
     /// Creation of the absolute corner of the camera
     vector<Point2f*> list_corner_absolute_camera;
-    Mat mat = camera->getFrame();
-    cout<<"x:"<<mat.cols<<" y :"<<mat.rows<<endl;
+    Mat* mat = new Mat(camera->getFrame());
+    cout<<"x:"<<mat->cols<<" y :"<<mat->rows<<endl;
     list_corner_absolute_camera.push_back(new Point2f(0, 0));
-    list_corner_absolute_camera.push_back(new Point2f(mat.cols, 0));
-    list_corner_absolute_camera.push_back(new Point2f(mat.cols, mat.rows));
-    list_corner_absolute_camera.push_back(new Point2f(0, mat.rows));
+    list_corner_absolute_camera.push_back(new Point2f(mat->cols, 0));
+    list_corner_absolute_camera.push_back(new Point2f(mat->cols, mat->rows));
+    list_corner_absolute_camera.push_back(new Point2f(0, mat->rows));
 
     vector<Point2f*> temp = list_point;
     vector<Point2f*> ret;
@@ -378,7 +384,7 @@ vector<Point2f*> Core::getCorners()
 int Core::imagediff(int player)
 {
     /// Getting the goban mask coordinates
-    cout<<"image difference"<<endl;
+    /*cout<<"image difference"<<endl;
     int x0, x1, y0, y1;
 
     if(list_corner_markers[0]->x>list_corner_markers[3]->x)
@@ -399,15 +405,28 @@ int Core::imagediff(int player)
     if(list_corner_markers[2]->y>list_corner_markers[3]->y)
         y1=list_corner_markers[2]->y;
     else
-        y1=list_corner_markers[3]->y;
+        y1=list_corner_markers[3]->y;*/
+
+    Mat frame2,maskDraw,maskDraw2;
+    maskDraw = Mat::zeros(FULL_VG_HEIGHT, FULL_VG_HEIGHT, CV_8UC3);
+    maskDraw = cv::Scalar(0, 0, 0);
+        Mat test(camera->getFrame());
+    maskDraw2 = Mat::zeros(test.size(), test.type());
+
+    //get the horloge size & draw it in white
+    Rect cache = Rect(0, 0, FULL_VG_HEIGHT,FULL_VG_HEIGHT);
+    rectangle(maskDraw,cache , Scalar(255, 255, 255), -1);
+    cv::warpPerspective(maskDraw, maskDraw2, VG2C, maskDraw2.size());
+    imshow("mask", maskDraw2);
+    waitKey(0);
 
     /// Initialisation of masks
-    Mat frame2,maskDraw;
+    /*Mat frame2,maskDraw;
     Mat maskedFrame2; // stores masked Image
     Mat test(camera->getFrame());
     maskDraw = Mat::zeros(test.size(), test.type());
     maskDraw = cv::Scalar(0, 0, 0);
-    rectangle(maskDraw, Point(x0, y0), Point(x1, y1), Scalar(255, 255, 255), -1);
+    rectangle(maskDraw, Point(x0, y0), Point(x1, y1), Scalar(255, 255, 255), -1);*/
 
     //int key=0;
 
@@ -422,10 +441,38 @@ int Core::imagediff(int player)
             key = 0;
         }*/
         //if(key =='x'){
-            Mat frame(camera->getFrame());
+            frame2 = Mat(camera->getFrame());
             cout<<"comparing"<<endl;
-            cv::absdiff(beginningTurn, frame, frame2);
-            bitwise_and(frame2, maskDraw,frame2);
+/*
+            bitwise_and(frame, maskDraw,frame);
+
+            vector<Point2f*> list_temp;
+            list_temp = getFrameCircles(frame, 0);
+            if(list_temp.size()!=0)
+            {
+
+                for(int i=0; i<list_temp.size(); i++)
+                {
+                    std::vector<cv::Point2f> inPts, outPts;
+                    inPts.push_back(cv::Point2f(list_temp[i]->x, list_temp[i]->y));
+                    perspectiveTransform(inPts, outPts, C2G);
+                    int x=round(outPts[0].x);
+                    int y=round(outPts[0].y);
+                    cout<<x<<endl;
+                    cout<<y<<endl;
+                    if(goban->isSomething(x, y))
+                    {
+                        goban->play(player, x, y);
+                        break;
+                    }
+                }
+
+            }*/
+
+
+            cv::absdiff(beginningTurn, frame2, frame2);
+            cout<<"bitwise"<<endl;
+            bitwise_and(frame2, maskDraw2,frame2);
             //cv::imshow("difference ",frame2);
             //src2 = frame2;
         //}
@@ -440,29 +487,53 @@ int Core::imagediff(int player)
 
   /// Reduce the noise so we avoid false circle detection
             cout<<"blur"<<endl;
-            GaussianBlur( src_gray, src_gray, Size(5,5), 2, 2 );
+            //GaussianBlur( src_gray, src_gray, Size(1,1), 1, 1 );
             //imshow( "Hough Circle Transform Demo", src_gray );
             //waitKey(0);
             cout<<"cilcles"<<endl;
             vector<Vec3f> circles;
+            Mat element = getStructuringElement(MORPH_ELLIPSE, Size(5, 5), Point(2, 2));
+            cout<<"erosion"<<endl;
+            erode(frame2, frame2, element);
+            double alpha = 3;
+            int beta = 20;
+            //Mat frame3 = Mat::zeros(frame2.size(), frame2.type());
+            /*for(int y=0; y<frame2.rows; y++)
+            {
+                for(int x=0; x < frame2.cols; x++)
+                {
+                    for(int c=0; c<3; c++)
+                    {
+                        frame3.at<Vec3b>(x, y)[c] = saturate_cast<uchar>(alpha*(frame2.at<Vec3b>(x, y)[c])+beta);
+                    }
+                }
+            }*/
+            frame2.convertTo(frame2, -1, alpha, beta);
+            cout<<"cvt"<<endl;
+            cvtColor( frame2, src_gray, CV_BGR2GRAY );
+            cout<<"haought"<<endl;
             HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 200, 10, 0, src_gray.rows/18 );
 
             /// Draw the circles detected
-            /*for( size_t i = 0; i < circles.size(); i++ )
+            for( size_t i = 0; i < circles.size(); i++ )
             {
               Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
               int radius = cvRound(circles[i][2]);
               // circle center
-              //circle( frame2, center, 3, Scalar(0,255,0), -1, 8, 0 );
+              circle( frame2, center, 3, Scalar(0,255,0), -1, 8, 0 );
+              circle( src_gray, center, 3, Scalar(0,255,0), -1, 8, 0 );
               // circle outline
-              //circle( frame2, center, radius, Scalar(0,0,255), 3, 8, 0 );
-            }*/
+              circle( frame2, center, radius, Scalar(0,0,255), 3, 8, 0 );
+              circle( src_gray, center, radius, Scalar(0,0,255), 3, 8, 0 );
+            }
 
             /// Show your results
-            //imshow( "Hough Circle Transform Demo", frame2 );
+            imshow( "Hough Circle Transform Demo", frame2 );
+            imshow( "Hough Circle Transform Demo2", src_gray );
+            waitKey(0);
             cout<<"drawing"<<endl;
             std::vector<cv::Point2f> inPts, outPts;
-            if (circles.size())
+            if (circles.size()!=0)
             {
             inPts.push_back(cv::Point2f(circles[0][0], circles[0][1]));
 
@@ -470,20 +541,17 @@ int Core::imagediff(int player)
                     //cout<<outPts.size()<<endl;
                     //cout<<"x:"<<outPts[0].x<<  "y:"<<outPts[0].y<<endl;
 
-
-
                     int x=round(outPts[0].x);
                     int y=round(outPts[0].y);
-                    x++;
-                    y++;
-                    //cout<<x<<endl;
-                    //cout<<y<<endl;
+                    cout<<x<<endl;
+                    cout<<y<<endl;
                     //proj->draw(PROJ_MOD_STONE, x, y, player);
                     goban->play(player, x, y);
-                    goban->play(0, x-1, y);
-                    goban->play(0, x+1, y);
-                    goban->play(0, x, y+1);
-                    goban->play(0, x, y-1);
+                    waitKey(10);
+                    goban->play(PLAYER_BLACK, x-1, y);
+                    goban->play(PLAYER_BLACK, x+1, y);
+                    goban->play(PLAYER_BLACK, x, y+1);
+                    goban->play(PLAYER_BLACK, x, y-1);
                     //flag=true;
                     //cout<<"press any key"<<endl;
                     //waitKey(0);
@@ -616,24 +684,21 @@ vector<Point2f*> Core::getFrameCircles(Mat frame, int width)
 bool Core::detectHand()
 {
     ///Zone in the projector area
-    int xc_proj, yc_proj;
+    /*int xc_proj, yc_proj;
     xc_proj = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
-    yc_proj = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
+    yc_proj = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;*/
 
-
-
-
-    int xc_vg, yc_vg;
+    /*int xc_vg, yc_vg;
     xc_vg = 225;
-    yc_vg = 105;
+    yc_vg = 105;*/
     Mat frame2,maskDraw,maskDraw2;
-    maskDraw = Mat::zeros(210, 240, CV_8UC3);
+    maskDraw = Mat::zeros(FULL_VG_HEIGHT, FULL_VG_WIDTH, CV_8UC3);
     maskDraw = cv::Scalar(0, 0, 0);
         Mat test(camera->getFrame());
     maskDraw2 = Mat::zeros(test.size(), test.type());
 
     //get the horloge size & draw it in white
-    circle(maskDraw, Point(xc_vg, yc_vg) , 10,  Scalar(255, 255, 255), -1);
+    circle(maskDraw, Point(CLOCK_CENTER_X, CLOCK_CENTER_Y) , CLOCK_SIZE,  Scalar(255, 255, 255), -1);
     cv::warpPerspective(maskDraw, maskDraw2, VG2C, maskDraw2.size());
 
     //zone in the camera
@@ -678,21 +743,21 @@ bool Core::detectHand()
 
     ///Apply the mask
     Mat frame = Mat(camera->getFrame());
-    imshow("camera image", frame);
-    imshow("beginning turn", beginningTurn);
+    //imshow("camera image", frame);
+    //imshow("beginning turn", beginningTurn);
     cout<<"comparing"<<endl;
     absdiff( beginningTurn,frame, frame2);
     bitwise_and(frame2, maskDraw2,frame2);
     cvtColor( frame2, src_gray, CV_BGR2GRAY );
     GaussianBlur( src_gray, src_gray, Size(5,5), 3, 3 );
-    imshow("manipulate image", src_gray);
+    //imshow("manipulate image", src_gray);
     int test2;
-    for(int i=25; i>0; i--){
+    /*for(int i=25; i>0; i--){
     test2=countNotBlack(src_gray,i*10);
     cout<<test2<<endl;
-    }
-    waitKey(0);
-    if (test2>150)
+    }*/
+    test2=countNotBlack(src_gray,minGray);
+    if (test2>minPixel)
     {
         cout<<"yes there is a hand : "<<test2<<endl;
             return true;
@@ -702,6 +767,54 @@ bool Core::detectHand()
         cout<<"nope sorry : "<<test2<<endl;
         return false;
     }
+    waitKey(0);
+}
+
+bool Core::detectHandParam()
+{
+    ///Zone in the projector area
+    /*int xc_proj, yc_proj;
+    xc_proj = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
+    yc_proj = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;*/
+
+    /*int xc_vg, yc_vg;
+    xc_vg = 225;
+    yc_vg = 105;*/
+    Mat frame2,maskDraw,maskDraw2;
+    maskDraw = Mat::zeros(FULL_VG_HEIGHT, FULL_VG_WIDTH, CV_8UC3);
+    maskDraw = cv::Scalar(0, 0, 0);
+    Mat test(camera->getFrame());
+    maskDraw2 = Mat::zeros(test.size(), test.type());
+
+    //get the horloge size & draw it in white
+    circle(maskDraw, Point(CLOCK_CENTER_X, CLOCK_CENTER_Y) , CLOCK_SIZE,  Scalar(255, 255, 255), -1);
+    //imshow("VirtualGoban", maskDraw2);
+    //waitKey(0);
+    cv::warpPerspective(maskDraw, maskDraw2, VG2C, maskDraw2.size());
+    cout<<"detection des paramètres"<<endl;
+
+    //imshow("camera image", maskDraw2);
+    //waitKey(0);
+    ///Apply the mask
+    Mat frame = Mat(camera->getFrame());
+    imshow("camera image", frame);
+    imshow("beginning turn", beginningTurn);
+    absdiff( beginningTurn,frame, frame2);
+    bitwise_and(frame2, maskDraw2,frame2);
+    cvtColor( frame2, src_gray, CV_BGR2GRAY );
+    GaussianBlur( src_gray, src_gray, Size(5,5), 3, 3 );
+    imshow("manipulate image", src_gray);
+    int test2;
+    int i;
+    for(i=255; i>0; i--){
+        test2=countNotBlack(src_gray,i);
+        //cout<<i<<", "<<test2<<endl;
+        if(test2!=0)
+            break;
+    }
+    minGray=i;
+    minPixel=test2+10;
+    cout<<endl<<i<<", "<<test2<<endl;
 }
 
 

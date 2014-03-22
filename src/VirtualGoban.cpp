@@ -5,10 +5,11 @@ using namespace rago;
 VirtualGoban::VirtualGoban(Projector* proj)
 {
     this->proj = proj;
-    matDraw = Mat(Mat::zeros(210, 240, CV_8UC3));
+    matDraw = Mat(Mat::zeros(FULL_VG_HEIGHT, FULL_VG_WIDTH, CV_8UC3));
     matDraw = cv::Scalar(0, 0, 0);
-    Rect cache = Rect(5, 5, 195, 195);
-    rectangle(matDraw,cache , Scalar(203, 214, 218), -1);
+    Rect cache = Rect(VG_PADDING, VG_PADDING, VG_HEIGHT+FULL_VG_PADDING+VG_PADDING, VG_WIDTH+FULL_VG_PADDING+VG_PADDING);
+    rectangle(matDraw,cache , Scalar(137, 134, 208), -1);
+    namedWindow( "VirtualGoban", CV_WINDOW_FREERATIO );
 }
 
 VirtualGoban::~VirtualGoban(){}
@@ -23,14 +24,14 @@ void VirtualGoban::draw()
 void VirtualGoban::addStone(int color, int x, int y)
 {
     std::cout<<"addstone "<<color<<std::endl;
-    if(color == 0)
+    if(color == PLAYER_WHITE)
     {
-        circle(matDraw, Point(10*x, 10*y), 4,  Scalar(255, 255, 255), -1);
+        circle(matDraw, Point(FULL_VG_PADDING+RATIO_G_VG*x, FULL_VG_PADDING+RATIO_G_VG*y), STONE_SIZE,  Scalar(255, 255, 255), -1);
         std::cout<<"white"<<std::endl;
     }
-    if(color == 1)
+    if(color == PLAYER_BLACK)
     {
-        circle(matDraw, Point(10*x, 10*y), 5,  Scalar(255, 255, 255), 1);
+        circle(matDraw, Point(FULL_VG_PADDING+RATIO_G_VG*x, FULL_VG_PADDING+RATIO_G_VG*y), STONE_BORDER_SIZE,  Scalar(255, 255, 255), STONE_BORDER_SIZE-STONE_SIZE);
         std::cout<<"black"<<std::endl;
     }
 
@@ -40,15 +41,15 @@ void VirtualGoban::addStone(int color, int x, int y)
 
 void VirtualGoban::drawBorders()
 {
-    circle(matDraw, Point(10, 10), 5,  Scalar(0, 0, 255), 1);
-    circle(matDraw, Point(190, 10), 5,  Scalar(0, 0, 255), 1);
-    circle(matDraw, Point(190, 190), 5,  Scalar(0, 0, 255), 1);
-    circle(matDraw, Point(10, 190), 5,  Scalar(0, 0, 255), 1);
+    circle(matDraw, Point(FULL_VG_PADDING, FULL_VG_PADDING), STONE_SIZE,  Scalar(0, 0, 255), 5);
+    circle(matDraw, Point(VG_HEIGHT+FULL_VG_PADDING, FULL_VG_PADDING), STONE_SIZE,  Scalar(0, 0, 255), 5);
+    circle(matDraw, Point(VG_HEIGHT+FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING), STONE_SIZE,  Scalar(0, 0, 255), 5);
+    circle(matDraw, Point(FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING), STONE_SIZE,  Scalar(0, 0, 255), 5);
 
-    line( matDraw, Point(10, 10), Point(190, 10), Scalar(0,0,255), 1);
-    line( matDraw, Point(190, 10), Point(190, 190), Scalar(0,0,255), 1);
-    line( matDraw, Point(190, 190), Point(10, 190), Scalar(0,0,255), 1);
-    line( matDraw, Point(10, 190), Point(10, 10), Scalar(0,0,255), 1);
+    line( matDraw, Point(FULL_VG_PADDING, FULL_VG_PADDING), Point(VG_HEIGHT+FULL_VG_PADDING, FULL_VG_PADDING), Scalar(0,0,255), 5);
+    line( matDraw, Point(VG_HEIGHT+FULL_VG_PADDING, FULL_VG_PADDING), Point(VG_HEIGHT+FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING), Scalar(0,0,255), 5);
+    line( matDraw, Point(VG_HEIGHT+FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING), Point(FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING), Scalar(0,0,255), 5);
+    line( matDraw, Point(FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING), Point(FULL_VG_PADDING, FULL_VG_PADDING), Scalar(0,0,255), 5);
 
     imshow("VirtualGoban", matDraw);
     draw();
@@ -57,8 +58,8 @@ void VirtualGoban::drawBorders()
 void VirtualGoban::removeBorders()
 {
     matDraw = cv::Scalar(0, 0, 0);
-    Rect cache = Rect(5, 5, 195, 195);
-    rectangle(matDraw,cache , Scalar(203, 214, 218), -1);
+    Rect cache = Rect(VG_PADDING, VG_PADDING, VG_HEIGHT+FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING);
+    rectangle(matDraw,cache , Scalar(137, 134, 208), -1);
     imshow("VirtualGoban", matDraw);
     draw();
 }
@@ -68,114 +69,22 @@ void VirtualGoban::setClock2(int){};
 void VirtualGoban::setText(std::string){};
 void VirtualGoban::drawClock()
 {
-    circle(matDraw, Point(215, 105) , 19,  Scalar(150, 150, 150), -1);
+    circle(matDraw, Point(CLOCK_CENTER_X, CLOCK_CENTER_Y) , CLOCK_SIZE,  Scalar(150, 150, 150), -1);
     imshow("VirtualGoban", matDraw);
     draw();
 }
 
 void VirtualGoban::drawClockBorders(int val)
 {
-    circle(matDraw, Point(225, 50) , 20,  Scalar(0, 0, 0), 2);
-    circle(matDraw, Point(225, 50) , 10+val*2,  Scalar(0, 0, 200), 2);
+    circle(matDraw, Point(CLOCK_CENTER_X, CIRCLE_CENTER_Y) , CLOCK_SIZE,  Scalar(0, 0, 0), -1);
+    circle(matDraw, Point(CLOCK_CENTER_X, CIRCLE_CENTER_Y) , CLOCK_SIZE-(val)*20,  Scalar(0, 0, 200), CIRCLE_WIDTH);
     imshow("VirtualGoban", matDraw);
     draw();
 }
-/*
-    case 4: //detection zone
-    {
-        int xc, yc, yc1, yc2;
-        xc = (list_corner_detected[1]->x + list_corner_detected[2]->x)/2 +20 + 80;
-        yc = (list_corner_detected[1]->y + list_corner_detected[2]->y)/2;
-        yc1 = 100;
-        yc2 = 500 ;
 
-
-        circle(matDraw, Point(xc, yc) , 45,  Scalar(0, 0, 200), 2);
-
-        if (this->countClock>0)
-        {
-            circle(matDraw, Point(xc, yc) , 65-4*countClock+1,  Scalar(203, 214, 218), 10);
-            circle(matDraw, Point(xc, yc) , 65-4*countClock,  Scalar(0, 0, 200),2);
-
-        }
-        else
-        {
-            circle(matDraw, Point(xc, yc) , 55,  Scalar(203, 214, 218), 20);
-        }
-
-        break;
-    }
-    case 5: //information for the player turn
-    {
-
-
-        int xc, yc, yc1, yc2;
-        xc = (list_corner_detected[0]->x + list_corner_detected[1]->x)/2-(list_corner_detected[0]->x+list_corner_detected[1]->x)/4;
-        yc = (list_corner_detected[0]->y + list_corner_detected[1]->y)/2-5;
-        int dirx, diry ;
-        dirx = list_corner_detected[1]->x - list_corner_detected[0]->x;
-        diry = list_corner_detected[1]->y - list_corner_detected[0]->y;
-        yc1 = 100;
-        yc2 = 500 ;
-
-        Rect cache = Rect(xc, yc-12, 300, 15);
-        // Mat rot_mat = cv::getRotationMatrix2D(Point(xc, yc-12), atan(diry/dirx), 1);
-
-        rectangle(matDraw,cache , Scalar(203, 214, 218), -1);
-        int fontFace =  FONT_HERSHEY_SIMPLEX;
-        double fontScale = 0.5;
-        int thickness = 1;
-
-        String mess = "A vous de jouer !";
-
-
-        int length = mess.size();
-        for (int k =0 ; k<length ; k++)
-        {
-            std::stringstream s;
-            s << mess[k]  ;
-            Point textOrg(xc + 10*k*dirx/(sqrt(dirx*dirx + diry*diry)), yc + 10*k*diry/(sqrt(dirx*dirx + diry*diry)));
-            putText(matDraw, s.str(), textOrg, fontFace, fontScale, Scalar::all(0), thickness,8);
-        }
-
-        break;
-    }
-       case 6: //information for the player turn ordinateur //TODO meger with the precedent part by adding a number for each player
-        {
-
-
-        int xc, yc, yc1, yc2;
-        xc = (list_corner_detected[0]->x + list_corner_detected[1]->x)/2-(list_corner_detected[0]->x+list_corner_detected[1]->x)/4;
-        yc = (list_corner_detected[0]->y + list_corner_detected[1]->y)/2-5;
-        int dirx, diry ;
-        dirx = list_corner_detected[1]->x - list_corner_detected[0]->x;
-        diry = list_corner_detected[1]->y - list_corner_detected[0]->y;
-        yc1 = 100;
-        yc2 = 500 ;
-
-        Rect cache = Rect(xc, yc-12, 300, 15);
-        // Mat rot_mat = cv::getRotationMatrix2D(Point(xc, yc-12), atan(diry/dirx), 1);
-
-        rectangle(matDraw,cache , Scalar(203, 214, 218), -1);
-        int fontFace =  FONT_HERSHEY_SIMPLEX;
-        double fontScale = 0.5;
-        int thickness = 1;
-
-        String mess = "Attendez, l'ordinateur joue";
-
-
-        int length = mess.size();
-        for (int k =0 ; k<length ; k++)
-        {
-            std::stringstream s;
-            s << mess[k]  ;
-            Point textOrg(xc + 10*k*dirx/(sqrt(dirx*dirx + diry*diry)), yc + 10*k*diry/(sqrt(dirx*dirx + diry*diry)));
-            putText(matDraw, s.str(), textOrg, fontFace, fontScale, Scalar::all(0), thickness,8);
-        }
-
-        break;
-    }
-
-
-    }
-    */
+void VirtualGoban::removeClockBorders()
+{
+    circle(matDraw, Point(CLOCK_CENTER_X, CIRCLE_CENTER_Y) , CLOCK_SIZE,  Scalar(0, 0, 0), -1);
+    imshow("VirtualGoban", matDraw);
+    draw();
+}

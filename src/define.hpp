@@ -35,3 +35,25 @@
 #define PROJ_MOD_STONE 3
 ///Projector mod drawing the clock
 #define PROJ_MOD_CLOCK 4
+
+#define FULL_VG_HEIGHT 2100
+#define FULL_VG_WIDTH 2400
+#define VG_WIDTH 1800
+#define VG_HEIGHT 1800
+#define FULL_VG_PADDING 100
+#define VG_PADDING 50
+
+#define STONE_SIZE 40
+
+#define CLOCK_CENTER_X 2200
+#define CLOCK_CENTER_Y 1050
+#define CIRCLE_CENTER_Y 525
+#define CLOCK_SIZE 150
+#define CIRCLE_WIDTH 20
+
+#define RATIO_G_VG 100
+#define STONE_BORDER_SIZE 45
+
+#define PLAYER_NONE 0
+#define PLAYER_WHITE 1
+#define PLAYER_BLACK 2

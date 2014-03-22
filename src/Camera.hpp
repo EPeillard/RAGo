@@ -21,6 +21,9 @@ public:
     IplImage* getFrame();
     void close();
 
+    void genYML(int, char**);
+    Mat corection(IplImage);
+
 private:
     CvCapture* capture;
 

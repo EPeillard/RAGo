@@ -123,6 +123,8 @@ public:
     **/
     bool detectHand();
 
+    bool detectHandParam();
+
     /**\brief TODO
     **/
     int countNotBlack(Mat img, int lim);
@@ -212,6 +214,9 @@ private:
     **/
     Mat VG2P;
     Mat VG2C;
+
+    int minGray;
+    int minPixel;
 
     /**\brief Camera object of the project
     **/
