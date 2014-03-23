@@ -64,25 +64,4 @@ double Clock::getCurrentTime(){
     return (double) tpsStop/CLOCKS_PER_SEC;
 }
 
-void Clock::printCurrentTime(double tps){
 
-        Mat matDraw;
-//modification with virtiualGoban
-    //matDraw = this->proj->matDraw;
-
-    std::stringstream s;
-    s << "temps actuel" ;
-    s << tps;
-
-    int fontFace =  FONT_HERSHEY_SIMPLEX;
-    double fontScale = 0.5;
-    int thickness = 1;
-    Point textOrg(10, 10);
-
-    rectangle(matDraw, Rect(0, 0, 800, 20), Scalar(255, 0, 0), -1);
-    putText(matDraw, s.str(), textOrg, fontFace, fontScale, Scalar::all(0), thickness,8);
-
-    imshow("detection", matDraw);
-    waitKey(10);
-
-}

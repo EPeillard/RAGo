@@ -28,6 +28,7 @@ public:
     void removeClockBorders();
     void drawBorders();
     void removeBorders();
+void remove(int x, int y);
 };
 
 }

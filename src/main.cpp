@@ -18,7 +18,7 @@
 
 #include <string.h>
 
-
+#include <sys/time.h>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -35,7 +35,10 @@ using namespace std;
 
 /** @function main */
 void initGame(VirtualGoban* vg, Core *core);
-void playerTurn(VirtualGoban* vg, Core *core, Projector* proj);
+void playerTurn(VirtualGoban* vg, Core *core, Projector* proj, bool);
+void infoNetwork(Goban* goban, VirtualGoban* vg);
+
+void sendNetwork(int x, int y);
 
 int main(int argc, char** argv)
 {
@@ -80,65 +83,82 @@ int main(int argc, char** argv)
     while(true)
     {
         cout<<"What do you want to do with RAGo ?"<<endl;
-        cout<<"1 - play Go"<<endl;
-        cout<<"2 - watch Go"<<endl;
-        cout<<"3 - help me I'm lost"<<endl;
+        cout<<"1 - try Go"<<endl;
+        cout<<"2 - play Go on the web"<<endl;
+        cout<<"3 - watch Go"<<endl;
+        cout<<"4- help me I'm lost"<<endl;
 
         int mode;
         cin>>mode;
 
         switch(mode)
         {
-        case 1: //play
+        case 1: //play against the computer (no time)
         {
-            for(int i=0; i<10; i++)
+
+            infoNetwork(goban, vg);
+            sendNetwork(-1, -1);
+            initGame(vg, core);
+            vg->drawClock();
+            playerTurn(vg, core, proj, true);
+            while(1)
             {
+                infoNetwork(goban, vg);
+                infoNetwork(goban, vg);
+                sendNetwork(-1, -1);
                 initGame(vg, core);
 
                 //the human player put a stone on the goban
                 //we wait that he put his hand in the clock
-                int count = 0;
                 vg->drawClock();
-                //proj->setCountClock(count);
-               playerTurn(vg, core, proj);
-            }
-            break;
-        }
-        case 2 : //watch
-        {
-            std::cout<<"network"<<std::endl;
-            while(1)
-            {
-                Network net("127.0.0.1", 5001);
-                net.connexion();
-                std::string str = net.getInfo();
-                std::cout<<"result : "<<str<<std::endl;
-                if(std::atoi(str.substr(0, 2).c_str())==11)
-                {
-                    int x, y;
-                    int color = std::atoi(str.substr(3, 4).c_str());
-                    if(str[6]==',')
-                    {
-                        x=std::atoi(str.substr(5, 6).c_str());
-                        y=std::atoi(str.substr(7).c_str());
-                    }
-                    else{
-                        x=std::atoi(str.substr(5, 7).c_str());
-                        y=std::atoi(str.substr(8).c_str());
-                    }
-                    std::cout<<color<<","<<x<<","<<y<<std::endl;
-                    goban->play(color, x, y);
-                }
-                else
-                {
-                    std::cout<<"not a move"<<std::endl;
-                }
-                waitKey(10);
+
+                playerTurn(vg, core, proj, true);
+                infoNetwork(goban, vg);
             }
             break;
         }
 
-        case 3 : //help
+        case 2 : //play go with the server
+        {
+            cout<<"Enter your color : 1 for white, 2 for black"<<endl;
+            int player;
+            do
+            {
+                cin>>player;
+            }while(player!=PLAYER_BLACK && player!=PLAYER_WHITE);
+            if(player==PLAYER_WHITE)
+            {
+                infoNetwork(goban, vg);
+                infoNetwork(goban, vg);
+            }
+            while(1)
+            {
+                infoNetwork(goban, vg);
+                sendNetwork(-1, -1);
+                initGame(vg, core);
+                int count = 0;
+                vg->drawClock();
+                playerTurn(vg, core, proj, true);
+
+                infoNetwork(goban, vg);
+                infoNetwork(goban, vg);
+                infoNetwork(goban, vg);
+            }
+            break;
+        }
+
+
+        case 3 : //watch
+        {
+            while(1)
+            {
+                infoNetwork(goban, vg);
+            }
+
+            break;
+        }
+
+        case 4 : //help
         {
             initGame(vg, core);
             // ask to put hand in the detection zone
@@ -179,7 +199,7 @@ int main(int argc, char** argv)
             //ask to put a stone on the goban and put the hand in the detection zone
             cout<<"now put a stone on the goban and validate with your hand"<<endl;
 
-            playerTurn(vg, core, proj);
+            playerTurn(vg, core, proj, false);
 
             //ask to put a stone on the goban and validate it in the zone, draw the neighboors in 4-connexity
 break;
@@ -214,20 +234,15 @@ break;
 void initGame(VirtualGoban* vg, Core *core)
 {
     waitKey(100);
-    //proj->draw(4,0,0);
     vg->drawClock();
     waitKey(10);
     core->generateBeginningTurnMat();
-    waitKey(0);
-    cout<<"je bug ici"<<endl;
-    imshow("verbose",core->beginningTurn);
-     cout<<"tu vois"<<endl;
     waitKey(10);
     core->detectHandParam();
     waitKey(100);
 }
 
-void playerTurn(VirtualGoban* vg, Core *core, Projector* proj)
+void playerTurn(VirtualGoban* vg, Core *core, Projector* proj, bool network)
 {
     //ask to put a stone on the goban and put the hand in the detection zone
             cout<<"now put a stone on the goban and validate with your hand"<<endl;
@@ -260,11 +275,114 @@ void playerTurn(VirtualGoban* vg, Core *core, Projector* proj)
                 int essai=0;
                 while(essai<4)
                 {
-                    if(core->imagediff(PLAYER_WHITE)==1)
+                    essai++;
+                    int *val = core->imagediff(PLAYER_WHITE);
+                    if(val[0]!=-1)
                     {
-                        cout<<"essai"<<endl;
-                        isStone = true;
+                        int x = val[0];
+                        int y = val[1];
+                        if(x>=1 && x<=19 && y>=1 && y<=19)
+                        {
+                            cout<<"essai"<<endl;
+                            isStone = true;
+                            if(network)
+                            {
+                                //sendNetwork(x, y);
+                                cout<<"client"<<endl;
+                                sendNetwork(x, y);
+                                sendNetwork(x, y);
+                            }
+                            cout<<"quit"<<endl;
+                            break;
+                        }
                     }
                 }
             }
+}
+
+void sendNetwork(int x, int y)
+{
+    Network net("127.0.0.1", 5001);
+    net.connexion();
+    stringstream s_x, s_y;
+    if(x<10)
+        s_x<<"0"<<x;
+    else
+        s_x<<x;
+    if(y<10)
+        s_y<<"0"<<y;
+    else
+        s_y<<y;
+    string s = s_x.str()+","+s_y.str();
+    cout<<s<<endl;
+    net.sendRequest(12, s);
+}
+
+
+void infoNetwork(Goban* goban, VirtualGoban* vg)
+{
+        Network net("127.0.0.1", 5001);
+        net.connexion();
+        std::string str = net.getInfo();
+        std::cout<<"result : "<<str<<std::endl;
+        switch(std::atoi(str.substr(0, 2).c_str()))
+        {
+           case 11 :
+            {
+                int x, y;
+                int color = std::atoi(str.substr(3, 4).c_str());
+                if(str[6]==',')
+                {
+                    x=std::atoi(str.substr(5, 6).c_str());
+                    y=std::atoi(str.substr(7).c_str());
+                }
+                else{
+                    x=std::atoi(str.substr(5, 7).c_str());
+                    y=std::atoi(str.substr(8).c_str());
+                }
+                std::cout<<color<<","<<x<<","<<y<<std::endl;
+                goban->play(color, x, y);
+                break;
+            }
+            case 21 :
+            {
+                int time = std::atoi(str.substr(3).c_str());
+                vg->setClock1(time);
+                break;
+            }
+            case 22 :
+            {
+                int time = std::atoi(str.substr(3).c_str());
+                vg->setClock2(time);
+                break;
+            }
+            case 31 :
+            {
+                if(str!="")
+                {
+                    int x, y;
+                    int color = std::atoi(str.substr(3, 4).c_str());
+                    if(str[6]==',')
+                    {
+                        x=std::atoi(str.substr(5, 6).c_str());
+                        y=std::atoi(str.substr(7).c_str());
+                    }
+                    else{
+                        x=std::atoi(str.substr(5, 7).c_str());
+                        y=std::atoi(str.substr(8).c_str());
+                    }
+                    std::cout<<color<<","<<x<<","<<y<<std::endl;
+                    goban->remove(color, x, y);
+
+                }
+                break;
+            }
+            default :
+            {
+                std::cout<<"not a move"<<std::endl;
+                break;
+            }
+        }
+
+        waitKey(10);
 }

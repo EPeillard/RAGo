@@ -30,6 +30,9 @@
 #include <sstream>
 #include <cstdio>
 
+#include <sys/time.h>
+#include <sys/socket.h>
+
 namespace rago{
 
 class Network{

@@ -48,18 +48,18 @@ Core::Core(Camera* camera, Projector* proj, Goban* goban)
 
 #ifdef COMP_MOD_NO_INIT
     ///If the init() method is disabled, the corner Camera coordinate are set width the registered values
-    list_corner_markers.push_back(new Point2f(172, 142));
-    list_corner_markers.push_back(new Point2f(482, 136));
-    list_corner_markers.push_back(new Point2f(548, 390));
-    list_corner_markers.push_back(new Point2f(144, 404));
+    list_corner_markers.push_back(new Point2f(198, 172));
+    list_corner_markers.push_back(new Point2f(516, 160));
+    list_corner_markers.push_back(new Point2f(586, 414));
+    list_corner_markers.push_back(new Point2f(164, 430));
 #endif // COMP_MOD_NO_INIT
 
 #ifdef COMP_MOD_NO_DETECT
     ///If the detection() method is disabled, the corner Projector coordinate are set width the registered values
-    list_corner_detected.push_back(new Point2f(83, 169));
-    list_corner_detected.push_back(new Point2f(771, 161));
-    list_corner_detected.push_back(new Point2f(848, 720));
-    list_corner_detected.push_back(new Point2f(41, 740));
+    list_corner_detected.push_back(new Point2f(115, 165));
+    list_corner_detected.push_back(new Point2f(815, 150));
+    list_corner_detected.push_back(new Point2f(895, 719));
+    list_corner_detected.push_back(new Point2f(63, 729));
 #endif // COMP_MOD_NO_DETECT
 
 
@@ -381,7 +381,7 @@ vector<Point2f*> Core::getCorners()
     return list_corner_detected;
 }
 
-int Core::imagediff(int player)
+int* Core::imagediff(int player)
 {
     /// Getting the goban mask coordinates
     /*cout<<"image difference"<<endl;
@@ -417,8 +417,8 @@ int Core::imagediff(int player)
     Rect cache = Rect(0, 0, FULL_VG_HEIGHT,FULL_VG_HEIGHT);
     rectangle(maskDraw,cache , Scalar(255, 255, 255), -1);
     cv::warpPerspective(maskDraw, maskDraw2, VG2C, maskDraw2.size());
-    imshow("mask", maskDraw2);
-    waitKey(0);
+    //imshow("mask", maskDraw2);
+    //waitKey(0);
 
     /// Initialisation of masks
     /*Mat frame2,maskDraw;
@@ -528,36 +528,33 @@ int Core::imagediff(int player)
             }
 
             /// Show your results
-            imshow( "Hough Circle Transform Demo", frame2 );
-            imshow( "Hough Circle Transform Demo2", src_gray );
-            waitKey(0);
+            //imshow( "Hough Circle Transform Demo", frame2 );
+            //imshow( "Hough Circle Transform Demo2", src_gray );
+            waitKey(3000);
             cout<<"drawing"<<endl;
             std::vector<cv::Point2f> inPts, outPts;
             if (circles.size()!=0)
             {
-            inPts.push_back(cv::Point2f(circles[0][0], circles[0][1]));
+                    inPts.push_back(cv::Point2f(circles[0][0], circles[0][1]));
 
                     perspectiveTransform(inPts, outPts, C2G);
                     //cout<<outPts.size()<<endl;
                     //cout<<"x:"<<outPts[0].x<<  "y:"<<outPts[0].y<<endl;
 
-                    int x=round(outPts[0].x);
-                    int y=round(outPts[0].y);
+                    int x=round(outPts[0].x)+1;
+                    int y=round(outPts[0].y)+1;
                     cout<<x<<endl;
                     cout<<y<<endl;
                     //proj->draw(PROJ_MOD_STONE, x, y, player);
                     goban->play(player, x, y);
                     waitKey(10);
-                    goban->play(PLAYER_BLACK, x-1, y);
-                    goban->play(PLAYER_BLACK, x+1, y);
-                    goban->play(PLAYER_BLACK, x, y+1);
-                    goban->play(PLAYER_BLACK, x, y-1);
                     //flag=true;
                     //cout<<"press any key"<<endl;
                     //waitKey(0);
 
                     cout<<"end"<<endl;
-                             return 1;
+                    int ret[2] = {x, y};
+                             return ret;
              }
                 //}
                //cv::imshow("stream",frame);
@@ -567,7 +564,8 @@ int Core::imagediff(int player)
          else
          {
             cout<<"no difference"<<endl;
-            return 0;
+            int ret[2] = {-1, -1};
+            return ret;
          }
 }
 

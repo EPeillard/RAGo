@@ -30,6 +30,7 @@ public:
     void playTerminal(int);
     void play(int, int, int);
     bool isSomething(int, int);
+    void remove(int, int, int);
 
 private:
     void showAllCorners();

@@ -35,6 +35,10 @@ void Network::connexion()
          perror("ERROR connecting");
          exit(1);
     }
+    struct timeval tv ;
+    tv.tv_sec=0;
+    tv.tv_usec=100;
+    //setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv,sizeof(struct timeval));
 }
 
 bool Network::sendRequest(int code, std::string request)

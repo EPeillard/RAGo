@@ -114,7 +114,7 @@ public:
       * Then a circle detection function is apply to get the played stone.
       * \arg number of the player (0 for white, 1 for black)
     **/
-    int imagediff(int);
+    int* imagediff(int);
 
     /** \fn bool detectHand()
       * \brief Detect if an hand is inside the circle of validation

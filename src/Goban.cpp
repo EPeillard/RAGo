@@ -75,10 +75,19 @@ void Goban::playTerminal(int player)
 
 void Goban::play(int player, int x, int y)
 {
-    if(x>=0 && x<=19 && y>=0 && y<=19)
+    if(x>=1 && x<=19 && y>=1 && y<=19)
     {
         tab_stone[x-1][y-1]->setPlayer(player);
         vg->addStone(player, x, y);
+    }
+}
+
+void Goban::remove(int player, int x, int y)
+{
+    if(x>=1 && x<=19 && y>=1 && y<=19)
+    {
+        tab_stone[x-1][y-1]->setPlayer(PLAYER_NONE);
+        vg->remove(x, y);
     }
 }
 
