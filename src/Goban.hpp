@@ -1,69 +1,98 @@
-/**
-  * Class representing the Goban
+/** \file Goban.hpp
   *
-  * @author Nicolas David and Sylvain Palominos
+  * \date 07/02/2014
   *
+  * \author Nicolas David & Sylvain Palominos
+  *
+  * \version 0
+  *
+  * Declaration of the class Goban
   **/
 
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#ifndef GOBAN_HPP
+#define GOBAN_HPP
 
 #include "Clock.hpp"
 #include "Stone.hpp"
-
-
-#define MARGIN_DETECT_CALIB 2
+#include "VirtualGoban.hpp"
+#include "Network.hpp"
 
 using namespace std;
 using namespace cv;
+using namespace rago;
 
 namespace rago{
-
+/** \class  rago::Goban Goban.hpp Goban
+  *
+  * \brief Class representing the goban
+  *
+  * This class is made of a 2D array of stonesand describe
+  *
+  * Other functions are use to detect stones and hands on the goban.
+  **/
 class Goban{
 
 public:
-    Goban();
+
+    /** \fn Goban(VirtualGoban*)
+      * Main class constructor
+      * \arg VirtualGoban pointer to permit the drawing
+      **/
+    Goban(VirtualGoban*);
+
+    /** \fn ~Goban()
+      * Main class destructor
+      **/
     ~Goban();
-    void init();
-    void detection();
-    void draw();
+
+    /** \fn setGoban()
+      * Initialisation of the goban
+      **/
     void setGoban();
 
+    /** \fn playTerminal(int)
+      * This function is used to simulate a second player with the terminal.
+      * \arg player (0 for none, 1 for white, 2 for black
+      **/
+    void playTerminal(int);
+
+    /** \fn play(int, int, int)
+      * Do the move of a player.
+      * \arg x position of the stone
+      * \arg y position of the stone
+      * \arg player (0 for none, 1 for white, 2 for black
+      **/
+    void play(int, int, int);
+
+    /** \fn bool isSomething(int, int)
+      * Return is there is a stone at this place
+      * \arg x position of the stone
+      * \arg y position of the stone
+      * \return true if there is something, false else
+      **/
+    bool isSomething(int, int);
+
+    /** \fn remove(int, int, int)
+      * Remove a stone from the goban
+      * \arg x position of the stone
+      * \arg y position of the stone
+      * \arg player (0 for none, 1 for white, 2 for black
+      **/
+    void remove(int, int, int);
+
 private:
-    vector<Point*> cornerHarris_demo(int, void*);
-    void showAllCorners();
-    void detectCalibPt();
-    void reorderPoints(vector<Point*>&);
-    void emptyBuffer();
-    void refresh();
 
-    /// Global variables
-    //OpenCV matrix
-    Mat src, src_gray, matGoban;
+    /** VirtualGoban associated to draw the Goban content
+      **/
+    VirtualGoban* vg;
 
-    //vector of point to save corners coodinates
-    vector<Point*> list_corner_markers;
-    vector<Point*> list_corner_detected;
-
-    //points
-    int nbrPt;
-    Point *point_display;
-    Point *point_read;
-
-    //capture stream
-    CvCapture* capture;
-
-    Clock* clock;
-
-    int margin_corner;
-    int pasX, pasY;
-
+    /** 2D array of stones
+      *
+      **/
     vector<vector<Stone*> > tab_stone;
 
 };
 
 }
+
+#endif
