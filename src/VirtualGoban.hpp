@@ -73,7 +73,7 @@ public:
       * Draw the interactive clock for hand detection
       **/
     void drawClock();
-    /** \fn drawClockBorder(int)
+    /** \fn drawClockBorders(int)
       * Draw the circle in the top of the interactive clock
       * \arg size of the circle
       **/

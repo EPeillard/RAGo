@@ -4,8 +4,8 @@
  */
 
 ///This value indicate the margin (in pixels) accepted during the corners detections between
-///the corners getted in the \fn init() function
-///and the center of the circle detected in the \fn detection()
+///the corners getted in the init() function
+///and the center of the circle detected in the detection()
 #define MARGIN_MARKERS_CALIB 2
 
 ///Goban size (number of columns/rows)

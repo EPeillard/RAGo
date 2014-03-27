@@ -58,7 +58,6 @@ int main(int argc, char** argv)
         cout<<"detect"<<endl;
         core->detection();
         core->genConvMat();
-        proj->setG2P(core->getG2PMat());
         proj->setVG2P(core->getVG2PMat());
         vg->drawBorders();
         cout<<"Are cornes and borders displayed well? (o/n)"<<endl;
@@ -219,7 +218,6 @@ void playerTurn(VirtualGoban* vg, Core *core, Projector* proj, bool network)
             while(!isStone)
             {
                 int count = 0;
-                proj->setCountClock(count);
                 while(count<5)
                 {
                     if(core->detectHand())

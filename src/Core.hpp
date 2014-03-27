@@ -174,7 +174,7 @@ private:
     **/
     vector<Point2f*> getFrameCircles(Mat, int);
 
-    /** \fn detectCalibPt()
+    /** \fn detectCalibPtCirlces()
       * \brief Set point_read with the detection circle detected in a frame
       * The function read all the circles detected on a frame and tell if there is one which is different from the corner of the goban.
       **/

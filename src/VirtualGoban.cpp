@@ -133,10 +133,6 @@ void VirtualGoban::setClock2(int time)
 
 }
 
-
-void VirtualGoban::setText(std::string){};
-
-
 void VirtualGoban::drawClock()
 {
     circle(matDraw, Point(CLOCK_CENTER_X, CLOCK_CENTER_Y) , CLOCK_SIZE,  Scalar(150, 150, 150), -1);

@@ -13,7 +13,7 @@ using namespace rago;
 Camera::Camera()
 {
     ///The value is the numero of the camera
-    capture = cvCreateCameraCapture(1);
+    capture = cvCreateCameraCapture(0);
 }
 
 Camera::~Camera()
@@ -289,7 +289,6 @@ bool runCalibrationAndSave(Settings& s, Size imageSize, Mat&  cameraMatrix, Mat&
 
 void Camera::genYML(int argc, char* argv[])
 {
-    help();
     Settings s;
     const string inputSettingsFile = argc > 1 ? argv[1] : "default.xml";
     FileStorage fs(inputSettingsFile, FileStorage::READ); // Read the settings

@@ -127,7 +127,7 @@ void Core::genConvMat()
 void Core::init()
 {
     ///Waiting the conformation of the user to let time to place the window in case of only corner detection
-    cout<<"Please, put the white window in the projector screen, in fullscreen mode"<<endl<<endl<<"Press any key to continue"<<endl;
+    cout<<"Please, put the white window in the projector screen, in fullscreen mode"<<endl<<endl<<"Press 'y' an validate when it's done"<<endl;
     std::string s;
     cin >> s;
 
@@ -213,7 +213,7 @@ void Core::init()
     list_corner_markers=reorderPoints(list_corner_markers);
 
     cout<<"Please, remove all the stones on the goban"<<endl;
-    cout<<"Press any key to continu"<<endl;
+    cout<<"Press 'y' an validate when it's done"<<endl;
     cin>>s;
     waitKey(10);
 #endif // COMP_MOD_NO_INIT
@@ -271,8 +271,6 @@ void Core::detection()
 
         }while(nbrPt<CORNER_NUMBER);
 #endif // COMP_MOD_NO_DETECT
-        ///Give to the projector the coordinates of the corner in its system
-        proj->setCorner(list_corner_detected);
 #ifdef COMP_MOD_VERBOSE
         for(int i=0; i<list_corner_detected.size(); i++){
             cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
