@@ -4,8 +4,8 @@
  */
 
 ///This value indicate the margin (in pixels) accepted during the corners detections between
-///the corners getted in the @function init() function
-///and the center of the circle detected in the @function detection()
+///the corners getted in the \fn init() function
+///and the center of the circle detected in the \fn detection()
 #define MARGIN_MARKERS_CALIB 2
 
 ///Goban size (number of columns/rows)
@@ -36,28 +36,47 @@
 ///Projector mod drawing the clock
 #define PROJ_MOD_CLOCK 4
 
+///All of the following values are for the VirtualGoban
+
+///Height of the full Virtual Goban
 #define FULL_VG_HEIGHT 2100
+///Width of the full Virtual Goban
 #define FULL_VG_WIDTH 2400
+///Width of the goban in the Virtual Goban
 #define VG_WIDTH 1800
+///Height of the goban in the Virtual Goban
 #define VG_HEIGHT 1800
+///Padding to make a margin between the goban and the border of the VirtualGoban
 #define FULL_VG_PADDING 100
+///Padding inside the goban to integrate the border of the phisical goban
 #define VG_PADDING 50
 
+///Stone size
 #define STONE_SIZE 40
 
+///Center of the clock
 #define CLOCK_CENTER_X 2200
+///Center of the clock
 #define CLOCK_CENTER_Y 1050
+///Center of the circles which signalise the hand is detected
 #define CIRCLE_CENTER_Y 525
+///Clock size
 #define CLOCK_SIZE 150
+///Width of the cicle
 #define CIRCLE_WIDTH 20
 
+///Ratio between the Goban and the VirtualGoban
 #define RATIO_G_VG 100
 #define STONE_BORDER_SIZE 45
 
+///Player void
 #define PLAYER_NONE 0
+///Player white
 #define PLAYER_WHITE 1
+///Player black
 #define PLAYER_BLACK 2
 
+///Localisation of the clocks
 #define CLOCK_PLAYER_CENTER_X 1975
 #define CLOCK_TIME_CENTER_X 2125
 #define CLOCK_1_CENTER_Y 1500

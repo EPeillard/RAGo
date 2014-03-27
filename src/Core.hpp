@@ -30,7 +30,7 @@ namespace rago{
 
 /** \class  rago::Core Core.hpp Core
   *
-  * \brief Class containing core the function of the project.
+  * \brief Class containing the core functions of the project.
   *
   * This class give all the functions that give back the coordinates of the goban (camera, projector, VirtualGoban, goban coordinates).
   * It also give the matrix permitting the convertion between two system of coordintes.

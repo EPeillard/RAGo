@@ -9,10 +9,6 @@
   * Declaration of the class Network
   **/
 
-/** \class  rago::Network Network.hpp Network
-  *
-  **/
-
 #ifndef NETWORK_HPP
 #define NETWORK_HPP
 
@@ -35,19 +31,50 @@
 
 namespace rago{
 
+/** \class  rago::Network Network.hpp Network
+  *
+  * \brief Class containing the network functions of the project.
+  *
+  * This class allow the communication throw server sockets with QGo client.
+  **/
 class Network{
 
 public:
 
+    /** \fn Network(std::string, int)
+      * Main class constructor
+      * \arg string of the ip adress of the server
+      * \arg number of the port of the socket server
+      **/
     Network(std::string, int);
+
+    /** \fn connexion()
+      * Estabmlish the connexion with the server
+      **/
     void connexion();
+
+    /** \fn bool sendRequest(int, std::string)
+      * Send informations to the server
+      * \arg id of the request
+      * \arg text of the request
+      * \return true if the request was send
+      **/
     bool sendRequest(int, std::string);
+
+    /** \fn std::string getInfo()
+      * read the network for messages
+      * \return the text of the message
+      **/
     std::string getInfo();
 
 private:
 
+    /** ip adresss of the host **/
     std::string ipHostAddr;
-    int sockfd, portNo;
+    /** socket file descriptor **/
+    int sockfd;
+    /** Number of the host port **/
+    int portNo;
     struct sockaddr_in serv_addr;
     struct hostent *server;
 

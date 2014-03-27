@@ -89,11 +89,13 @@ int thickness = 1;
     rectangle(matDraw,cache_player1 , Scalar(200, 0, 0), -1);
     rectangle(matDraw,cache_time1 , Scalar(200, 0, 0), -1);
 
+    ///Display player name
     std::stringstream s_player;
     s_player << player  ;
     Point textOrgPlayer(CLOCK_PLAYER_CENTER_X + 1*CLOCK_PLAYER_WIDTH/8, CLOCK_1_CENTER_Y + 4 * CLOCK_PLAYER_HEIGHT/8);
     putText(matDraw, s_player.str(), textOrgPlayer, fontFace, fontScale, Scalar::all(255), thickness,8);
 
+    ///Display time remaining
     std::stringstream s_time;
     s_time << min <<":"<< sec  ;
     Point textOrgTime(CLOCK_TIME_CENTER_X + 1*CLOCK_TIME_WIDTH/8, CLOCK_1_CENTER_Y + 4 * CLOCK_TIME_HEIGHT/8);

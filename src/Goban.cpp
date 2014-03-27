@@ -1,12 +1,3 @@
-/**
-  * Implementation of the functions of the class Goban
-  *
-  * @author Nicolas David and Sylvain Palominos
-  *
-  **/
-#define CORNER "Corners detected"
-#define GOBAN "Goban"
-
 #include "Goban.hpp"
 
 using namespace rago;
@@ -14,9 +5,6 @@ using namespace rago;
 Goban::Goban(VirtualGoban* vg)
 {
     this->vg = vg;
-    ///Initialisation of the goban display Mat
-    matGoban = Mat::zeros(768, 1024, CV_8UC3);
-    matGoban = cv::Scalar(255, 255, 255);
 }
 
 Goban::~Goban()
@@ -25,6 +13,7 @@ Goban::~Goban()
 
 void Goban::setGoban()
 {
+    ///Initialisation of the goban with empty stones
     for(int i=0; i<19; i++)
     {
         vector<Stone*> vec;
@@ -35,8 +24,6 @@ void Goban::setGoban()
             tab_stone[i][j]->setDraw(i, j, PLAYER_NONE);
         }
     }
-    clock = new Clock(this->vg);
-    clock->draw();
 }
 
 void Goban::playTerminal(int player)
@@ -52,21 +39,17 @@ void Goban::playTerminal(int player)
         if(x>=1 && x<=19 && y>=1 && y<=19)
         {
             tab_stone[x-1][y-1]->setPlayer(player);
-
-            //vg->draw(1, x-1, y-1, tab_stone[x-1][y-1]->getPlayer());
             vg->addStone(tab_stone[x-1][y-1]->getPlayer(), x-1, y-1);
             waitKey(10);
-            //clock->increaseTime();
-            clock->draw();
             flag=true;
             std::ostringstream oss1, oss2;
             oss1 << x;
             oss2 << y;
             std::string str = oss1.str() + "," + oss2.str();
 
-          net = new Network("127.0.0.1", 5001);
+            net = new Network("127.0.0.1", 5001);
            net->connexion();
-         std::cout<<"request : "<<str<<"result : "<<net->sendRequest(0, str)<<std::endl;
+            std::cout<<"request : "<<str<<"result : "<<net->sendRequest(0, str)<<std::endl;
             waitKey(10);
 
         }
@@ -75,6 +58,7 @@ void Goban::playTerminal(int player)
 
 void Goban::play(int player, int x, int y)
 {
+    ///Verification of the position of the stone
     if(x>=1 && x<=19 && y>=1 && y<=19)
     {
         tab_stone[x-1][y-1]->setPlayer(player);

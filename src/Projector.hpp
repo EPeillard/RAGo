@@ -1,3 +1,13 @@
+/** \file Projector.hpp
+  *
+  * \date 07/02/2014
+  *
+  * \author Nicolas David & Sylvain Palominos
+  *
+  * \version 0
+  *
+  * Declaration of the class Projector
+  **/
 #ifndef PROJECTOR_HPP
 #define PROJECTOR_HPP
 
@@ -16,31 +26,51 @@ using namespace std;
 
 namespace rago{
 
+/** \class  rago::Projector Projector.hpp Projector
+  *
+  * \brief Class containing the drawing functions of the project.
+  *
+  * This class give function to display throw the projector the informatuions on the goban
+  **/
 class Projector{
 
 public:
+
+    /** \fn Projector()
+      * Main class constructor
+      **/
     Projector();
+    /** \fn ~Projector()
+      * Main class destructor
+      **/
     ~Projector();
 
+    /**\fn void draw(int, int=0, int=0, int=0)
+      * Depreciate function for drawing the goban informations
+      * \arg code of the projection mod
+      * \arg x coordinate
+      * \arg y coordinate
+      * \arg
+      **/
     void draw(int, int=0, int=0, int=0);
-    void draw(Mat *mat);
-    void unDraw(int);
-    void setCorner(vector<Point2f*>);
 
-    void setG2P(Mat*);
+    /** \fn draw(Mat *mat)
+      * Drawing funstion. It draw on the projector screen
+      * \arg Mat image to draw
+      **/
+    void draw(Mat *mat);
+    /** \fn void setVG2P(Mat*)
+      * Setter for the VG2P matrix
+      * \arg VG2P matrix
+      **/
+
     void setVG2P(Mat*);
 
     Mat matDraw; //TODO faire un getter
-    void setCountClock(int);
 
 private:
 
-    void drawRoundCorner(int, int);
-    vector<Point2f*> list_corner_detected;
-
-    Mat* G2P;
     Mat* VG2P;
-    int countClock;
 
 };
 

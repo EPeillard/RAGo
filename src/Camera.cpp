@@ -1,6 +1,5 @@
 #include "Camera.hpp"
 
-
 #include <iostream>
 #include <sstream>
 #include <time.h>
@@ -11,39 +10,26 @@
 
 using namespace rago;
 
-/**
-  *Create a new Camera and Capture of a picture
-  *
-  **/
 Camera::Camera()
 {
+    ///The value is the numero of the camera
     capture = cvCreateCameraCapture(1);
 }
 
-/**
-  *Destructor of Camera
-  *
-  **/
 Camera::~Camera()
 {
 }
 
 IplImage* Camera::getFrame()
 {
+    ///First empty the camera buffer
     emptyBuffer();
+    ///Get the frame
     IplImage* image = cvQueryFrame(capture);
 
-    //imshow("verbose",Mat(image));
-    //Mat mat= corection(*image);
-    Mat mat(image);
-    cout<<"return"<<endl;
     return image;
 }
 
-/** The function empty the capture buffer
-  *
-  * @function emptyBuffer()
-  **/
 void Camera::emptyBuffer()
 {
     IplImage *frame = cvQueryFrame(capture);
@@ -69,96 +55,46 @@ void read_camera_params( const char* in_filename,
                          CvMat* camera_matrix,
                          CvMat* dist_coeffs)
 {
-    cout<<"1"<<endl;
+    ///First the savefile is oppened
     CvFileStorage* fs = cvOpenFileStorage( in_filename, 0, CV_STORAGE_READ );
-    cout<<fs<<endl;
-    cout<<"2"<<endl;
+    ///The values of the camera matrix are loaded
     camera_matrix = (CvMat *) cvRead (fs, cvGetFileNodeByName (fs, NULL, "Camera_Matrix"));
-    cout<<camera_matrix<<endl;
-    cout<<"3"<<endl;
+    ///The values of the distortion coefficents are loaded
     dist_coeffs = (CvMat *) cvRead (fs, cvGetFileNodeByName (fs, NULL, "Distortion_Coefficients"));
-    cout<<dist_coeffs<<endl;
-    cout<<"4"<<endl;
+    ///The file is closed
     cvReleaseFileStorage (&fs);
-    cout<<"5"<<endl;
 }
 
 Mat Camera::corection(IplImage image)
 {
     cout<<"correction"<<endl;
     const char* in_filename = "out_camera_data.yml";
-    double data[3][3] = {{8.0471988736293019e+02, 0., 3.1950000000000000e+02},{ 0., 8.0471988736293019e+02, 2.3950000000000000e+02},{ 0., 0., 1. }};
-    Mat camera_matrix(3, 3, CV_32F, &data);
-    double data2[1][5] = {4.4628190636543129e-02, 1.4887161149394226e+00, 0., 0.,-9.7825667665347282e+00};
-    Mat dist_coeffs(1, 5, CV_32F, &data2);
+
+    Mat* camera_matrix;
+    Mat* dist_coeffs;
+
     vector<CvMat> vec_camera_matrix;
     vector<CvMat> vec_dist_coeffs;
+
     cout<<"reading file"<<endl;
 
-/*
-    cout<<"1"<<endl;
     CvFileStorage* fs = cvOpenFileStorage( in_filename, 0, CV_STORAGE_READ );
-    cout<<fs<<endl;
-    cout<<"2"<<endl;
     camera_matrix = (Mat *) cvRead (fs, cvGetFileNodeByName (fs, NULL, "Camera_Matrix"));
-    cout<<camera_matrix<<endl;
-    cout<<"3"<<endl;
     dist_coeffs = (Mat *) cvRead (fs, cvGetFileNodeByName (fs, NULL, "Distortion_Coefficients"));
-    cout<<dist_coeffs<<endl;
-    cout<<"4"<<endl;
     cvReleaseFileStorage (&fs);
-    cout<<"5"<<endl;*/
 
-/*
-    cout<<"push mat"<<endl;
-    cout<<camera_matrix<<endl;
-    cout<<"push mat"<<endl;
-    vec_camera_matrix.push_back(*camera_matrix);
-    cout<<"push mat"<<endl;
-    vec_dist_coeffs.push_back(*dist_coeffs);*/
-/*
-    cout<<"view"<<endl;
-    vector<IplImage> view;
-    cout<<"push mat"<<endl;
-    view.push_back(image);
-
-    cout<<"undistroerd"<<endl;
-    vector<IplImage> undistorted;
-    cout<<"push mat"<<endl;
-    undistorted.push_back(image);*/
-
-    //internet example
-    waitKey(0);
     Mat view(&image);
-
-    imshow("verbose2",view);
-    waitKey(0);
     view.convertTo(view, CV_32F);
     Mat temp = view.clone();
+
     cout<<"udustortion"<<endl;
-    undistort( temp, view, camera_matrix, dist_coeffs );
-    cout<<"conversion"<<endl;
-    view.convertTo(view, CV_32FC2);
-    cout<<"end"<<endl;
-        waitKey(0);
+    undistort( temp, view, *camera_matrix, *dist_coeffs );
 
-
-    imshow("verbose",view);
-    waitKey(0);
-
-    //cvReleaseImage( &undistorted );
-    //cvReleaseImage( &view );
     return view;
 }
 
-/** fonction de calibration */
-static void help()
-{
-    cout <<  "This is a camera calibration sample." << endl
-         <<  "Usage: calibration configurationFile"  << endl
-         <<  "Near the sample file you'll find the configuration file, which has detailed help of "
-             "how to edit it.  It may be any OpenCV supported file format XML/YAML." << endl;
-}
+//All the following functions come from OpenCv website examples
+//It's quite a mess, and it need to be reorgenised
 class Settings
 {
 public:

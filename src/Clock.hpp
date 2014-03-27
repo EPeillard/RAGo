@@ -1,9 +1,14 @@
-/**
-  * Class representing the Goban
+/** \file Clock.hpp
   *
-  * @author Nicolas David and Sylvain Palominos
+  * \date 07/02/2014
   *
+  * \author Nicolas David & Sylvain Palominos
+  *
+  * \version 0
+  *
+  * Declaration of the class Clock
   **/
+
 #ifndef CLOCK_HPP
 #define CLOCK_HPP
 
@@ -28,8 +33,22 @@ namespace rago{
 class Clock{
 
 public:
+
+    /** \fn Clock(VirtualGoban*)
+      * Main constructor of the class Clock
+      * \arg VirtualGoban to permit the display of the différents clocks
+      **/
     Clock(VirtualGoban*);
+
+    /** \fn ~Clock()
+      * Main desctructor of the Clock class
+      **/
     ~Clock();
+
+    /** \fn void draw()
+      *
+      *
+      **/
     void draw();
     void increaseTime();
 

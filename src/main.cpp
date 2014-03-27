@@ -42,23 +42,17 @@ void sendNetwork(int x, int y);
 
 int main(int argc, char** argv)
 {
-
-    //FileStorage fs("out_camera_data.xml", FileStorage::READ);
-    //Mat intrinsics, distortion;
-    //fs["camera_matrix"] >> intrinsics;
-    //fs["distortion_coefficients"] >> distortion;
-
-
-    //string ret="";
     Projector* proj = new Projector();
     VirtualGoban* vg = new VirtualGoban(proj);
     Camera* camera = new Camera();
     Goban* goban = new Goban(vg);
     Core* core = new Core(camera, proj, goban);
 
+    ///Initialisation
     core->init();
 
     string s="";
+    ///Looping the detection while the user haven't validate it
     while(s[0]!='o')
     {
         cout<<"detect"<<endl;
@@ -73,13 +67,12 @@ int main(int argc, char** argv)
     }
     waitKey(1000);
 
+    ///Setting the goban
     goban->setGoban();
-
-
-
 
     waitKey(100);
 
+    ///Game
     while(true)
     {
         cout<<"What do you want to do with RAGo ?"<<endl;
@@ -93,7 +86,7 @@ int main(int argc, char** argv)
 
         switch(mode)
         {
-        case 1: //play against the computer (no time)
+        case 1: ///play against the computer (no time)
         {
 
             infoNetwork(goban, vg);
@@ -107,9 +100,6 @@ int main(int argc, char** argv)
                 infoNetwork(goban, vg);
                 sendNetwork(-1, -1);
                 initGame(vg, core);
-
-                //the human player put a stone on the goban
-                //we wait that he put his hand in the clock
                 vg->drawClock();
 
                 playerTurn(vg, core, proj, true);
@@ -118,7 +108,7 @@ int main(int argc, char** argv)
             break;
         }
 
-        case 2 : //play go with the server
+        case 2 : ///play go with the server
         {
             cout<<"Enter your color : 1 for white, 2 for black"<<endl;
             int player;
@@ -148,7 +138,7 @@ int main(int argc, char** argv)
         }
 
 
-        case 3 : //watch
+        case 3 : ///watch
         {
             while(1)
             {
@@ -158,29 +148,25 @@ int main(int argc, char** argv)
             break;
         }
 
-        case 4 : //help
+        case 4 : ///help
         {
             initGame(vg, core);
-            // ask to put hand in the detection zone
+            /// ask to put hand in the detection zone
             cout<<"put your hand in the detection zone in red until the red circle gets smaller"<<endl;
-            //use a draw method that print put your hand in the clock with an arrow
+            ///use a draw method that print put your hand in the clock with an arrow
             int count = 0;
-            //proj->setCountClock(count);
+            ///proj->setCountClock(count);
             while(count<5)
             {
                 if(core->detectHand())
                 {
                     count++;
-                    //proj->setCountClock(count);
-                    //proj->draw(4,0,0);
                     vg->drawClockBorders(count);
                     cout<<count<<endl;
                 }
                 else
                 {
                     count = 0;
-                    //proj->setCountClock(count);
-                    //proj->draw(4,0,0);
                     vg->removeClockBorders();
                     cout<<count<<endl;
                 }
@@ -195,36 +181,18 @@ int main(int argc, char** argv)
             cout<<"took picture"<<endl;
             waitKey(100);
 
-
-            //ask to put a stone on the goban and put the hand in the detection zone
+            ///ask to put a stone on the goban and put the hand in the detection zone
             cout<<"now put a stone on the goban and validate with your hand"<<endl;
-
             playerTurn(vg, core, proj, false);
-
-            //ask to put a stone on the goban and validate it in the zone, draw the neighboors in 4-connexity
-break;
-
-        /*}
-        cout<<"hand OK"<<endl;
-        //once he put his hand in the clock we calculate the idfference between our actual goban and the one at the beginning of the turn
-        core->imagediff(2);
-        proj->draw(6,0,0);
-        waitKey(100);
-        goban->playTerminal(1);*/
+            break;
     }
 
         default :
         {
             cout<<"chose an existing mode, please"<<endl;
-break;
+            break;
         }
-               waitKey(0);
-      //  goban->playTerminal();
-
-
-    //  goban->playTerminal();
-
-
+        waitKey(0);
         }
 
     }
@@ -244,7 +212,7 @@ void initGame(VirtualGoban* vg, Core *core)
 
 void playerTurn(VirtualGoban* vg, Core *core, Projector* proj, bool network)
 {
-    //ask to put a stone on the goban and put the hand in the detection zone
+    ///ask to put a stone on the goban and put the hand in the detection zone
             cout<<"now put a stone on the goban and validate with your hand"<<endl;
             bool isStone = false;
 
@@ -257,16 +225,12 @@ void playerTurn(VirtualGoban* vg, Core *core, Projector* proj, bool network)
                     if(core->detectHand())
                     {
                     count++;
-                    //proj->setCountClock(count);
-                    //proj->draw(4,0,0);
                     vg->drawClockBorders(count);
                     cout<<count<<endl;
                     }
                     else
                     {
                     count = 0;
-                    //proj->setCountClock(count);
-                    //proj->draw(4,0,0);
                     vg->removeClockBorders();
                     cout<<count<<endl;
                     }
@@ -383,6 +347,5 @@ void infoNetwork(Goban* goban, VirtualGoban* vg)
                 break;
             }
         }
-
         waitKey(10);
 }
