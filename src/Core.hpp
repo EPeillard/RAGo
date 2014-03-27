@@ -30,19 +30,23 @@ namespace rago{
 
 /** \class  rago::Core Core.hpp Core
   *
-  * \brief Class containing the function for the goban detection.
+  * \brief Class containing core the function of the project.
   *
-  * This class give all the functions that give back the real coordinates of the goban corner,
-  * the conversion between point get from the camera to the Stone tab and from the stone tab to the projector.
+  * This class give all the functions that give back the coordinates of the goban (camera, projector, VirtualGoban, goban coordinates).
+  * It also give the matrix permitting the convertion between two system of coordintes.
+  *
+  * Other functions are use to detect stones and hands on the goban.
   **/
 class Core{
 
 public:
 
+///Constructors and destructors
+
     /** \fn Core::Core(Camera* camera, Projector* proj, Goban* goban)
       *
       * \brief Main void constructor
-      * Main constructor of the Core class
+      * Main constructor of the Core class. It initialize all the field for initialization and detection.
       *
       * \param camera Pointer to the Camera object used to get image from the device.
       * \param proj Pointer to the Projector object used to display images.
@@ -57,12 +61,7 @@ public:
       **/
     ~Core();
 
-    /** \fn vector<Point2f*> getCorners()
-      * \brief Getter for the point list of corners
-      * \return vector of the detected corners (Projector coordinates)
-    **/
-    vector<Point2f*> getCorners();
-
+///Matrix for conversion between two coordinate system
 
     /** \fn Mat* getG2PMat()
       * \brief Getter for the G2P matrix
@@ -71,14 +70,6 @@ public:
       * \return Mat object for the conversion from Goban to Projector
       **/
     Mat* getG2PMat();
-
-    /** \fn Mat* getC2GMat()
-      * \brief Getter for the C2G matrix
-      * Getter for the Mat object for the transformation from the Camera coordinate into the Goban coordinate
-      *
-      * \return Mat object for the conversion from Camera to Goban
-      **/
-    Mat* getC2GMat();
 
     /** \fn Mat* getVG2PMat()
       * \brief Getter for the VG2P matrix
@@ -89,18 +80,13 @@ public:
       **/
     Mat* getVG2PMat();
 
-    /** \fn void init()
-      * \brief Initialization
-      * Initialization before the detection. First the stone on the corners are read and then saved.
-    **/
-    void init();
-
-    /** \fn void detection()
-      * \brief Detection by moving a point to get the projector coordinate of the corners
-      * Detection of coordinates points. To obtains the projector coordinates, the point get by the camera is displayed.
-      * If it's no over the corner, it will be moved and detect again.
-    **/
-    void detection();
+    /** \fn Mat* getC2GMat()
+      * \brief Getter for the C2G matrix
+      * Getter for the Mat object for the transformation from the Camera coordinate into the Goban coordinate
+      *
+      * \return Mat object for the conversion from Camera to Goban
+      **/
+    Mat* getC2GMat();
 
     /** \fn void genConvMat()
       * \brief Generation of the conversion matrix
@@ -108,9 +94,33 @@ public:
     **/
     void genConvMat();
 
-    /** \fn int imagediff(int)
+    /** \fn vector<Point2f*> getCorners()
+      * \brief Getter for the point list of corners
+      * \return vector of the detected corners (Projector coordinates)
+    **/
+    vector<Point2f*> getCorners();
+
+///Main Core functions for the calibration of the camera/projector/goban
+
+    /** \fn void init()
+      * \brief Initialization
+      * Initialization before the detection.
+      * First the stone putted on the corners are read to get there coordinates in the camera system.
+    **/
+    void init();
+
+    /** \fn void detection()
+      * \brief Detection by moving a point on the goban to get the projector coordinate of the corners
+      * Detection of coordinates points. To obtains the projector coordinates, the point get by the camera is displayed.
+      * If it's no over the corner, it will be moved, displayed and detected again.
+      * In the end, le points getted are saved and give the corner coordinates in the projector system.
+    **/
+    void detection();
+
+    /** \fn int* imagediff(int)
       * \brief Get the coordinate of a played stone on the goban
       * First the difference between to images is done (one just taken from the camera ans the other is the reference frame).
+      * Then a mask is applyed focus the detection on the goban
       * Then a circle detection function is apply to get the played stone.
       * \arg number of the player (0 for white, 1 for black)
     **/
@@ -118,14 +128,19 @@ public:
 
     /** \fn bool detectHand()
       * \brief Detect if an hand is inside the circle of validation
-      * First a just taken image is compare to the reference frame only on the circle for detection.
+      * First a just taken image is compare to the reference frame. Then a binary mask is applyed to detect only on the circle.
       * Then an other function is called to detect id an object is present.
     **/
     bool detectHand();
 
+    /** \fn bool detectHandParam()
+      * \brief Detect the parameters for the hand detection
+      * Try to determine the gray level and number of pixel to detect to get the better hand detection possible
+    **/
     bool detectHandParam();
 
-    /**\brief TODO
+    /** \fn int countNotBlack(Mat img, int lim)
+      * \brief TODO
     **/
     int countNotBlack(Mat img, int lim);
 
