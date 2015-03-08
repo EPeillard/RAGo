@@ -60,7 +60,7 @@ int main(int argc, char** argv)
         core->genConvMat();
         proj->setVG2P(core->getVG2PMat());
         vg->drawBorders();
-        cout<<"Are cornes and borders displayed well? (o/n)"<<endl;
+        cout<<"Are corners and borders displayed well? (o/n)"<<endl;
         cin>>s;
         vg->removeBorders();
     }

@@ -28,6 +28,16 @@ using namespace std;
   **/
 namespace rago{
 
+/** \struct lineGrp
+ *
+ *	\brief Structure containing lines of same orientation
+ *
+ **/
+struct lineGrp{
+    vector<Vec2f> lines;
+    float anglMoy;
+};
+
 /** \class  rago::Core Core.hpp Core
   *
   * \brief Class containing the core functions of the project.
@@ -156,13 +166,64 @@ public:
     Mat beginningTurn; //TODO private
 
 private:
+    /**	\fn vector<lineGrp> grpLines(vector<Vec2f>)
+     * 	\brief Sort lines in group according to their global orientation
+     * 	This function sort all the input lines in a vector of lineGrp (struct).
+     * 	Lines which have the same orientation are in the same group.
+     * 	\arg Vector of lines
+     * 	\return sorted vector of lineGrp
+     **/
+    vector<lineGrp> grpLines(vector<Vec2f>);
+
+    /**	\fn void mergeRelatedLines(vector<lineGrp>*, Mat&)
+     * 	\brief Merge lines of each group which are sufficiently close
+     * 	\arg Vector of lines
+     * 	\arg Matrix representing the frame
+     **/
+    void mergeRelatedLines(vector<lineGrp> *, Mat &);
+
+    /**	\fn drawLine(Vec2f, Mat &, Scalar)
+     * 	\brief Draw a line
+     * 	\arg Line to draw
+     * 	\arg Frame to draw into
+     * 	\arg Color of the line
+     **/
+    void drawLine(Vec2f, Mat &, Scalar rgb = CV_RGB(0,0,255));
+
+    /**	\fn bool findAndCleanGoban(vector<lineGrp>::iterator, vector<lineGrp>::iterator)
+     * 	\brief Search and clean a goban in the two set of lines
+     * 	This function is looking for a goban form in the two set of lines given in parameters (horizontal and vertical).
+     * 	It deletes the lines fused before
+     * 	It can also clean the vector, if the borders are detected as part of the goban for example.
+     * 	\arg First group of lines
+     * 	\arg Second group of lines
+     * 	\return If a goban has finally be found or not.
+     **/
+    bool findAndCleanGoban(vector<lineGrp>::iterator, vector<lineGrp>::iterator);
+
+    /**	\fn vector<Vec2f> findExtremaLinesOneGrp(lineGrp,lineGrp)
+	 * 	\brief For one group, return the two extremal lines
+	 * 	\arg First group of lines (base)
+	 * 	\arg Second group of lines (from which will be extract the lines)
+	 * 	\return The tow extremal lines
+    **/
+    vector<Vec2f> findExtremaLinesOneGrp(lineGrp,lineGrp);
+
+
+    /**	\fn vector<Point2f*> findExtrema(lineGrp,lineGrp)
+	 * 	\brief Extract the 4 extremal points
+	 * 	\arg First group of lines
+	 * 	\arg Second group of lines
+	 * 	\return The extremal points
+    **/
+    vector<Point2f*> findExtrema(lineGrp,lineGrp);
 
     /** \fn vector<Point2f*> reorderPoints(vector<Point2f*>&)
       * \brief Function reordering the point this way : 0 : top left corner, 1 top right corner, 2 bottom right corner, 3 bottom left corner
       * It reorder the point to have the top left corner first, then the top right corner, the bottom right corner and at least the bottom left corner.
       * \arg vector of points
       * \return reordered vector of points
-      **/
+    **/
     vector<Point2f*> reorderPoints(vector<Point2f*>&);
 
     /** \fn vector<Point2f*> getFrameCircles(Mat, int)
@@ -187,11 +248,23 @@ private:
     /**\brief Source Mat converted in gray
     **/
     Mat src_gray;
+    /**\brief Mat used to detect lines
+    **/
+    Mat m_lines;
+    /**\brief Temporary Mat used to detect lines
+    **/
+    Mat lines_tmp1;
+    /**\brief Temporary Mat used to detect lines
+    **/
+    Mat lines_tmp2;
+    /**\brief Mat used to display calibration to the user
+    **/
+    Mat display;
 
-    /**\brief Vector of points corresponding to the corners in Camera coodinate
+    /**\brief Vector of points corresponding to the corners in Camera coordinate
     **/
     vector<Point2f*> list_corner_markers;
-    /**\brief Vector of points corresponding to the corners in Projector coodinate
+    /**\brief Vector of points corresponding to the corners in Projector coordinate
     **/
     vector<Point2f*> list_corner_detected;
 

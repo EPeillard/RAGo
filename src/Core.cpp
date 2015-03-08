@@ -63,6 +63,7 @@ Core::Core(Camera* camera, Projector* proj, Goban* goban)
     list_corner_detected.push_back(new Point2f(63, 729));
 #endif // COMP_MOD_NO_DETECT
 
+    namedWindow("Vue camera", CV_WINDOW_FREERATIO );
 
 }
 
@@ -126,14 +127,20 @@ void Core::genConvMat()
 
 void Core::init()
 {
-    ///Waiting the conformation of the user to let time to place the window in case of only corner detection
-    cout<<"Please, put the white window in the projector screen, in fullscreen mode"<<endl<<endl<<"Press 'y' an validate when it's done"<<endl;
-    std::string s;
-    cin >> s;
-
-    ///Drawing a white image on the goban to improve the detection od the corners
+    ///Drawing a white image on the goban to improve the detection of the corners
     proj->draw(PROJ_MOD_1 , PROJECTOR_WIDTH, PROJECTOR_HEIGHT);
     waitKey(10);
+
+    ///Waiting the conformation of the user to let time to place the window in case of only corner detection
+    cout<<"Please, put the white window in the projector screen, in fullscreen mode"<<endl<<endl<<"Press a key when it's done"<<endl;
+
+    int key=0;
+    while(key<=0)
+    {
+    	imshow("Vue camera",Mat(camera->getFrame()));
+    	key=waitKey(100);
+    }
+
 
 #ifndef COMP_MOD_NO_INIT
     vector<Point2f*> list_temp;
@@ -143,41 +150,154 @@ void Core::init()
 #endif // COMP_MOD_VERBOSE
 
 
-    ///While the isn't enought corners detected
+    ///While the isn't enough corners detected
     while(list_temp.size()!=CORNER_NUMBER)
     {
-        ///Load source image and convert it to gray
-        src = Mat(camera->getFrame());
-        cvtColor(src, src_gray, CV_BGR2GRAY);
-        ///Minimum width of circles that  detected
-        int i=1;
-        ///Maximum number of points detected
-        int max=0;
-        ///While there isn't enought corner detected saved in list_temp
-        ///or the size of the circes detected is more than the maximum size of the goban/15
-        while(list_temp.size()!=CORNER_NUMBER && i<src_gray.rows/15)
-        {
-            ///Getting in list_temp the center of circles detectes by giving the image to analise and the minimum width of the circles
-            list_temp = getFrameCircles(src, i);
-            if(list_temp.size()>max)
-                max=list_temp.size();
-            i++;
-            waitKey(100);
-        }
-        ///If there is too many or too few points detected,
-        if(list_temp.size()!=4)
-        {
-            string s="";
-            ///Ask for the confirmation from the user
-            while(s[0]!='n' && s[0]!='o')
-            {
-                cout<<"Only "<<max<<" points are detected. Retry ? (o/n)";
-                cin>>s;
-            }
-            if(s[0]=='n')
-                exit(0);
-            i=1;
-        }
+    	Mat kernel = (Mat_<uchar>(3,3) << 0,1,0,1,1,1,0,1,0);
+    	display = Mat(camera->getFrame());
+
+    	int nbMean=1;
+		for(int u=0;u<nbMean;u++)
+		{
+			int nbMult=1;
+			for(int k=0;k<nbMult;k++)
+			{
+				///Load source image and convert it to gray
+				src = Mat(camera->getFrame());
+				cvtColor(src, src_gray, CV_BGR2GRAY);
+
+				//GaussianBlur(image_modif,image_modif,Size(11,11),0);
+
+				///Threshold the gray image and revert it
+				///\todo fix parameters
+				adaptiveThreshold(src_gray, lines_tmp1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 15, 3);
+				bitwise_not(lines_tmp1,lines_tmp1);
+
+				///Dilate the image in order to re-connect lines
+				dilate(lines_tmp1, lines_tmp1, kernel);
+
+				if(k==0)
+					lines_tmp2=lines_tmp1;
+				else
+					lines_tmp2=lines_tmp1.mul(lines_tmp2);
+			}
+			///Mult some times this step, to suppress noise
+
+			int count=0;
+			int max=-1;
+
+			Point maxPt;
+
+			///Extract the biggest contiguous area
+			for(int y=0;y<lines_tmp2.size().height;y++)
+			{
+				uchar *row = lines_tmp2.ptr(y);
+				for(int x=0;x<lines_tmp2.size().width;x++)
+				{
+					if(row[x]>=128)
+					{
+						 int area = floodFill(lines_tmp2, Point(x,y), CV_RGB(0,0,64));
+
+						 if(area>max)
+						 {
+							 maxPt = Point(x,y);
+							 max = area;
+						 }
+					}
+				}
+
+			}
+
+			floodFill(lines_tmp2, maxPt, CV_RGB(255,255,255));
+
+			for(int y=0;y<lines_tmp2.size().height;y++)
+			{
+				uchar *row = lines_tmp2.ptr(y);
+				for(int x=0;x<lines_tmp2.size().width;x++)
+				{
+					if(row[x]==64 && x!=maxPt.x && y!=maxPt.y)
+					{
+						int area = floodFill(lines_tmp2, Point(x,y), CV_RGB(0,0,0));
+					}
+				}
+			}
+
+			///Erode after the dilating step
+			erode(lines_tmp2,lines_tmp2,kernel);
+
+			if(u==0)
+				m_lines=lines_tmp2;
+			else
+				m_lines+=lines_tmp2;
+		}
+		///Average this some times to reduce approximations
+
+		vector<Vec2f> lines;
+		HoughLines(m_lines, lines, 1, CV_PI/180, 200);
+		vector<lineGrp> linesGrouped = grpLines(lines);
+
+		vector<lineGrp>::iterator group;
+
+		///Just keep the two biggest groups
+		if(linesGrouped.size()>=2)
+		{
+			vector<lineGrp>::iterator grp1=linesGrouped.begin();
+			vector<lineGrp>::iterator grp2=linesGrouped.begin()+1;
+			if((*grp1).lines.size()<(*grp2).lines.size())
+			{
+				group=grp1;
+				grp1=grp2;
+				grp2=group;
+			}
+			for(group=linesGrouped.begin()+2;group!=linesGrouped.end();group++)
+			{
+				if((*group).lines.size()>(*grp1).lines.size())
+				{
+					grp2=grp1;
+					grp1=group;
+				}
+				else if((*group).lines.size()>(*grp2).lines.size())
+				{
+					grp2=group;
+				}
+			}
+
+			///Merge the closest lines
+			mergeRelatedLines(&linesGrouped, m_lines);
+
+			///If a real goban is detected
+			if(findAndCleanGoban(grp1,grp2))
+			{
+				///Search for extrema and print them
+				list_temp = findExtrema((*grp1),(*grp2));
+
+				for(int i=0;i<4;i++)
+				{
+					circle(display,(*list_temp[i]),5,Scalar(0,0,128),-1,8);
+				}
+			}
+
+			for(int i=0;i<(*grp1).lines.size();i++)
+			{
+				drawLine((*grp1).lines[i], m_lines, CV_RGB(0,0,128));
+			}
+			for(int i=0;i<(*grp2).lines.size();i++)
+			{
+				drawLine((*grp2).lines[i], m_lines, CV_RGB(0,0,128));
+			}
+		}
+		else
+		{
+			for(int i=0;i<lines.size();i++)
+			{
+				drawLine(lines[i], m_lines, CV_RGB(0,0,128));
+			}
+		}
+
+
+        imshow("Vue camera",display);
+        waitKey(20);
+
         ///If there the right number of points
         if(list_temp.size()==4)
         {
@@ -190,10 +310,8 @@ void Core::init()
             }
             if(s[0]=='n')
                 while(list_temp.size()!=0){list_temp.pop_back();}
-            i=1;
         }
     }
-
 #ifdef COMP_MOD_VERBOSE
     verbose = src;
     for(int i=0; i<list_temp.size(); i++)
@@ -211,11 +329,8 @@ void Core::init()
 
     ///Ordering the points to have the top left corner in 0, the top right corner in 1 ...
     list_corner_markers=reorderPoints(list_corner_markers);
-
-    cout<<"Please, remove all the stones on the goban"<<endl;
-    cout<<"Press 'y' an validate when it's done"<<endl;
-    cin>>s;
     waitKey(10);
+
 #endif // COMP_MOD_NO_INIT
 }
 
@@ -244,7 +359,7 @@ void Core::detection()
             waitKey(0);
 #endif // COMP_MOD_VERBOSE
 
-            ///Detection of th calibration point displayed on the goban.
+            ///Detection of the calibration point displayed on the goban.
             waitKey(100);
             detectCalibPtCirlces();
 
@@ -597,7 +712,6 @@ bool Core::detectHandParam()
     cout<<endl<<i<<", "<<n<<endl;
 }
 
-
 int Core::countNotBlack(Mat img,int lim)
 {
     int compt=0;
@@ -613,3 +727,197 @@ void Core::generateBeginningTurnMat()
 {
      Mat(camera->getFrame()).copyTo(beginningTurn);
 }
+
+vector<lineGrp> Core::grpLines(vector<Vec2f> lines)
+{
+    vector<lineGrp> group;
+
+    vector<Vec2f>::iterator currentLine;
+    for(currentLine=lines.begin();currentLine!=lines.end();currentLine++)
+    {
+        vector<lineGrp>::iterator currentGrp;
+        for(currentGrp=group.begin();currentGrp!=group.end();currentGrp++)
+        {
+            if(abs((*currentLine)[1]-(*currentGrp).anglMoy)<CV_PI*20/180 || abs((*currentLine)[1]-(*currentGrp).anglMoy)>CV_PI*(180-20)/180)
+            {
+                if(abs((*currentLine)[1]-(*currentGrp).anglMoy)<CV_PI*20/180)
+                    (*currentGrp).anglMoy=((*currentGrp).lines.size()*(*currentGrp).anglMoy+(*currentLine)[1])/((*currentGrp).lines.size()+1);
+                if(abs((*currentLine)[1]-(*currentGrp).anglMoy)>CV_PI*(180-20)/180)
+                {
+                	if((*currentLine)[1]>(*currentGrp).anglMoy)
+                		(*currentGrp).anglMoy=((*currentGrp).lines.size()*(*currentGrp).anglMoy+(*currentLine)[1]-CV_PI)/((*currentGrp).lines.size()+1);
+                	else
+                		(*currentGrp).anglMoy=((*currentGrp).lines.size()*((*currentGrp).anglMoy-CV_PI)+(*currentLine)[1])/((*currentGrp).lines.size()+1);
+                }
+                if((*currentGrp).anglMoy<0) (*currentGrp).anglMoy+=CV_PI;
+                (*currentGrp).lines.push_back((*currentLine));
+                currentGrp=group.end();
+                break;
+            }
+        }
+        if(currentGrp==group.end())
+        {
+            lineGrp newGrp;
+            newGrp.lines.push_back((*currentLine));
+            newGrp.anglMoy=(*currentLine)[1];
+            group.push_back(newGrp);
+        }
+    }
+
+    return group;
+}
+
+void Core::mergeRelatedLines(vector<lineGrp> *groups, Mat &img)
+{
+    vector<lineGrp>::iterator g;
+	vector<Vec2f>::iterator l1;
+	vector<Vec2f>::iterator l2;
+
+    for(g = groups->begin();g!=groups->end();g++)
+    {
+    	for(l1=(*g).lines.begin();l1!=(*g).lines.end();l1++)
+    	{
+    		if((*l1)[0]==0 && (*l1)[1]==-100) continue;
+
+    		for(l2=(*g).lines.begin();l2!=(*g).lines.end();l2++)
+    		{
+    			if(*l1==*l2) continue;
+    			if((*l2)[0]==0 && (*l2)[1]==-100) continue;
+
+    			if(abs((*l1)[0]-(*l2)[0])<(float)(img.size().width)/70)
+    			{
+					(*l1)[0]=((*l1)[0]+(*l2)[0])/2;
+
+    				if(abs((*l1)[1]-(*l2)[1])<CV_PI/4)
+						(*l1)[1]=((*l1)[1]+(*l2)[1])/2;
+    				else {
+    					(*l1)[1]=((*l1)[1]+(*l2)[1]-CV_PI)/2;
+    					if((*l1)[1]<0)
+    						(*l1)[1]+=CV_PI;
+    				}
+
+    				(*l2)[0]=0;
+    				(*l2)[1]=-100;
+    			}
+    		}
+    	}
+    }
+}
+
+void Core::drawLine(Vec2f line, Mat &img, Scalar rgb)
+{
+	if(line[1]!=0)
+    {
+        float m = -1/tan(line[1]);
+
+        float c = line[0]/sin(line[1]);
+
+        cv::line(img, Point(0, c), Point(img.size().width, m*img.size().width+c), rgb);
+    }
+    else
+    {
+        cv::line(img, Point(line[0], 0), Point(line[0], img.size().height), rgb);
+    }
+}
+
+bool Core::findAndCleanGoban(vector<lineGrp>::iterator g1, vector<lineGrp>::iterator g2)
+{
+	vector<Vec2f> correctLine;
+
+	vector<Vec2f>::iterator line;
+	for(line=(*g1).lines.begin();line!=(*g1).lines.end();line++)
+	{
+		if((*line)[0]!=0||(*line)[1]!=-100)
+			correctLine.push_back((*line));
+	}
+	(*g1).lines=correctLine;
+	correctLine.clear();
+	for(line=(*g2).lines.begin();line!=(*g2).lines.end();line++)
+	{
+		if((*line)[0]!=0||(*line)[1]!=-100)
+			correctLine.push_back((*line));
+	}
+	(*g2).lines=correctLine;
+
+	if((*g1).lines.size()!=9 && (*g1).lines.size()!=13 && (*g1).lines.size()!=19) return false;
+	if((*g2).lines.size()!=9 && (*g2).lines.size()!=13 && (*g2).lines.size()!=19) return false;
+	if((*g1).lines.size()!=(*g2).lines.size()) return false;
+
+	return true;
+}
+
+vector<Vec2f> Core::findExtremaLinesOneGrp(lineGrp g1,lineGrp g2)
+{
+	//Il faudra gérer la division par zéro un jour ...
+
+	float a1,b1,a2i,b2i,a2j,b2j,xi,yi,xj,yj;
+	Vec2f lmax = g1.lines[0];
+	Vec2f lmin = g1.lines[0];
+	float d=0;
+
+	a1=-cos(g1.lines[0][1])/sin(g1.lines[0][1]);
+	b1=g1.lines[0][0]/sin(g1.lines[0][1]);
+
+	for(int i=0;i<g1.lines.size();i++)
+	{
+		a2i=-cos(g2.lines[i][1])/sin(g2.lines[i][1]);
+		b2i=g2.lines[i][0]/sin(g2.lines[i][1]);
+		xi=-(b1-b2i)/(a1-a2i);
+		yi=(a1*b2i-a2i*b1)/(a1-a2i);
+
+
+		for(int j=0;j<g1.lines.size();j++)
+		{
+			a2j=-cos(g2.lines[j][1])/sin(g2.lines[j][1]);
+			b2j=g2.lines[j][0]/sin(g2.lines[j][1]);
+
+			xj=-(b1-b2j)/(a1-a2j);
+			yj=(a1*b2j-a2j*b1)/(a1-a2j);
+
+			if(d<sqrt(pow((xi-xj),2)+pow((yi-yj),2)))
+			{
+				d=sqrt(pow((xi-xj),2)+pow((yi-yj),2));
+				lmin=g2.lines[i];
+				lmax=g2.lines[j];
+			}
+		}
+	}
+
+	vector<Vec2f> result;
+	result.push_back(lmin);
+	result.push_back(lmax);
+
+	return result;
+}
+
+vector<Point2f*> Core::findExtrema(lineGrp g1,lineGrp g2)
+{
+	vector<Vec2f> partResult;
+	vector<Vec2f> result;
+	vector<Point2f*> extrema;
+
+	partResult=findExtremaLinesOneGrp(g1,g2);
+	result.push_back(partResult[0]);
+	result.push_back(partResult[1]);
+
+	partResult=findExtremaLinesOneGrp(g2,g1);
+	result.push_back(partResult[0]);
+	result.push_back(partResult[1]);
+
+	float a1,b1,a2,b2;
+	for(int i=0;i<2;i++)
+	{
+		a1=-cos(result[i][1])/sin(result[i][1]);
+		b1=result[i][0]/sin(result[i][1]);
+
+		for(int j=2;j<4;j++)
+		{
+			a2=-cos(result[j][1])/sin(result[j][1]);
+			b2=result[j][0]/sin(result[j][1]);
+
+			extrema.push_back(new Point2f(-(b1-b2)/(a1-a2),(a1*b2-b1*a2)/(a1-a2)));
+		}
+	}
+	return extrema;
+}
+

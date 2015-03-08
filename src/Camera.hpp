@@ -25,7 +25,7 @@ namespace rago{
 
 /** \class  rago::Camera Camera.hpp Camera
   *
-  * \brief Class fepresenting the camera and all the functions associated
+  * \brief Class representing the camera and all the functions associated
   *
   * This class contain all the Camera function from getting a frame to the calibration of the camera itself
   **/
