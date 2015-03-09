@@ -14,7 +14,7 @@ Projector::~Projector(){}
 
 void Projector::draw(Mat *mat)
 {
-    ///Perspective tranformation of the matrix
+    ///Perspective transformation of the matrix
     cv::warpPerspective(*mat, matDraw, *VG2P, matDraw.size());
     imshow("detection", matDraw);
 }
@@ -23,12 +23,19 @@ void Projector::draw(int mode, int x, int y, int i)
 {
     switch(mode)
     {
-        case 2: /// display detection points
+        case PROJ_MOD_DETECTION: /// display detection points
             matDraw = cv::Scalar(0, 0, 0);
             circle(matDraw, Point2f(x, y), 20, Scalar(255, 255, 255), -1);
             imshow("detection", matDraw);
             break;
-
+        case PROJ_MOD_MARKER:
+            matDraw = cv::Scalar(0, 0, 0);
+            Mat marker=FiducidalMarkers::createMarkerImage(i,round(matDraw.size().width/15));
+            cvtColor(marker,marker,CV_GRAY2RGB);
+        	Rect roi(Point(x,y),marker.size());
+        	marker.copyTo(matDraw(roi));
+        	imshow("detection", matDraw);
+            break;
     }
     imshow("detection", matDraw);
 }

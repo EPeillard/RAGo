@@ -13,6 +13,7 @@
 #define CORE_HPP
 
 #include "opencv2/calib3d/calib3d.hpp"
+#include <aruco/aruco.h>
 
 #include "Camera.hpp"
 #include "Projector.hpp"
@@ -20,6 +21,7 @@
 
 using namespace cv;
 using namespace std;
+using namespace aruco;
 /** \namespace rago
   *
   * namespace used to define all the functions used in the rago project
@@ -120,10 +122,9 @@ public:
     void init();
 
     /** \fn void detection()
-      * \brief Detection by moving a point on the goban to get the projector coordinate of the corners
-      * Detection of coordinates points. To obtains the projector coordinates, the point get by the camera is displayed.
-      * If it's no over the corner, it will be moved, displayed and detected again.
-      * In the end, le points getted are saved and give the corner coordinates in the projector system.
+      * \brief Detection by displaying markers
+      * A marker is displayed on the Goban and then it's position in the Camera system is saved.
+      * It generates a list of coordonated points which allow to find a tranformation matrix.
     **/
     void detection();
 
@@ -277,6 +278,9 @@ private:
     /**\brief Detection point read by the camera
     **/
     Point2f *point_read;
+    /**\brief Location of marker for projector calibration
+     **/
+	vector<Point2f*> marker_points;
 
     /**\brief Margin between the center of the detection point and a corner of the goban
     **/

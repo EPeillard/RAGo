@@ -91,12 +91,6 @@ Mat* Core::getC2GMat()
 
 void Core::genConvMat()
 {
-    /// Setting Projector coordinate of corners
-    vector<Point2f> cornersProj;
-    cornersProj.push_back(*list_corner_detected[0]);
-    cornersProj.push_back(*list_corner_detected[1]);
-    cornersProj.push_back(*list_corner_detected[2]);
-    cornersProj.push_back(*list_corner_detected[3]);
     /// Setting Goban coordinate of corners
     vector<Point2f> cornersGoban;
     cornersGoban.push_back(Point2f(0, 0));
@@ -116,13 +110,30 @@ void Core::genConvMat()
     cornersVirtualGoban.push_back(Point2f(VG_HEIGHT+FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING));
     cornersVirtualGoban.push_back(Point2f(FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING));
 
+    /// Setting Camera coordinate of markers
+    vector<Point2f> markersCamera;
+    /// Setting Projector coordinate of markers
+    vector<Point2f> markersProj;
+    for(int i=0;i<marker_points.size();i++)
+    {
+    	markersCamera.push_back(marker_points[i][0]);
+    	markersProj.push_back(marker_points[i][1]);
+    }
+
     /// Generation of the conversion matrix
     findHomography(cornersCamera, cornersGoban).convertTo(C2G, CV_32F);
-    findHomography(cornersGoban, cornersProj).convertTo(G2P, CV_32F);
-    findHomography(cornersProj, cornersCamera).convertTo(P2C, CV_32F);
-    findHomography(cornersVirtualGoban, cornersProj).convertTo(VG2P, CV_32F);
+    findHomography(markersProj,markersCamera).convertTo(P2C, CV_32F);
     findHomography(cornersVirtualGoban, cornersCamera).convertTo(VG2C, CV_32F);
 
+    G2P=C2G.inv()*P2C.inv();
+    VG2P=VG2C*C2G;
+
+    for(int i=0;i<list_corner_detected.size();i++)
+    {
+    	delete list_corner_detected[i];
+    }
+    list_corner_detected.clear();
+    perspectiveTransform(cornersGoban,list_corner_detected,G2P);
 }
 
 void Core::init()
@@ -336,61 +347,37 @@ void Core::init()
 
 void Core::detection()
 {
-    ///Setting the number of points already detected
-    nbrPt=0;
-    #ifndef COMP_MOD_NO_DETECT
-        ///Getting the point to display and move on the goban
-        point_display = new Point2f(*list_corner_markers[nbrPt]);
+	#ifndef COMP_MOD_NO_DETECT
 
-        namedWindow( "detection circles", CV_WINDOW_AUTOSIZE );
-        ///Projection of the point
-        proj->draw(PROJ_MOD_DETECTION, point_display->x, point_display->y);
-        cout<<"Detection"<<endl;
-        waitKey(100);
-        ///Do the detection while there still corner not detected
-        do{
-            ///Reloading a picture to detect points displayed
-            src = Mat(camera->getFrame());
-            cvtColor(src, src_gray, CV_BGR2GRAY);
+		srand (time(NULL));
 
-#ifdef COMP_MOD_VERBOSE
-            imshow( "detection circles", src );
-            cout<<"press any key"<<endl;
-            waitKey(0);
-#endif // COMP_MOD_VERBOSE
+		while(marker_points.size()<5) //TODO use global define
+		{
+			int nMark = rand()%1000;
+			int x = rand()%(proj->matDraw.size().width-(int)round(proj->matDraw.size().width/15));
+			int y = rand()%(proj->matDraw.size().height-(int)round(proj->matDraw.size().width/15));
 
-            ///Detection of the calibration point displayed on the goban.
-            waitKey(100);
-            detectCalibPtCirlces();
+			proj->draw(PROJ_MOD_MARKER, x,y,nMark);
+			waitKey(100);
 
+			MarkerDetector myDetector;
+			vector <Marker> markers;
 
-            ///Changing the coordinate of the display point to move it to the corner if it need
-            if(point_read!=NULL)
-            {
-               ///If the point isn't over the corner withe a margin, it's moved.
-                if(list_corner_markers[nbrPt]->x-MARGIN_MARKERS_CALIB>=point_read->x)
-                    *point_display += Point2f(pasX, 0);
-                if(list_corner_markers[nbrPt]->x+MARGIN_MARKERS_CALIB<=point_read->x)
-                    *point_display += Point2f(-pasX, 0);
+			src = Mat(camera->getFrame());
+			myDetector.detect(src,markers);
 
-                if(list_corner_markers[nbrPt]->y-MARGIN_MARKERS_CALIB>=point_read->y)
-                    *point_display += Point2f(0, pasY);
-                if(list_corner_markers[nbrPt]->y+MARGIN_MARKERS_CALIB<=point_read->y)
-                    *point_display += Point2f(0, -pasY);
+			for (unsigned int i=0;i<markers.size();i++){
+				if(markers[i].id==nMark)
+				{
+					Point2f temp[2];
+					temp[0]=markers[i].getCenter();
+					temp[1]=Point2f(x+(int)round(proj->matDraw.size().width/15/2),y+(int)round(proj->matDraw.size().width/15/2));
 
-                circle( src, *point_display , 3, Scalar(0,255,0), -1, 8, 0 );
-
-            }
-            proj->draw(PROJ_MOD_DETECTION, point_display->x, point_display->y);
-            waitKey(10);
-
-        }while(nbrPt<CORNER_NUMBER);
+					marker_points.push_back(temp);
+				}
+			}
+		}
 #endif // COMP_MOD_NO_DETECT
-#ifdef COMP_MOD_VERBOSE
-        for(int i=0; i<list_corner_detected.size(); i++){
-            cout<<"x:"<<list_corner_detected[i]->x<<"  y:"<<list_corner_detected[i]->y<<endl;
-        }
-#endif // COMP_MOD_VERBOSE
 }
 
 vector<Point2f*> Core::getCorners()

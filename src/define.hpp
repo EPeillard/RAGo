@@ -35,6 +35,8 @@
 #define PROJ_MOD_STONE 3
 ///Projector mod drawing the clock
 #define PROJ_MOD_CLOCK 4
+///Projector mod drawing a Aruco marker
+#define PROJ_MOD_MARKER 5
 
 ///All of the following values are for the VirtualGoban
 

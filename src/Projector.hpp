@@ -15,6 +15,10 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
+//Aruco includes
+#include <aruco/aruco.h>
+#include <aruco/arucofidmarkers.h>
+
 #include <iostream>
 #include <vector>
 
@@ -23,6 +27,7 @@
 
 using namespace cv;
 using namespace std;
+using namespace aruco;
 
 namespace rago{
 
@@ -55,15 +60,15 @@ public:
     void draw(int, int=0, int=0, int=0);
 
     /** \fn draw(Mat *mat)
-      * Drawing funstion. It draw on the projector screen
+      * Drawing function. It draw on the projector screen
       * \arg Mat image to draw
       **/
     void draw(Mat *mat);
+
     /** \fn void setVG2P(Mat*)
       * Setter for the VG2P matrix
       * \arg VG2P matrix
       **/
-
     void setVG2P(Mat*);
 
     Mat matDraw; //TODO faire un getter
