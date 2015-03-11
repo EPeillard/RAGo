@@ -5,10 +5,10 @@
   **/
 
 ///To avoid running the function to get corner coordinate (camera coordinate) and just use values written in the code
-//#define COMP_MOD_NO_INIT
+#define COMP_MOD_NO_INIT
 
 ///To avoid running the function to get corner coordinate (projector coordinate) and just use values written in the code
-//#define COMP_MOD_NO_DETECT
+#define COMP_MOD_NO_DETECT
 
 ///To display all the information
 //#define COMP_MOD_VERBOSE
@@ -63,7 +63,11 @@ Core::Core(Camera* camera, Projector* proj, Goban* goban)
     list_corner_detected.push_back(new Point2f(63, 729));
 #endif // COMP_MOD_NO_DETECT
 
-    namedWindow("Vue camera", CV_WINDOW_FREERATIO );
+    namedWindow(WINDOW_PROJECTOR, CV_WINDOW_FREERATIO );
+
+#ifdef COMP_MOD_VERBOSE
+    namedWindow(WINDOW_VERBOSE, CV_WINDOW_AUTOSIZE);
+#endif // COMP_MOD_VERBOSE
 
 }
 
@@ -91,6 +95,7 @@ Mat* Core::getC2GMat()
 
 void Core::genConvMat()
 {
+
     /// Setting Goban coordinate of corners
     vector<Point2f> cornersGoban;
     cornersGoban.push_back(Point2f(0, 0));
@@ -125,19 +130,34 @@ void Core::genConvMat()
     findHomography(markersProj,markersCamera).convertTo(P2C, CV_32F);
     findHomography(cornersVirtualGoban, cornersCamera).convertTo(VG2C, CV_32F);
 
-    G2P=C2G.inv()*P2C.inv();
-    VG2P=VG2C*C2G;
+    vector<Point2f> temp_vect(cornersGoban.size());
+    perspectiveTransform(markersProj,temp_vect,P2C);
+    perspectiveTransform(temp_vect,temp_vect,C2G);
+    findHomography(temp_vect,markersProj).convertTo(G2P,CV_32F);
+
+    perspectiveTransform(cornersVirtualGoban,temp_vect,VG2C);
+    perspectiveTransform(temp_vect,temp_vect,C2G);
+    perspectiveTransform(temp_vect,temp_vect,G2P);
+    findHomography(cornersVirtualGoban,temp_vect).convertTo(VG2P,CV_32F);
 
     for(int i=0;i<list_corner_detected.size();i++)
     {
     	delete list_corner_detected[i];
     }
     list_corner_detected.clear();
-    perspectiveTransform(cornersGoban,list_corner_detected,G2P);
+
+    perspectiveTransform(cornersGoban,temp_vect,G2P);
+
+    for(int i=0;i<temp_vect.size();i++)
+    {
+    	list_corner_detected.push_back(new Point2f(temp_vect[i]));
+    }
 }
 
 void Core::init()
 {
+    //TODO checkez les modes sans initialisation
+
     ///Drawing a white image on the goban to improve the detection of the corners
     proj->draw(PROJ_MOD_1 , PROJECTOR_WIDTH, PROJECTOR_HEIGHT);
     waitKey(10);
@@ -148,18 +168,13 @@ void Core::init()
     int key=0;
     while(key<=0)
     {
-    	imshow("Vue camera",Mat(camera->getFrame()));
+    	imshow(WINDOW_CAMERA,Mat(camera->getFrame()));
     	key=waitKey(100);
     }
 
 
 #ifndef COMP_MOD_NO_INIT
     vector<Point2f*> list_temp;
-
-#ifdef COMP_MOD_VERBOSE
-    namedWindow("Verbose mod", CV_WINDOW_AUTOSIZE);
-#endif // COMP_MOD_VERBOSE
-
 
     ///While the isn't enough corners detected
     while(list_temp.size()!=CORNER_NUMBER)
@@ -177,11 +192,11 @@ void Core::init()
 				src = Mat(camera->getFrame());
 				cvtColor(src, src_gray, CV_BGR2GRAY);
 
-				//GaussianBlur(image_modif,image_modif,Size(11,11),0);
+				GaussianBlur(src_gray,src_gray,Size(11,11),1);
 
 				///Threshold the gray image and revert it
 				///\todo fix parameters
-				adaptiveThreshold(src_gray, lines_tmp1, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 15, 3);
+				adaptiveThreshold(src_gray, lines_tmp1, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 13, 3);
 				bitwise_not(lines_tmp1,lines_tmp1);
 
 				///Dilate the image in order to re-connect lines
@@ -305,8 +320,12 @@ void Core::init()
 			}
 		}
 
+		#ifdef COMP_MOD_VERBOSE
+            imshow(WINDOW_VERBOSE,m_lines);
+		#endif // COMP_MOD_VERBOSE
 
-        imshow("Vue camera",display);
+
+        imshow(WINDOW_CAMERA,display);
         waitKey(20);
 
         ///If there the right number of points
@@ -330,7 +349,7 @@ void Core::init()
         cout<<"x:"<<list_temp[i]->x<<"  y:"<<list_temp[i]->y<<endl;
         circle( verbose, *list_temp[i], 3, Scalar(0,255,0), -1, 8, 0 );
     }
-    imshow("Verbose mod", verbose);
+    imshow(WINDOW_VERBOSE, verbose);
     cout<<"Press any key to continue"<<endl;
     waitKey(0);
 #endif // COMP_MOD_VERBOSE
@@ -347,36 +366,61 @@ void Core::init()
 
 void Core::detection()
 {
-	#ifndef COMP_MOD_NO_DETECT
+#ifndef COMP_MOD_NO_DETECT
 
-		srand (time(NULL));
+    srand (time(NULL));
+    marker_points.clear();
 
-		while(marker_points.size()<5) //TODO use global define
-		{
-			int nMark = rand()%1000;
-			int x = rand()%(proj->matDraw.size().width-(int)round(proj->matDraw.size().width/15));
-			int y = rand()%(proj->matDraw.size().height-(int)round(proj->matDraw.size().width/15));
+    while(marker_points.size()<5)
+    {
+        int nMark = rand()%1000;
+        int x = rand()%(proj->matDraw.size().width-(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE));
+        int y = rand()%(proj->matDraw.size().height-(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE));
 
-			proj->draw(PROJ_MOD_MARKER, x,y,nMark);
-			waitKey(100);
+        proj->draw(PROJ_MOD_MARKER, x,y,nMark);
+        imshow(WINDOW_CAMERA,Mat(camera->getFrame()));
+        waitKey(100);
 
-			MarkerDetector myDetector;
-			vector <Marker> markers;
+        MarkerDetector myDetector;
+        vector <Marker> markers;
 
-			src = Mat(camera->getFrame());
-			myDetector.detect(src,markers);
+        src = Mat(camera->getFrame());
+        myDetector.detect(src,markers);
 
-			for (unsigned int i=0;i<markers.size();i++){
-				if(markers[i].id==nMark)
-				{
-					Point2f temp[2];
-					temp[0]=markers[i].getCenter();
-					temp[1]=Point2f(x+(int)round(proj->matDraw.size().width/15/2),y+(int)round(proj->matDraw.size().width/15/2));
+        for (unsigned int i=0;i<markers.size();i++){
+            cout << "Affiché : " << nMark << " , Trouvé : " << markers[i].id << endl;
+            if(markers[i].id==nMark)
+            {
+                Point2f temp[2];
+                temp[0]=markers[i].getCenter();
+                temp[1]=Point2f(x+(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE/2),y+(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE/2));
 
-					marker_points.push_back(temp);
-				}
-			}
-		}
+                marker_points.push_back(temp);
+            }
+        }
+    }
+
+    #ifdef COMP_MOD_VERBOSE
+
+    #endif // COMP_MOD_VERBOSE
+#else
+    Point2f temp[2];
+
+    temp[0]=Point2f(0,0);
+    temp[1]=Point2f(0,0);
+    marker_points.push_back(temp);
+
+    temp[0]=Point2f(src.size().width,0);
+    temp[1]=Point2f(proj->matDraw.size().width,0);
+    marker_points.push_back(temp);
+
+    temp[0]=Point2f(0,src.size().height);
+    temp[1]=Point2f(0,proj->matDraw.size().height);
+    marker_points.push_back(temp);
+
+    temp[0]=Point2f(src.size().width,src.size().height);
+    temp[1]=Point2f(proj->matDraw.size().width,proj->matDraw.size().height);
+    marker_points.push_back(temp);
 #endif // COMP_MOD_NO_DETECT
 }
 

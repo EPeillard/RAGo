@@ -1,71 +1,67 @@
 #include "Camera.hpp"
 
-#include <iostream>
-#include <sstream>
-#include <time.h>
-#include <stdio.h>
-
-#include <string.h>
-#include <opencv2/calib3d/calib3d.hpp>
-
 using namespace rago;
 
 Camera::Camera()
 {
-    ///The value is the numero of the camera
-    capture = cvCreateCameraCapture(0);
+    id=0;
+    nbTests=0;
+    capture = VideoCapture(id);
+    while(!capture.isOpened())
+    {
+        id++;
+        capture = VideoCapture(id);
+        if(id<15) {id=0; nbTests++;}
+        if(nbTests>5) throw runtime_error("No camera found");
+    }
 }
 
 Camera::~Camera()
 {
 }
 
-IplImage* Camera::getFrame()
+void Camera::nextCam()
 {
-    ///First empty the camera buffer
-    emptyBuffer();
-    ///Get the frame
-    IplImage* image = cvQueryFrame(capture);
+    id++;
+    nbTests=0;
+    capture = VideoCapture(id);
+    while(!capture.isOpened())
+    {
+        id++;
+        capture = VideoCapture(id);
+        if(id<15) {id=0; nbTests++;}
+        if(nbTests>5) throw runtime_error("No camera found");
+    }
+}
+
+Mat Camera::getFrame()
+{
+    Mat image;
+    capture >> image;
 
     return image;
 }
 
-void Camera::emptyBuffer()
-{
-    IplImage *frame = cvQueryFrame(capture);
-    IplImage *frame2 = NULL;
-    int i=0;
-
-    while(i<5){
-        if(frame2)
-            frame = cvCloneImage(frame2);
-        frame2 = cvQueryFrame(capture);
-        if(!frame2) break;
-        waitKey(10);
-        i++;
-    }
-}
-
 void Camera::close()
 {
-    cvReleaseCapture(&capture);
+    capture.release();
 }
 
 void read_camera_params( const char* in_filename,
                          CvMat* camera_matrix,
                          CvMat* dist_coeffs)
 {
-    ///First the savefile is oppened
+    ///First the savefile is opened
     CvFileStorage* fs = cvOpenFileStorage( in_filename, 0, CV_STORAGE_READ );
     ///The values of the camera matrix are loaded
     camera_matrix = (CvMat *) cvRead (fs, cvGetFileNodeByName (fs, NULL, "Camera_Matrix"));
-    ///The values of the distortion coefficents are loaded
+    ///The values of the distortion coefficients are loaded
     dist_coeffs = (CvMat *) cvRead (fs, cvGetFileNodeByName (fs, NULL, "Distortion_Coefficients"));
     ///The file is closed
     cvReleaseFileStorage (&fs);
 }
 
-Mat Camera::corection(IplImage image)
+Mat Camera::correction(IplImage image)
 {
     cout<<"correction"<<endl;
     const char* in_filename = "out_camera_data.yml";
@@ -95,6 +91,7 @@ Mat Camera::corection(IplImage image)
 
 //All the following functions come from OpenCv website examples
 //It's quite a mess, and it need to be reorgenised
+//TODO fix that mess
 class Settings
 {
 public:

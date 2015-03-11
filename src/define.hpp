@@ -67,6 +67,9 @@
 ///Width of the cicle
 #define CIRCLE_WIDTH 20
 
+///Ratio of the windows size for the marker size
+#define RATIO_MARKER_SIZE 0.1
+
 ///Ratio between the Goban and the VirtualGoban
 #define RATIO_G_VG 100
 #define STONE_BORDER_SIZE 45
@@ -87,5 +90,11 @@
 #define CLOCK_PLAYER_HEIGHT 100
 #define CLOCK_TIME_WIDTH 150
 #define CLOCK_TIME_HEIGHT 100
+
+///Windows names
+#define WINDOW_CAMERA "Vue caméra"
+#define WINDOW_PROJECTOR "Affichage projecteur"
+#define WINDOW_VERBOSE "Mode verbose"
+#define WINDOW_VG "VirtualGoban"
 
 

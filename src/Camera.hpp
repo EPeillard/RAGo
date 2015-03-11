@@ -17,6 +17,14 @@
 #include "opencv2/imgproc/imgproc.hpp"
 
 #include <iostream>
+#include <sstream>
+#include <time.h>
+#include <stdio.h>
+
+#include <string.h>
+#include <opencv2/calib3d/calib3d.hpp>
+
+#include <stdexcept>
 
 using namespace cv;
 using namespace std;
@@ -43,11 +51,16 @@ public:
     **/
     ~Camera();
 
+    /** \fn nextCam()
+      * Use an other camera
+    **/
+    void nextCam();
+
     /** \fn IplImage* getFrame()
       * Give back a image just taken from the camera
       *
       **/
-    IplImage* getFrame();
+    Mat getFrame();
 
     /** \fn close()
       * Close the steam to the camera
@@ -60,16 +73,24 @@ public:
       **/
     void genYML(int, char**);
 
-    /** \fn Mat corection(IplImage)
-      * Becarfull, this function DOESN'T WORK, it normaly correct an image just taken.
+    /** \fn Mat correction(IplImage)
+      * Be careful, this function DOESN'T WORK, it normally corrects an image just taken.
     **/
-    Mat corection(IplImage);
+    Mat correction(IplImage);
 
 private:
 
     /** Camera stream for taking frames
     **/
-    CvCapture* capture;
+    VideoCapture capture;
+
+    /** Camera id
+    **/
+    int id;
+
+    /** Nb test until throwing exception for no cam found
+    **/
+    int nbTests;
 
     /** \fn void emptyBuffer();
       * This function empty the image buffer of the camera stream.
