@@ -25,6 +25,7 @@
 #include <opencv2/calib3d/calib3d.hpp>
 
 #include <stdexcept>
+#include <thread>
 
 using namespace cv;
 using namespace std;
@@ -96,6 +97,17 @@ private:
       * This function empty the image buffer of the camera stream.
       **/
     void emptyBuffer();
+
+
+    void refreshFrame();
+
+    /** Most recent frame
+    **/
+    Mat frame;
+
+    bool refreshing;
+
+    thread refresh;
 };
 
 }

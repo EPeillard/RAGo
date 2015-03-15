@@ -9,6 +9,7 @@ find_package (aruco REQUIRED)
 find_package (Qt4 REQUIRED)
 
 set(EXECUTABLE_OUTPUT_PATH bin)
+SET(CMAKE_CXX_FLAGS "-std=c++11")
 
 file(
         GLOB_RECURSE

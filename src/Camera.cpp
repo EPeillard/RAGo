@@ -14,14 +14,28 @@ Camera::Camera()
         if(id<15) {id=0; nbTests++;}
         if(nbTests>5) throw runtime_error("No camera found");
     }
+    refreshing=true;
+    capture>>frame;
+    refresh = thread(&Camera::refreshFrame, this);
+}
+
+void Camera::refreshFrame()
+{
+    while(refreshing)
+    {
+        capture >> frame;
+        waitKey(50);
+    }
 }
 
 Camera::~Camera()
 {
+    capture.release();
 }
 
 void Camera::nextCam()
 {
+    capture.release();
     id++;
     nbTests=0;
     capture = VideoCapture(id);
@@ -36,15 +50,12 @@ void Camera::nextCam()
 
 Mat Camera::getFrame()
 {
-    Mat image;
-    capture >> image;
-
-    return image;
+    return frame;
 }
 
 void Camera::close()
 {
-    capture.release();
+    refreshing=false;
 }
 
 void read_camera_params( const char* in_filename,

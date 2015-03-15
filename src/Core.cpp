@@ -5,13 +5,13 @@
   **/
 
 ///To avoid running the function to get corner coordinate (camera coordinate) and just use values written in the code
-#define COMP_MOD_NO_INIT
+//#define COMP_MOD_NO_INIT
 
 ///To avoid running the function to get corner coordinate (projector coordinate) and just use values written in the code
-#define COMP_MOD_NO_DETECT
+//#define COMP_MOD_NO_DETECT
 
 ///To display all the information
-//#define COMP_MOD_VERBOSE
+#define COMP_MOD_VERBOSE
 
 #include "define.hpp"
 #include "Core.hpp"
@@ -130,7 +130,7 @@ void Core::genConvMat()
     findHomography(markersProj,markersCamera).convertTo(P2C, CV_32F);
     findHomography(cornersVirtualGoban, cornersCamera).convertTo(VG2C, CV_32F);
 
-    vector<Point2f> temp_vect(cornersGoban.size());
+    vector<Point2f> temp_vect(4);
     perspectiveTransform(markersProj,temp_vect,P2C);
     perspectiveTransform(temp_vect,temp_vect,C2G);
     findHomography(temp_vect,markersProj).convertTo(G2P,CV_32F);
@@ -170,6 +170,11 @@ void Core::init()
     {
     	imshow(WINDOW_CAMERA,Mat(camera->getFrame()));
     	key=waitKey(100);
+    	if(key=='c')
+    	{
+            camera->nextCam();
+            key=0;
+    	}
     }
 
 
@@ -371,20 +376,21 @@ void Core::detection()
     srand (time(NULL));
     marker_points.clear();
 
-    while(marker_points.size()<5)
+    while(marker_points.size()<4)
     {
         int nMark = rand()%1000;
         int x = rand()%(proj->matDraw.size().width-(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE));
         int y = rand()%(proj->matDraw.size().height-(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE));
 
         proj->draw(PROJ_MOD_MARKER, x,y,nMark);
-        imshow(WINDOW_CAMERA,Mat(camera->getFrame()));
+        waitKey(500);
+        src = camera->getFrame();
+        imshow(WINDOW_CAMERA,src);
         waitKey(100);
 
         MarkerDetector myDetector;
         vector <Marker> markers;
 
-        src = Mat(camera->getFrame());
         myDetector.detect(src,markers);
 
         for (unsigned int i=0;i<markers.size();i++){
@@ -815,7 +821,7 @@ void Core::mergeRelatedLines(vector<lineGrp> *groups, Mat &img)
     			if(*l1==*l2) continue;
     			if((*l2)[0]==0 && (*l2)[1]==-100) continue;
 
-    			if(abs((*l1)[0]-(*l2)[0])<(float)(img.size().width)/70)
+    			if(abs((*l1)[0]-(*l2)[0])<(float)(img.size().width)/100)
     			{
 					(*l1)[0]=((*l1)[0]+(*l2)[0])/2;
 
