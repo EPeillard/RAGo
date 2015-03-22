@@ -18,6 +18,7 @@
 //Aruco includes
 #include <aruco/aruco.h>
 #include <aruco/arucofidmarkers.h>
+#include <aruco/board.h>
 
 #include <iostream>
 #include <vector>
@@ -58,6 +59,14 @@ public:
       * \arg
       **/
     void draw(int, int=0, int=0, int=0);
+
+    /**\fn void draw(int, vector<int> &)
+      * Only used to draw an Arruco marker filled board
+      * \arg code of the projection mod
+      * \arg list of the marker centers
+      * \arg list of the id
+      **/
+    void draw(int mode, vector<Point> &, vector<int> &);
 
     /** \fn draw(Mat *mat)
       * Drawing function. It draw on the projector screen
