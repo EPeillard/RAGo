@@ -26,7 +26,7 @@
 #define PROJECTOR_WIDTH 1024
 
 ///Values used for the detection parameter
-#define GRAY_SCALE 0.2
+#define GRAY_SCALE 0.4
 
 ///Projector mod drawing the corners and borders of the goban detected
 #define PROJ_MOD_BORDERS 0

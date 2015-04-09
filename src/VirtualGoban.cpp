@@ -9,7 +9,7 @@ VirtualGoban::VirtualGoban(Projector* proj)
     matDraw = cv::Scalar(0, 0, 0);
     Rect cache = Rect(VG_PADDING, VG_PADDING, VG_HEIGHT+FULL_VG_PADDING+VG_PADDING, VG_WIDTH+FULL_VG_PADDING+VG_PADDING);
     rectangle(matDraw,cache , Scalar(137, 134, 208), -1);
-    namedWindow( "VirtualGoban", CV_WINDOW_FREERATIO );
+    namedWindow( WINDOW_VG, CV_WINDOW_FREERATIO );
 }
 
 VirtualGoban::~VirtualGoban(){}
@@ -35,7 +35,7 @@ void VirtualGoban::addStone(int color, int x, int y)
         std::cout<<"black"<<std::endl;
     }
 
-    imshow("VirtualGoban", matDraw);
+    imshow(WINDOW_VG, matDraw);
     draw();
 }
 
@@ -44,7 +44,7 @@ void VirtualGoban::remove(int x, int y)
     std::cout<<"remove "<<std::endl;
     circle(matDraw, Point(FULL_VG_PADDING+RATIO_G_VG*(x-1), FULL_VG_PADDING+RATIO_G_VG*(y-1)), STONE_SIZE,  Scalar(137, 134, 208), -1);
 
-    imshow("VirtualGoban", matDraw);
+    imshow(WINDOW_VG, matDraw);
     draw();
 }
 
@@ -60,7 +60,14 @@ void VirtualGoban::drawBorders()
     line( matDraw, Point(VG_HEIGHT+FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING), Point(FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING), Scalar(0,0,255), 5);
     line( matDraw, Point(FULL_VG_PADDING, VG_WIDTH+FULL_VG_PADDING), Point(FULL_VG_PADDING, FULL_VG_PADDING), Scalar(0,0,255), 5);
 
-    imshow("VirtualGoban", matDraw);
+    cout << "matDraw size : " << matDraw.size() << endl;
+
+    imwrite("coucou.jpg",matDraw);
+
+    imshow(WINDOW_VG, matDraw); //Pour une raison inconnue, cette ligne seg fault parfois
+
+    cout << "Coucou" << endl;
+
     draw();
 }
 
@@ -136,7 +143,7 @@ void VirtualGoban::setClock2(int time)
 void VirtualGoban::drawClock()
 {
     circle(matDraw, Point(CLOCK_CENTER_X, CLOCK_CENTER_Y) , CLOCK_SIZE,  Scalar(150, 150, 150), -1);
-    imshow("VirtualGoban", matDraw);
+    imshow(WINDOW_VG, matDraw);
     draw();
 }
 
@@ -144,14 +151,14 @@ void VirtualGoban::drawClockBorders(int val)
 {
     circle(matDraw, Point(CLOCK_CENTER_X, CIRCLE_CENTER_Y) , CLOCK_SIZE,  Scalar(0, 0, 0), -1);
     circle(matDraw, Point(CLOCK_CENTER_X, CIRCLE_CENTER_Y) , CLOCK_SIZE-(val)*20,  Scalar(0, 0, 200), CIRCLE_WIDTH);
-    imshow("VirtualGoban", matDraw);
+    imshow(WINDOW_VG, matDraw);
     draw();
 }
 
 void VirtualGoban::removeClockBorders()
 {
     circle(matDraw, Point(CLOCK_CENTER_X, CIRCLE_CENTER_Y) , CLOCK_SIZE,  Scalar(0, 0, 0), -1);
-    imshow("VirtualGoban", matDraw);
+    imshow(WINDOW_VG, matDraw);
     draw();
 }
 

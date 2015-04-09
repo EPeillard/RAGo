@@ -141,11 +141,6 @@ void Core::genConvMat()
     perspectiveTransform(temp_vect,temp_vect,C2G);
     findHomography(temp_vect,markersProj).convertTo(G2P,CV_32F);
 
-    /*Mat G2C, C2P;
-    invert(C2G,G2C);
-    invert(P2C,C2P);
-    G2P=G2C*C2P;*/
-
     cout << "Test G2P" << endl;
     temp_vect[0]=Point2f(0,0);
     temp_vect[1]=Point2f(9,9);
@@ -178,11 +173,11 @@ void Core::genConvMat()
     	//cout << temp_vect[i] << endl;
     }
 
-    /*cout << C2G << endl;
+    cout << C2G << endl;
     cout << P2C << endl;
     cout << VG2C << endl;
     cout << G2P << endl;
-    cout << VG2P << endl;*/
+    cout << VG2P << endl;
 }
 
 void Core::init()
@@ -218,7 +213,7 @@ void Core::init()
     	Mat kernel = (Mat_<uchar>(3,3) << 0,1,0,1,1,1,0,1,0);
     	display = Mat(camera->getFrame());
 
-    	int nbMean=5;
+        int nbMean=1;
 		for(int u=0;u<nbMean;u++)
 		{
 			int nbMult=1;
@@ -298,7 +293,7 @@ void Core::init()
 			}
 
 			///Erode after the dilating step
-			erode(lines_tmp2,lines_tmp2,kernel);
+			//erode(lines_tmp2,lines_tmp2,kernel);
 
 			if(u==0)
 				m_lines=lines_tmp2;
@@ -749,6 +744,10 @@ bool Core::detectHand()
     ///Do a gaussian blur to improve the results
     GaussianBlur( src_gray, src_gray, Size(5,5), 3, 3 );
 
+#ifdef COMP_MOD_VERBOSE
+    imshow(WINDOW_VERBOSE,src_gray);
+#endif // COMP_MOD_VERBOSE
+
     ///Get the number of pixel
     int n=countNotBlack(src_gray,minGray);
     if (n>minPixel)
@@ -932,9 +931,9 @@ bool Core::findAndCleanGoban(vector<lineGrp>::iterator g1, vector<lineGrp>::iter
 	}
 	(*g2).lines=correctLine;
 
-	if((*g1).lines.size()!=9 && (*g1).lines.size()!=13 && (*g1).lines.size()!=19) return false;
-	if((*g2).lines.size()!=9 && (*g2).lines.size()!=13 && (*g2).lines.size()!=19) return false;
-	if((*g1).lines.size()!=(*g2).lines.size()) return false;
+    if((*g1).lines.size()!=9 && (*g1).lines.size()!=13 && (*g1).lines.size()!=19) return false;
+    if((*g2).lines.size()!=9 && (*g2).lines.size()!=13 && (*g2).lines.size()!=19) return false;
+    if((*g1).lines.size()!=(*g2).lines.size()) return false;
 
 	return true;
 }
