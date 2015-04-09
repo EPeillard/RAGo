@@ -4,6 +4,8 @@ cmake_minimum_required (VERSION 2.8)
 # Nom du projet
 project (hello)
 
+SET(CMAKE_MODULE_PATH /usr/local/lib/cmake/)
+
 find_package (OpenCV REQUIRED)
 find_package (aruco REQUIRED)
 find_package (Qt4 REQUIRED)
