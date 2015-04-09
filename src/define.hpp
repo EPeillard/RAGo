@@ -25,6 +25,9 @@
 ///Height of the projector image in pixels
 #define PROJECTOR_WIDTH 1024
 
+///Values used for the detection parameter
+#define GRAY_SCALE 0.4
+
 ///Projector mod drawing the corners and borders of the goban detected
 #define PROJ_MOD_BORDERS 0
 ///Projector mod unused
@@ -37,6 +40,8 @@
 #define PROJ_MOD_CLOCK 4
 ///Projector mod drawing a Aruco marker
 #define PROJ_MOD_MARKER 5
+///Projector mod drawing an Aruco marker filled board
+#define PROJ_MOD_BOARD 6
 
 ///All of the following values are for the VirtualGoban
 

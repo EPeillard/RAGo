@@ -280,7 +280,7 @@ private:
     Point2f *point_read;
     /**\brief Location of marker for projector calibration
      **/
-	vector<Point2f*> marker_points;
+	vector<pair<Point2f,Point2f> > marker_points;
 
     /**\brief Margin between the center of the detection point and a corner of the goban
     **/

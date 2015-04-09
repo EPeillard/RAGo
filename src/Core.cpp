@@ -119,26 +119,45 @@ void Core::genConvMat()
     vector<Point2f> markersCamera;
     /// Setting Projector coordinate of markers
     vector<Point2f> markersProj;
+    cout<<marker_points.size() << endl;
     for(int i=0;i<marker_points.size();i++)
     {
-    	markersCamera.push_back(marker_points[i][0]);
-    	markersProj.push_back(marker_points[i][1]);
+    	markersCamera.push_back(marker_points[i].first);
+    	markersProj.push_back(marker_points[i].second);
+
+    	cout << marker_points[i].first << ";" << marker_points[i].second<< endl;
     }
+
+    vector<Point2f> temp_vect(4);
 
     /// Generation of the conversion matrix
     findHomography(cornersCamera, cornersGoban).convertTo(C2G, CV_32F);
+
     findHomography(markersProj,markersCamera).convertTo(P2C, CV_32F);
+
     findHomography(cornersVirtualGoban, cornersCamera).convertTo(VG2C, CV_32F);
 
-    vector<Point2f> temp_vect(4);
     perspectiveTransform(markersProj,temp_vect,P2C);
     perspectiveTransform(temp_vect,temp_vect,C2G);
     findHomography(temp_vect,markersProj).convertTo(G2P,CV_32F);
+
+    cout << "Test G2P" << endl;
+    temp_vect[0]=Point2f(0,0);
+    temp_vect[1]=Point2f(9,9);
+    temp_vect[2]=Point2f(13,13);
+    temp_vect[3]=Point2f(19,19);
+    perspectiveTransform(temp_vect,temp_vect,G2P);
+    cout << temp_vect[0] << endl;
+    cout << temp_vect[1] << endl;
+    cout << temp_vect[2] << endl;
+    cout << temp_vect[3] << endl;
 
     perspectiveTransform(cornersVirtualGoban,temp_vect,VG2C);
     perspectiveTransform(temp_vect,temp_vect,C2G);
     perspectiveTransform(temp_vect,temp_vect,G2P);
     findHomography(cornersVirtualGoban,temp_vect).convertTo(VG2P,CV_32F);
+
+    //VG2P=VG2C*C2P;
 
     for(int i=0;i<list_corner_detected.size();i++)
     {
@@ -151,7 +170,14 @@ void Core::genConvMat()
     for(int i=0;i<temp_vect.size();i++)
     {
     	list_corner_detected.push_back(new Point2f(temp_vect[i]));
+    	//cout << temp_vect[i] << endl;
     }
+
+    cout << C2G << endl;
+    cout << P2C << endl;
+    cout << VG2C << endl;
+    cout << G2P << endl;
+    cout << VG2P << endl;
 }
 
 void Core::init()
@@ -187,7 +213,7 @@ void Core::init()
     	Mat kernel = (Mat_<uchar>(3,3) << 0,1,0,1,1,1,0,1,0);
     	display = Mat(camera->getFrame());
 
-    	int nbMean=1;
+        int nbMean=1;
 		for(int u=0;u<nbMean;u++)
 		{
 			int nbMult=1;
@@ -197,10 +223,10 @@ void Core::init()
 				src = Mat(camera->getFrame());
 				cvtColor(src, src_gray, CV_BGR2GRAY);
 
-				GaussianBlur(src_gray,src_gray,Size(11,11),1);
+				//GaussianBlur(src_gray,src_gray,Size(11,11),1);
 
 				///Threshold the gray image and revert it
-				///\todo fix parameters
+				///TODO fix parameters
 				adaptiveThreshold(src_gray, lines_tmp1, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 13, 3);
 				bitwise_not(lines_tmp1,lines_tmp1);
 
@@ -220,6 +246,25 @@ void Core::init()
 			Point maxPt;
 
 			///Extract the biggest contiguous area
+			for(int y=lines_tmp2.size().height*2.0f/5;y<lines_tmp2.size().height*3.0f/5;y++)
+			{
+				uchar *row = lines_tmp2.ptr(y);
+				for(int x=lines_tmp2.size().width*2.0f/5;x<lines_tmp2.size().width*3.0f/5;x++)
+				{
+					if(row[x]>=128)
+					{
+						 int area = floodFill(lines_tmp2, Point(x,y), CV_RGB(0,0,64));
+
+						 if(area>max)
+						 {
+                             maxPt = Point(x,y);
+                             max = area;
+						 }
+					}
+				}
+
+			}
+
 			for(int y=0;y<lines_tmp2.size().height;y++)
 			{
 				uchar *row = lines_tmp2.ptr(y);
@@ -228,12 +273,6 @@ void Core::init()
 					if(row[x]>=128)
 					{
 						 int area = floodFill(lines_tmp2, Point(x,y), CV_RGB(0,0,64));
-
-						 if(area>max)
-						 {
-							 maxPt = Point(x,y);
-							 max = area;
-						 }
 					}
 				}
 
@@ -254,7 +293,7 @@ void Core::init()
 			}
 
 			///Erode after the dilating step
-			erode(lines_tmp2,lines_tmp2,kernel);
+			//erode(lines_tmp2,lines_tmp2,kernel);
 
 			if(u==0)
 				m_lines=lines_tmp2;
@@ -376,14 +415,19 @@ void Core::detection()
     srand (time(NULL));
     marker_points.clear();
 
-    while(marker_points.size()<4)
+    while(marker_points.size()<10)
     {
+        marker_points.clear();
         int nMark = rand()%1000;
         int x = rand()%(proj->matDraw.size().width-(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE));
         int y = rand()%(proj->matDraw.size().height-(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE));
 
-        proj->draw(PROJ_MOD_MARKER, x,y,nMark);
-        waitKey(500);
+        vector<int> markerIds;
+        vector<Point> markerPoints;
+
+        //proj->draw(PROJ_MOD_MARKER, x,y,nMark);
+        proj->draw(PROJ_MOD_BOARD, markerPoints, markerIds);
+        waitKey(2000);
         src = camera->getFrame();
         imshow(WINDOW_CAMERA,src);
         waitKey(100);
@@ -393,15 +437,22 @@ void Core::detection()
 
         myDetector.detect(src,markers);
 
-        for (unsigned int i=0;i<markers.size();i++){
-            cout << "Affiché : " << nMark << " , Trouvé : " << markers[i].id << endl;
-            if(markers[i].id==nMark)
-            {
-                Point2f temp[2];
-                temp[0]=markers[i].getCenter();
-                temp[1]=Point2f(x+(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE/2),y+(int)round(proj->matDraw.size().width*RATIO_MARKER_SIZE/2));
+        cout << "Taille : " << markerIds.size() << endl;
 
-                marker_points.push_back(temp);
+        for (unsigned int i=0;i<markers.size();i++){
+            cout << "Trouvé : " << markers[i].id << endl;
+            for(unsigned int j=0;j<markerIds.size();j++)
+            {
+                if(markers[i].id==markerIds[j])
+                {
+                    pair<Point2f,Point2f> temp;
+                    temp.first=markers[i].getCenter();
+                    cout << temp.first << endl;
+                    temp.second=markerPoints[j];
+                    cout << temp.second << endl;
+
+                    marker_points.push_back(temp);
+                }
             }
         }
     }
@@ -693,6 +744,10 @@ bool Core::detectHand()
     ///Do a gaussian blur to improve the results
     GaussianBlur( src_gray, src_gray, Size(5,5), 3, 3 );
 
+#ifdef COMP_MOD_VERBOSE
+    imshow(WINDOW_VERBOSE,src_gray);
+#endif // COMP_MOD_VERBOSE
+
     ///Get the number of pixel
     int n=countNotBlack(src_gray,minGray);
     if (n>minPixel)
@@ -876,9 +931,9 @@ bool Core::findAndCleanGoban(vector<lineGrp>::iterator g1, vector<lineGrp>::iter
 	}
 	(*g2).lines=correctLine;
 
-	if((*g1).lines.size()!=9 && (*g1).lines.size()!=13 && (*g1).lines.size()!=19) return false;
-	if((*g2).lines.size()!=9 && (*g2).lines.size()!=13 && (*g2).lines.size()!=19) return false;
-	if((*g1).lines.size()!=(*g2).lines.size()) return false;
+    if((*g1).lines.size()!=9 && (*g1).lines.size()!=13 && (*g1).lines.size()!=19) return false;
+    if((*g2).lines.size()!=9 && (*g2).lines.size()!=13 && (*g2).lines.size()!=19) return false;
+    if((*g1).lines.size()!=(*g2).lines.size()) return false;
 
 	return true;
 }

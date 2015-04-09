@@ -202,9 +202,9 @@ void initGame(VirtualGoban* vg, Core *core)
 {
     waitKey(100);
     vg->drawClock();
-    waitKey(10);
+    waitKey(100);
     core->generateBeginningTurnMat();
-    waitKey(10);
+    waitKey(100);
     core->detectHandParam();
     waitKey(100);
 }
@@ -212,54 +212,54 @@ void initGame(VirtualGoban* vg, Core *core)
 void playerTurn(VirtualGoban* vg, Core *core, Projector* proj, bool network)
 {
     ///ask to put a stone on the goban and put the hand in the detection zone
-            cout<<"now put a stone on the goban and validate with your hand"<<endl;
-            bool isStone = false;
+    cout<<"now put a stone on the goban and validate with your hand"<<endl;
+    bool isStone = false;
 
-            while(!isStone)
+    while(!isStone)
+    {
+        int count = 0;
+        while(count<5)
+        {
+            if(core->detectHand())
             {
-                int count = 0;
-                while(count<5)
+            count++;
+            vg->drawClockBorders(count);
+            cout<<count<<endl;
+            }
+            else
+            {
+            count = 0;
+            vg->removeClockBorders();
+            cout<<count<<endl;
+            }
+            waitKey(500);
+        }
+        int essai=0;
+        while(essai<4)
+        {
+            essai++;
+            int *val = core->imagediff(PLAYER_WHITE);
+            if(val[0]!=-1)
+            {
+                int x = val[0];
+                int y = val[1];
+                if(x>=1 && x<=19 && y>=1 && y<=19)
                 {
-                    if(core->detectHand())
+                    cout<<"essai"<<endl;
+                    isStone = true;
+                    if(network)
                     {
-                    count++;
-                    vg->drawClockBorders(count);
-                    cout<<count<<endl;
+                        //sendNetwork(x, y);
+                        cout<<"client"<<endl;
+                        sendNetwork(x, y);
+                        sendNetwork(x, y);
                     }
-                    else
-                    {
-                    count = 0;
-                    vg->removeClockBorders();
-                    cout<<count<<endl;
-                    }
-                    waitKey(500);
-                }
-                int essai=0;
-                while(essai<4)
-                {
-                    essai++;
-                    int *val = core->imagediff(PLAYER_WHITE);
-                    if(val[0]!=-1)
-                    {
-                        int x = val[0];
-                        int y = val[1];
-                        if(x>=1 && x<=19 && y>=1 && y<=19)
-                        {
-                            cout<<"essai"<<endl;
-                            isStone = true;
-                            if(network)
-                            {
-                                //sendNetwork(x, y);
-                                cout<<"client"<<endl;
-                                sendNetwork(x, y);
-                                sendNetwork(x, y);
-                            }
-                            cout<<"quit"<<endl;
-                            break;
-                        }
-                    }
+                    cout<<"quit"<<endl;
+                    break;
                 }
             }
+        }
+    }
 }
 
 void sendNetwork(int x, int y)
